@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Jemand:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8daf0494-5f6e-4740-abe2-638f250a41a7" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="15" />
+  </component>
+  <component name="ErrorTreeViewConfiguration">
+    <option name="autoscrollToSource" value="true" />
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="main" type="396b929e:GradleViewContributor$SourceSetNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="main" type="396b929e:GradleViewContributor$SourceSetNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="test" type="396b929e:GradleViewContributor$SourceSetNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Jemand" type="f1a62948:ProjectNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="test" type="396b929e:GradleViewContributor$SourceSetNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="Jemand">
+      <favorite_root url="file://$PROJECT_DIR$/src/main/java/Main.java" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+    </favorites_list>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/main/java/Jemand/VierGewinnt.java" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="jdkForImporter" value="12" />
+        <option name="vmOptionsForImporter" value="-Xmx768m" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Pc0g3taYwitZpVyZOMR1NAtYt2" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="jemand" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.1150748" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+      <recent name="owo" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dingd\IntelliJ\Jemand\src\main\java\Jemand" />
+      <recent name="C:\Users\dingd\Documents\IntelliJ\src\main\java" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="Jemand" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.Jemand">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+      <option name="MAIN_CLASS_NAME" value="Jemand.Main" />
+      <module name="Jemand.main" />
+      <option name="PROGRAM_PARAMETERS" value="-Dconsole.encoding=UTF-8" />
+      <option name="VM_PARAMETERS" value="-Dconsole.encoding=UTF-8" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Folder.Main" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Main$Task" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Main$Task2" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="Jemand" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Jemand [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="dependencies" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Jemand" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="-Dfile.encoding=UTF-8 -Dconsole.encoding=UTF-8 distZip startScripts --stacktrace" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <extension name="coverage" track_test_folders="true">
+        <pattern>
+          <option name="PATTERN" value="Main" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.Zitat" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.Befehl" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.Main" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.Zitat" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.ImageResizer" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.SaveChannel" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="Jemand.Texte" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Gradle.Jemand" />
+      <item itemvalue="Gradle.Jemand [dependencies]" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.Jemand [dependencies]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8daf0494-5f6e-4740-abe2-638f250a41a7" name="Default Changelist" comment="" />
+      <created>1566158185034</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1566158185034</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="690" y="275" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1584041015429">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="275" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1584041015429" />
+    <state x="188" y="153" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1581275543630">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="188" y="153" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581275543630" />
+    <state x="722" y="323" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1581793197910">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="722" y="323" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1581793197910" />
+    <state x="285" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1583860945300">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="285" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1583860945300" />
+    <state x="745" y="378" width="429" height="293" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1584470459464">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="745" y="378" width="429" height="293" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1040@0.0.1920.1040" timestamp="1584470459464" />
+    <state x="740" y="238" key="FileChooserDialogImpl" timestamp="1581881836360">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="238" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1581881836360" />
+    <state width="1875" height="161" key="GridCell.Tab.0.bottom" timestamp="1584472094255">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="161" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1584472094255" />
+    <state width="1875" height="161" key="GridCell.Tab.0.center" timestamp="1584472094255">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="161" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1584472094255" />
+    <state width="1875" height="161" key="GridCell.Tab.0.left" timestamp="1584472094255">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="161" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1584472094255" />
+    <state width="1875" height="161" key="GridCell.Tab.0.right" timestamp="1584472094255">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="161" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1584472094255" />
+    <state width="1875" height="347" key="GridCell.Tab.1.bottom" timestamp="1583621665693">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="347" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1583621665693" />
+    <state width="1875" height="347" key="GridCell.Tab.1.center" timestamp="1583621665692">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="347" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1583621665692" />
+    <state width="1875" height="347" key="GridCell.Tab.1.left" timestamp="1583621665692">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="347" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1583621665692" />
+    <state width="1875" height="347" key="GridCell.Tab.1.right" timestamp="1583621665693">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1875" height="347" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1583621665693" />
+    <state x="625" y="219" key="NewModule_or_Project.wizard" timestamp="1581881862932">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="625" y="219" key="NewModule_or_Project.wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1581881862932" />
+    <state x="461" y="163" key="SettingsEditor" timestamp="1582402707869">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1582402707869" />
+    <state x="346" y="234" width="1211" height="538" key="find.popup" timestamp="1584447825497">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="346" y="234" width="1211" height="538" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1584447825497" />
+    <state x="342" y="141" key="new project wizard" timestamp="1581881787714">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="342" y="141" key="new project wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1581881787714" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1584027994043">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1584027994043" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1583860891090">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1583860891090" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.javacord/javacord-api/3.0.5/2d00e3e9f26670b17b24a0d8fe19511cc8223a2/javacord-api-3.0.5-sources.jar!/org/javacord/api/entity/channel/TextChannel.java</url>
+          <line>480</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/Jemand/func.java</url>
+          <line>1348</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Jemand$Main.ic" NAME="Main Coverage Results" MODIFIED="1576267342499" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>Folder.Main</FILTER>
+      <FILTER>Main$Task</FILTER>
+      <FILTER>Main$Task2</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Jemand$Jemand.ic" NAME="Jemand Coverage Results" MODIFIED="1574950051966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>Main</FILTER>
+      <FILTER>Jemand.Zitat</FILTER>
+      <FILTER>Jemand.Befehl</FILTER>
+      <FILTER>Jemand.Main</FILTER>
+      <FILTER>Jemand.ImageResizer</FILTER>
+      <FILTER>Jemand.SaveChannel</FILTER>
+      <FILTER>Jemand.Texte</FILTER>
+    </SUITE>
+  </component>
+</project>

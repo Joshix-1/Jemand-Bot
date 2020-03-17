@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apfloat:apfloat:1.9.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apfloat/apfloat/1.9.1/ef77d93e42eaaabe1ea233f9ef919c6aa232c457/apfloat-1.9.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apfloat/apfloat/1.9.1/d694d506f392de007832ae7fc8c72d0bf643d374/apfloat-1.9.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,10 @@
+Open-Schnick:
+    Jeder kriegt Nachricht, sendet dann Begriff, Dann Abstimmung unter den Beiden, wer gewonnen hat.
+
+Kniffel
+
+Backup klappt nicht
+
+Backup JSON alles vernüftig speichern und dann auch das mit HTML kompatibel machen
+
+Starboard?
