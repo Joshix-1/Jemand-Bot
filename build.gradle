@@ -12,7 +12,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 tasks.withType(JavaCompile) {
-    options.encoding 'UTF-8'
+    options.encoding = 'UTF-8'
     System.out.println("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand\nsudo supervisorctl restart Jemand")
 }
 
@@ -30,12 +30,7 @@ dependencies {
     //compile 'org.twitter4j:twitter4j-core:4.0.7'
 
     compile group: 'org.kohsuke', name: 'github-api', version: '1.108'
-
-
-
-    //compile 'com.google.firebase:firebase-admin:6.12.2'
-    //implementation 'com.google.firebase:firebase-firestore:21.4.1'
-
+    
 
     compile 'org.apfloat:apfloat:1.9.1'
 

@@ -24,9 +24,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 
 public class Main {
+	private static final Pattern NOT_LETTER = Pattern.compile("[^A-Za-z]");
 	static AtomicReference<String> xd = new AtomicReference<>("");
 
 	public static void main(String[] args) {
@@ -184,7 +186,7 @@ public class Main {
 					server.addServerChannelDeleteListener(event -> {
 						try {
 							event.getServer().getAuditLog(1, AuditLogActionType.CHANNEL_DELETE).join().getInvolvedUsers().forEach(user1 -> {
-								user1.removeRole(func.getApi().getRoleById(367649615484551179L).get(), "Channel got deleted").join();
+								user1.removeRole(func.getApi().getRoleById(367649615484551179L).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Channel got deleted").join();
 								func.getApi().getUserById(230800661837512705L).join().
 										sendMessage(user1.getDisplayName(server) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").join();
 
@@ -197,8 +199,8 @@ public class Main {
 					server.addUserStartTypingListener(event -> {
 						if (event.getUser().getRoles(server).size() < 2) {
 							try {
-								event.getUser().addRole(server.getRoleById(559141475812769793L).get()).join();
-								event.getUser().addRole(server.getRoleById(559444155726823484L).get()).join();
+								event.getUser().addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+								event.getUser().addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
 							} catch (Exception e) {
 								func.handle(e);
 							}
@@ -207,17 +209,12 @@ public class Main {
 				});
 
 				func.writetexttofile("", "backups/ratelimit.txt"); //To avoid getting errors when restarting the bot
-				//try {
-				//	func.getApi().getThreadPool().getExecutorService().execute(Main::spam);
-				//} catch (Exception e) {
-				//	func.handle(e);
-				//}
 			}
 		}catch(Exception e) {func.handle(e);}
 
 		//erkennt wenn Nachricht ankommt
 		try {
-			//CommandCleanUp
+			//Listeners:
 			if(func.getFileSeparator().equals("/")) {
 				func.getApi().addMessageDeleteListener(new CommandCleanupListener());
 				func.getApi().addMessageCreateListener(new Channelportal());
@@ -311,7 +308,6 @@ public class Main {
 								event.getChannel().sendMessage(func.getNormalEmbed(event).setTitle(texte.get("Prefix")).setDescription(texte.get("Mention")));
 							} else {
 								if ((MessageContent.toLowerCase().startsWith(prefix.get().toLowerCase()) || MessageContent.startsWith(func.getApi().getYourself().getMentionTag()))) {
-									//event.getMessage().addReaction(func.getApi().getCustomEmojiById(630814528266960909L).orElse(null)).thenAcceptAsync(aVoid -> run(event));
 									if (func.getApi().getThreadPool().getExecutorService().submit(() -> run(event)).isDone())
 										func.getApi().getThreadPool().getExecutorService().shutdown();
 
@@ -395,7 +391,7 @@ public class Main {
 		return false;
     }
 	static private void TriggerReactMessage(MessageCreateEvent event, String ReactTo, String ReactWith) {
-		if(event.getMessageContent().replaceAll("[^A-Za-z]", "").equalsIgnoreCase(ReactTo.replaceAll("[^A-Za-z]", ""))) {
+		if(NOT_LETTER.matcher(event.getMessageContent()).replaceAll("").equalsIgnoreCase(NOT_LETTER.matcher(ReactTo).replaceAll(""))) {
 			func.reactText(event,ReactWith, "");
 		}
 	}
