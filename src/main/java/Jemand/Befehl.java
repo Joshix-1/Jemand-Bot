@@ -368,7 +368,7 @@ public class Befehl {
 
         if(befehl.get().equalsIgnoreCase("lmgtfy")) {
             String url = "https://lmgtfy.com/?q="+ URLEncoder.encode(subtext1.get(), StandardCharsets.UTF_8) + "&s=d&iie=1";
-            event.getChannel().sendMessage(embed.setTitle("LMGFTY").setDescription(url).setUrl(url)).join();
+            event.getChannel().sendMessage(embed.setTitle("LMGTFY").setDescription(url).setUrl(url)).join();
             return true;
         }
 
