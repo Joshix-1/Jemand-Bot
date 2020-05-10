@@ -5,6 +5,7 @@ import Jemand.Listener.ReactionRole;
 import com.vdurmont.emoji.EmojiParser;
 import me.bramhaag.owo.OwO;
 import org.apache.commons.io.FileUtils;
+import org.apfloat.Apfloat;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.PrivateChannel;
@@ -1070,14 +1071,26 @@ public class Befehl {
                 } else {
                     long t = System.currentTimeMillis();
                     try {
-                        String output = "```\n" + subtext1.get() + " = " + func.eval(subtext1.get());
-                        if(output.length() > 2040)  {   // embed desc max: 2048
-                            output = output.substring(0, 2040) + "...";
+                        String output = "```\n" + subtext1.get() + " = " ;
+
+                        int availableChars = 2048 - 3 - output.length();
+
+                        String val = func.eval(subtext1.get(), availableChars);
+
+                        if(val.length() > availableChars) {
+                            Apfloat f = new Apfloat(val, availableChars - 40);
+                            output += f.toString(false);
+                        } else {
+                            output += val;
                         }
 
-                        event.getChannel().sendMessage(embed.setDescription(output + "```").addField("\u200B", (System.currentTimeMillis() - t) + "ms"));
+                        if(output.length() > 2048 - 3)  {   // embed desc max: 2048
+                            output = output.substring(0, 2048 - 3 - 3) + "...";
+                        }
+
+                        event.getChannel().sendMessage(embed.setDescription(output + "```").addField("\u200B", (System.currentTimeMillis() - t) + "ms")).join();
                     } catch (Exception e) {
-                        event.getChannel().sendMessage(embed.setTitle("Fehler:").setUrl("https://www.wolframalpha.com/input/?i=" + subtext1.get().replace(" ", "")).setColor(new Color(func.getRandom(250, 255), func.getRandom(0, 5), func.getRandom(0, 5))).setDescription(e.getMessage()));
+                        event.getChannel().sendMessage(embed.setTitle("Fehler:").setUrl("https://www.wolframalpha.com/input/?i=" + subtext1.get().replace(" ", "")).setColor(new Color(func.getRandom(250, 255), func.getRandom(0, 5), func.getRandom(0, 5))).setDescription(e.getMessage())).join();
                     }
 
                 }

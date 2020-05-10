@@ -669,12 +669,13 @@ public class func {
         return f;
     }
 
-    static public String eval(String str) { //calculate
+    static public String eval(String str, int maxPrecision) { //calculate
         str = str.toLowerCase().replace(" ", "").replace("\n", "").replace("`", "").replace("**", "^").replace("×", "*").replace("÷", "/").replace("e", "(e)").replace("π", "(π)").replace("pi", "(π)").replace("rand()", "rand(0)")
             .replace(")(", ")*(").replace("0(", "0*(").replace("1(", "1*(").replace("2(", "2*(").replace("3(", "3*(").replace("4(", "4*(").replace("5(", "5*(").replace("6(", "6*(").replace("7(", "7*(").replace("8(", "8*(").replace("9(", "9*(");
 
         final String finalStr = str;
-        return new Object() {
+
+        String val = new Object() {
             int pos = -1, ch, precision = 100;
             boolean b1 = false;
 
@@ -704,7 +705,7 @@ public class func {
                     if(str.contains(".")) {
                         precision = str.lastIndexOf('.') + 16;
                     }
-                    if(precision > 2040) precision = 2040;
+                    if(precision > maxPrecision) precision = maxPrecision;
                     b1 = true;
                     return parse();
                 }
@@ -809,13 +810,17 @@ public class func {
                             throw new RuntimeException("Unknown function: " + func);
                     }
                 } else {
-                    throw new RuntimeException("Unexpected: \"" + (char)ch + "\" in \"`" + finalStr.replace("ß", "e").replace("°", "π") + "`\" at Index: " + pos);
+                    throw new RuntimeException("Unexpected: \"" + (char)ch + "\" in \"`" + finalStr + "`\" at Index: " + pos);
                 }
 
                 if (eat('^')) x = ApfloatMath.pow(x, parseFactor()); // exponentiation
                 return x;
             }
         }.parse();
+
+
+
+        return val;
     }
 
 
