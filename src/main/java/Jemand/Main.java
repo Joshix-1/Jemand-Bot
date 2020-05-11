@@ -356,8 +356,7 @@ public class Main {
 									if (TriggerReactText(event, "nicht witzig", "n")) {
 										event.getMessage().addReaction("i2:703595186629902438");
 										func.reactText(event, "ch", "");
-										event.getMessage().addReaction("t1:703595173342347314");
-										event.getMessage().addReaction("leerzeichen:703321360180445224");
+										event.getMessage().addReactions("t1:703595173342347314","leerzeichen:703321360180445224" );
 									}
 									TriggerReactText(event, "witzig", "witzig");
 									TriggerReactText(event, "no u", "no u");
@@ -405,7 +404,7 @@ public class Main {
 		func.getApi().getCustomEmojiById(630814528266960909L).ifPresent(event::addReactionToMessage); //loading
 		boolean b1;
 		try {
-			b1 = new Befehl(event).FuehreAus();
+			b1 = new Befehl(event).fuehreAus();
 		} catch (Exception e) {
 			func.handle(e);
 			b1 = false;

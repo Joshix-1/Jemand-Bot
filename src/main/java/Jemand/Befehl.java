@@ -39,7 +39,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -227,10 +226,10 @@ public class Befehl {
         }
         return this;
     }
-    private void fa() throws InterruptedException, ExecutionException, IOException {
+    private void fa() throws Exception {
         embed = func.getNormalEmbed(event);
         Delete.set(false);
-        FuehreAus();
+        fuehreAus();
     }
 
     public Texte getTexte() {
@@ -241,7 +240,7 @@ public class Befehl {
         return server;
     }
 
-    public boolean FuehreAus () throws IOException, ExecutionException, InterruptedException {
+    public boolean fuehreAus() throws Exception {
         if(!boo1.get()) {
             return false;
         } else event.getChannel().type().join();
@@ -283,8 +282,6 @@ public class Befehl {
             String[] zitate = func.readtextoffile("zitate.txt").split("\n");
             String[] namen = func.readtextoffile("namen.txt").split("\n");
 
-            JSONObject js = func.JsonFromFile("bewertung_zitate.json");
-
             String template = Memes.ZITAT_ATA;
             String date = "";
             if(subtext1.get().contains("ka")) {
@@ -299,9 +296,9 @@ public class Befehl {
             final String temp = template;
             final String d = date;
 
-            js.keySet().forEach(k -> {
+            Zitat.BEWERTUNGEN.keySet().forEach(k -> {
                 String key = k.toString();
-                int val = Integer.parseInt(js.get(key).toString());
+                int val = Integer.parseInt(Zitat.BEWERTUNGEN.get(key).toString());
                 if(val > 1) {
                     try {
                         String[] zitat = minus.split(key);
@@ -789,6 +786,7 @@ public class Befehl {
         //choose from 6 zitate
         //an only //&& (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L)
         if ((befehl.get().equalsIgnoreCase("goq") || befehl.get().equalsIgnoreCase("game-of-quotes"))) {
+            Zitat.updateQuotes();
             final String[] zitate = Zitat.ZITATE;
             final String[] namen = Zitat.NAMEN;
             AtomicReference<Boolean> boo = new AtomicReference<>(true);
@@ -882,7 +880,7 @@ public class Befehl {
                                                     event3.getMessage().delete();
                                                     try {
                                                         new Zitat(iz.get(), in.get(), subtext1.get()).sendMessage(event.getChannel().asTextChannel().get(), embed);
-                                                    } catch (IOException e) {
+                                                    } catch (Exception e) {
                                                         func.handle(e);
                                                     }
                                                 }
@@ -922,7 +920,7 @@ public class Befehl {
                                         message.delete();
                                         try {
                                             new Zitat(iz.get(), in.get(), subtext1.get()).sendMessage(event.getChannel().asTextChannel().get(), embed);
-                                        } catch (IOException e) {
+                                        } catch (Exception e) {
                                             func.handle(e);
                                         }
                                     }
@@ -956,7 +954,6 @@ public class Befehl {
 
             //zitate //an only && (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L)
             if (befehl.get().equalsIgnoreCase("zitat")) {
-                JSONObject bewertungen = func.JsonFromFile("bewertung_zitate.json");
                 Zitat zitat = new Zitat();
 
                 zitat.setTyp(subtext1.get());
@@ -972,13 +969,14 @@ public class Befehl {
                             b1 = subtext1.get().indexOf('n') < subtext1.get().indexOf('w');
                         }
                         StringBuilder keys = new StringBuilder();
-                        for (Object o : bewertungen.keySet()) {
+                        for (Object o : Zitat.BEWERTUNGEN.keySet()) {
                             keys.append(o).append("\n");
                         }
                         String[] keylist = keys.toString().split("\n");
                         while (true) {
                             int i = func.getRandom(0, keylist.length - 1);
-                            if ((Integer.parseInt(bewertungen.get(keylist[i]).toString()) > 0 && !b1) || (Integer.parseInt(bewertungen.get(keylist[i]).toString()) < 0 && b1)) {
+                            long rating = Long.parseLong(Zitat.getRating(keylist[i]));
+                            if (rating > 0 && !b1 || rating < 0 && b1) {
                                 subtext1.set(subtext1.get().replace("-", "") + " " + keylist[i]);
                                 break;
                             }
@@ -995,6 +993,7 @@ public class Befehl {
                 zitat.sendMessage(event.getChannel(), embed);
                 return true;
             }
+
             //give
             if(befehl.get().equalsIgnoreCase("give") || (befehl.get().equalsIgnoreCase("addcoins") && func.userIsTrusted(user))) {
                 boolean bgive = befehl.get().equalsIgnoreCase("give");

@@ -46,6 +46,7 @@ import java.text.Normalizer;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -74,24 +75,11 @@ public class func {
 
     static {
         try {
-            github = new GitHubBuilder().withPassword("JemandBot", pws[2]).build();
+            github = new GitHubBuilder().withOAuthToken(pws[2], "JemandBot").build();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    /*
-    private static Config config = new Config();
-
-
-    static {
-         config.useSingleServer().setAddress("redis://92.60.37.109:6379").setPassword("jemand 3398b573c024b4e5c7118f26d6c57e1023a2326e").setDatabase(0);
-
-         config.setCodec(StringCodec.INSTANCE);
-    }
-    //redis-cli -h 92.60.37.109 --user jemand --pass 3398b573c024b4e5c7118f26d6c57e1023a2326e PING
-    private static final RedissonClient redis = Redisson.create(config);
-    */
 
     //C:\Users\dingd\OneDrive\Dokumente\OneDrive\
     static private final String normalfilepathwin = "C:\\Users\\dingd\\OneDrive\\Dokumente\\OneDrive\\Jemand_Dateien";
@@ -100,6 +88,7 @@ public class func {
     static public final String[] EMOJIABC = "\uD83C\uDDE6 \uD83C\uDDE7 \uD83C\uDDE8 \uD83C\uDDE9 \uD83C\uDDEA \uD83C\uDDEB \uD83C\uDDEC \uD83C\uDDED \uD83C\uDDEE \uD83C\uDDEF \uD83C\uDDF0 \uD83C\uDDF1 \uD83C\uDDF2 \uD83C\uDDF3 \uD83C\uDDF4 \uD83C\uDDF5 \uD83C\uDDF6 \uD83C\uDDF7 \uD83C\uDDF8 \uD83C\uDDF9 \uD83C\uDDFA \uD83C\uDDFB \uD83C\uDDFC \uD83C\uDDFD \uD83C\uDDFE \uD83C\uDDFF :keycap_ten: :zero: :one: :two: :three: :four: :five: :six: :seven: :eight: :nine: :hash: :asterisk: ➕ ➖ <:ae:703320745782018179> <:oe:703320746188865637> <:ue:703320746134601758> <:ss:703174443148509264> ❓ ❗ <:und:invalid:> <:leerzeichen:703321360180445224>".split(" ");
 
     static public void shutdown() {
+        Zitat.saveRating();
         //redis.shutdown();
         api.disconnect();
         api.getThreadPool().getExecutorService().shutdown();
@@ -124,14 +113,6 @@ public class func {
 
         content.update(text.getBytes(StandardCharsets.UTF_8), "by Jemand");
     }
-
-    //static public void setRedisKey(String key, String MapKey, String value) {
-    //    //redis.getMap("jemand:" + key).fastPut(MapKey, value);
-    //}
-//
-    //static public String getRedisKey(String key, String MapKey) {
-    //    //return redis.getMap("jemand:" + key).get(MapKey).toString();
-    //}
 
     static public final EmbedBuilder getNormalEmbed(MessageCreateEvent event) {
         if(event == null) return getNormalEmbed(null, null);
@@ -181,25 +162,36 @@ public class func {
         return System.getProperty("file.separator");
     }
 
-    static public void reactText(MessageCreateEvent event, String text, String MessageID) {
+    static public void reactText(MessageCreateEvent event, String text, String messageId) {
         text = text.toLowerCase();
-        Boolean b1 = true;
-        Optional<Message> message = event.getApi().getCachedMessageByLink(MessageID);
-        if(message.isEmpty()) message =  event.getApi().getCachedMessageById(MessageID);
-        if(message.isEmpty()) {
-            if (event.getServer().isPresent()) {
-                for (int j = 0; j < event.getServer().get().getTextChannels().size() - 1; j++) {
-                    try {
-                        message = Optional.ofNullable(event.getApi().getMessageById(MessageID, event.getServer().get().getTextChannels().get(j)).exceptionally(null).join());
-                        if(message.isPresent()) {
-                            break;
+
+
+        Optional<Message> message;
+        if(DiscordRegexPattern.MESSAGE_LINK.matcher(messageId).matches()) {
+            message = event.getApi().getCachedMessageByLink(messageId);
+
+            if(message.isEmpty()) {
+                message = api.getMessageByLink(messageId).flatMap(future -> Optional.ofNullable(future.exceptionally(null).join()));
+            }
+        } else {
+            message =  event.getApi().getCachedMessageById(messageId);
+
+            if(message.isEmpty()) {
+                if (event.getServer().isPresent()) {
+                    for (int j = 0; j < event.getServer().get().getTextChannels().size() - 1; j++) {
+                        try {
+                            message = Optional.ofNullable(event.getApi().getMessageById(messageId, event.getServer().get().getTextChannels().get(j)).exceptionally(null).join());
+                            if(message.isPresent()) {
+                                break;
+                            }
+                        } catch (Exception e) {
+                            func.handle(e);
                         }
-                    } catch (Exception e) {
-                        func.handle(e);
                     }
                 }
             }
         }
+
         StringBuilder did = new StringBuilder(" ");
         try{
             Message message1 = message.orElse(event.getMessage());
@@ -782,7 +774,7 @@ public class func {
                             x = ApfloatMath.cbrt(x);
                             break;
                         case "rand":
-                            x = ApfloatMath.random(precision);
+                            x = ApfloatMath.random(precision).multiply(x);
                             break;
                         case "w":
                             x = ApfloatMath.w(x);

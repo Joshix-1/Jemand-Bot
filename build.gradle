@@ -40,7 +40,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.5.10'
     
 
-    implementation 'org.javacord:javacord:3.0.6-SNAPSHOT'
+    implementation 'org.javacord:javacord:3.0.7-SNAPSHOT'
 
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
