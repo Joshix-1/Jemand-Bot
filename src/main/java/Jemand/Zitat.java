@@ -16,6 +16,17 @@ public class Zitat {
     static public final long WITZIG_ID = 703173500139208734L;
     static public final CustomEmoji upvote2 = func.getApi().getCustomEmojiById(Zitat.WITZIG_ID).orElse(null);
     static public final String upvote = upvote2 == null ? "" : upvote2.getMentionTag();
+    static public String[] NAMEN = func.readtextoffile("namen.txt").split("\n");
+    static public String[] ZITATE;
+
+    static {
+        try {
+            ZITATE = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt").split("\n");
+        } catch (IOException e) {
+            ZITATE = func.readtextoffile("zitate.txt").split("\n");
+            e.printStackTrace();
+        }
+    }
     static {
         if(upvote2 == null) {
             func.handle(new Exception("Witzig-Emoji not found"));
@@ -31,7 +42,11 @@ public class Zitat {
         typ = Typ.toLowerCase();
     }
 
-    public  Zitat(int Id_Zitat, int Id_Name) {
+    static void updateNames() {
+        NAMEN = func.readtextoffile("namen.txt").split("\n");
+    }
+
+    public Zitat(int Id_Zitat, int Id_Name) {
         zitat = Id_Zitat;
         name = Id_Name;
     }
@@ -42,8 +57,8 @@ public class Zitat {
         typ = "";
 
         do {
-            zitat = f.getRandom(0, f.readtextoffile("zitate.txt").split("\n").length - 1);
-            name = f.getRandom(0, f.readtextoffile("namen.txt").split("\n").length - 1);
+            zitat = f.getRandom(0, ZITATE.length - 1);
+            name = f.getRandom(0, NAMEN.length - 1);
 
             if (!bewertungen.containsKey(getzid())) {
                 bewertungen.put(getzid(), 0);
@@ -60,16 +75,13 @@ public class Zitat {
 
         embed.removeAllFields();
 
-        final String[] zitate = f.readtextoffile("zitate.txt").split("\n");
-        final String[] namen = f.readtextoffile("namen.txt").split("\n");
-
         final String downvote = EmojiParser.parseToUnicode(":thumbsdown:");
         final String report = EmojiParser.parseToUnicode(":warning:");
         final String a = EmojiParser.parseToUnicode(":a:");
         JSONObject bewertungen = f.JsonFromFile("bewertung_zitate.json");
 
-        if(!(zitat<zitate.length)) zitat = zitate.length-1;
-        if(!(name < namen.length)) name = namen.length-1;
+        if(!(zitat< ZITATE.length)) zitat = ZITATE.length-1;
+        if(!(name < NAMEN.length)) name = NAMEN.length-1;
 
         if(!bewertungen.containsKey(getzid())) {
             bewertungen.put(getzid(), 0);
@@ -80,7 +92,7 @@ public class Zitat {
 
         embed.setUrl("https://asozialesnetzwerk.github.io/zitate/?id=" + zid2);
 
-        embed.addField("\u200B", upvote + ": " + bewertungen.get(zid2)).setTitle("Zitat-Id: "+ zid2).setDescription(f.LinkedEmbed(zitate[zitat]) + "\n\n- " + f.LinkedEmbed(namen[name]));
+        embed.addField("\u200B", upvote + ": " + bewertungen.get(zid2)).setTitle("Zitat-Id: "+ zid2).setDescription(f.LinkedEmbed(ZITATE[zitat]) + "\n\n- " + f.LinkedEmbed(NAMEN[name]));
 
         if(typ.toLowerCase().contains("bild")) {
             try {
@@ -88,10 +100,10 @@ public class Zitat {
                 api_url += "&brandLogo=https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png";
                 //api_url = "https://api.ritekit.com/v1/images/quote?quote=<ZITAT>&author=<AUTHOR>&fontSize=30&quoteFont=PassionOne&quoteFontColor=%23f7fffa&authorFont=Lato%20Black&authorFontColor=%23ffffff&enableHighlight=1&highlightColor=%23182578&bgType=gradient&backgroundColor=%23000000&gradientType=radial&gradientColor1=%230e0c1c&gradientColor2=%20%23040024&brandLogo=https%3A%2F%2Fimages.emojiterra.com%2Ftwitter%2Fv12%2F128px%2F1f998.png&animation=none";
                 api_url += "&client_id=808e102adae0050e7970e26a4d902470f1c07c44b5df";
-                String author = namen[name];
-                if(func.StringBlank(author.substring(namen[name].length()-1))) author = namen[name].substring(0, namen[name].length()-1);
+                String author = NAMEN[name];
+                if(func.StringBlank(author.substring(NAMEN[name].length()-1))) author = NAMEN[name].substring(0, NAMEN[name].length()-1);
                 embed.removeAllFields().setImage((String)
-                        f.readJsonFromUrl(api_url.replace("<ZITAT>", func.replaceNonNormalChars(zitate[zitat]).replace("\"", ""))
+                        f.readJsonFromUrl(api_url.replace("<ZITAT>", func.replaceNonNormalChars(ZITATE[zitat]).replace("\"", ""))
                                 .replace("<AUTHOR>", func.replaceNonNormalChars(author))
                                 .replace(" ", "%20")
                                 .replaceAll("  [\\t\\n\\x08\\x0c\\r]", ""))
@@ -103,12 +115,12 @@ public class Zitat {
         } else if(typ.toLowerCase().contains("ka")) {
             String str = Memes.KALENDER;
             if(func.getRandom(0, 1) == 1) str = Memes.KALENDER2;
-            BufferedImage bi = new Memes(str, "»" + zitate[zitat].substring(1, zitate[zitat].length()-1) + "«", namen[name], new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime())).getFinalMeme().orElse(null);
+            BufferedImage bi = new Memes(str, "»" + ZITATE[zitat].substring(1, ZITATE[zitat].length()-1) + "«", NAMEN[name], new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime())).getFinalMeme().orElse(null);
             if(bi != null) {
                 embed.removeAllFields().setImage(bi).addField("\u200B", upvote + ": " + bewertungen.get(zid2)).setTitle("Zitat-Id: " + zid2).setDescription("");
             }
         } else if(typ.toLowerCase().contains("ata")) {
-            new Memes(Memes.ZITAT_ATA, "»" + zitate[zitat].substring(1, zitate[zitat].lastIndexOf('"') -1) + "«", "- " + namen[name]).getFinalMeme().ifPresent(img -> {
+            new Memes(Memes.ZITAT_ATA, "»" + ZITATE[zitat].substring(1, ZITATE[zitat].lastIndexOf('"') -1) + "«", "- " + NAMEN[name]).getFinalMeme().ifPresent(img -> {
                 embed.removeAllFields().setImage(img).addField("\u200B", upvote + ": " + bewertungen.get(zid2)).setTitle("Zitat-Id: " + zid2).setDescription("");
             });
         }

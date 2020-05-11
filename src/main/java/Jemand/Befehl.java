@@ -20,6 +20,7 @@ import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.imageio.ImageIO;
@@ -788,8 +789,8 @@ public class Befehl {
         //choose from 6 zitate
         //an only //&& (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L)
         if ((befehl.get().equalsIgnoreCase("goq") || befehl.get().equalsIgnoreCase("game-of-quotes"))) {
-            final String[] zitate = func.readtextoffile("zitate.txt").split("\n");
-            final String[] namen = func.readtextoffile("namen.txt").split("\n");
+            final String[] zitate = Zitat.ZITATE;
+            final String[] namen = Zitat.NAMEN;
             AtomicReference<Boolean> boo = new AtomicReference<>(true);
             AtomicReference<Boolean> boo2 = new AtomicReference<>(true);
             AtomicReference<Integer> iz = new AtomicReference<>(-1);
@@ -870,6 +871,7 @@ public class Befehl {
                                                         String str = func.readtextoffile("namen.txt");
                                                         if(!str.endsWith("\n")) str += "\n";
                                                         func.writetexttofile(str + mc, "namen.txt");
+                                                        Zitat.updateNames();
                                                         try {
                                                             if (!func.getGithub("zitate", "namen.txt").equals(str + mc))
                                                                 func.setGithub("zitate", "namen.txt", str + mc);
@@ -1132,9 +1134,16 @@ public class Befehl {
 
             //https://yesno.wtf/# //8ball
             if (befehl.get().equalsIgnoreCase("8ball") || befehl.get().equalsIgnoreCase("8-ball")) {
-                JSONObject js = func.readJsonFromUrl("https://yesno.wtf/api/");
-                if (func.getRandom(0, 20) == 1) {
-                    js = func.readJsonFromUrl("https://yesno.wtf/api/?force=maybe");
+                JSONObject js = null;
+
+                try {
+                    if (func.getRandom(0, 20) == 1) {
+                        js = func.readJsonFromUrl("https://yesno.wtf/api/?force=maybe");
+                    } else {
+                        func.readJsonFromUrl("https://yesno.wtf/api/");
+                    }
+                } catch(ParseException e) {
+                    func.handle(e);
                 }
                 String str = "";
                 if (!subtext1.get().isEmpty()) {

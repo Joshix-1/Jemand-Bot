@@ -18,6 +18,7 @@ import org.javacord.api.entity.webhook.WebhookBuilder;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.File;
@@ -92,7 +93,7 @@ public class SaveChannel {
         loadJson(func.JsonFromFile(filename));
     }
 
-    public SaveChannel(URL link_to_json) throws IOException {
+    public SaveChannel(URL link_to_json) throws IOException, ParseException {
         loadJson(Objects.requireNonNull(func.readJsonFromUrl(link_to_json.toString())));
     }
 

@@ -583,20 +583,9 @@ public class func {
 
 
     //JSON
-    static public JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String jsonText = readAll(rd);
-            JSONParser jsp = new JSONParser();
-            JSONObject json = (JSONObject) jsp.parse(jsonText);
-            return json;
-        } catch (ParseException e) {
-            func.handle(e);
-        } finally {
-            is.close();
-        }
-        return null;
+    static public JSONObject readJsonFromUrl(String url) throws IOException, JSONException, ParseException {
+        JSONObject json = (JSONObject) new JSONParser().parse(readStringFromUrl(url));
+        return json;
     }
 
     static public JSONObject JsonFromFile(String filename) {
