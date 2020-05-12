@@ -975,7 +975,7 @@ public class Befehl {
                         String[] keylist = keys.toString().split("\n");
                         while (true) {
                             int i = func.getRandom(0, keylist.length - 1);
-                            long rating = Long.parseLong(Zitat.getRating(keylist[i]));
+                            long rating = Zitat.getRatingAsLong(keylist[i]);
                             if (rating > 0 && !b1 || rating < 0 && b1) {
                                 subtext1.set(subtext1.get().replace("-", "") + " " + keylist[i]);
                                 break;

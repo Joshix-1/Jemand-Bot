@@ -33,7 +33,7 @@ public class ReactionRole {
         public void onReactionAdd(ReactionAddEvent event) {
             try {
                 getRole(event).ifPresent(role -> {
-                    if(canManageRole(event, role)) role.addUser(event.getUser()).join();
+                    if(botCanManageRole(event, role)) role.addUser(event.getUser()).join();
                 });
             } catch (Exception e) {func.handle(e);}
         }
@@ -45,13 +45,13 @@ public class ReactionRole {
         public void onReactionRemove(ReactionRemoveEvent event) {
             try {
                 getRole(event).ifPresent(role -> {
-                    if(canManageRole(event, role)) role.removeUser(event.getUser()).join();
+                    if(botCanManageRole(event, role)) role.removeUser(event.getUser()).join();
                 });
             } catch (Exception e) {func.handle(e);}
         }
     }
 
-    private static boolean canManageRole(SingleReactionEvent e, Role r) {
+    private static boolean botCanManageRole(SingleReactionEvent e, Role r) {
         if(e.getApi().getYourself().canManageRole(r)) return true;
         try {
             Texte texte = new Texte(e.getUser());

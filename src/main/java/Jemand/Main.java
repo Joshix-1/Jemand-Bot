@@ -6,9 +6,12 @@ import Jemand.Listener.ReactionRole;
 import Jemand.Listener.ZitatBewerter;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.io.FileUtils;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedImage;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.Server;
@@ -19,6 +22,7 @@ import org.javacord.api.util.cache.MessageCache;
 import org.json.simple.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +37,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		func.getApi().updateStatus(UserStatus.DO_NOT_DISTURB);
+
 
 		try {
 			MessageCache messageCache = new MessageCache() {

@@ -16,33 +16,35 @@ import org.json.simple.JSONObject;
 import java.net.URL;
 
 public class ZitatBewerter {
-    static private final String downvote = Zitat.DOWNVOTE_EMOJI;
-    static private final String report =Zitat.REPORT_EMOJI;
-    
 
     public static class Add implements ReactionAddListener {
         @Override
         public void onReactionAdd(ReactionAddEvent event) {
-            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null) return;
+            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null  || event.getReaction().isEmpty()) return;
             try {
-                Message message = event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join();
+                Message message = event.getMessage()
+                        .orElse(event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join());
                 String zid = getZid(event, message);
                 if (!zid.isEmpty()) {
-                    EmbedBuilder embed = message.getEmbeds().get(0).toBuilder();
                     if (event.getReaction().isPresent()) {
                         try {
-                            if (event.getReaction().get().getEmoji().equalsEmoji(report)) {
+                            EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
+
+                            if (event.getReaction().get().getEmoji().equalsEmoji(Zitat.REPORT_EMOJI)) {
                                 func.sendOwner("Reportet: \n\nZitat-Id: " + zid + "Von: " + event.getUser().getDiscriminatedName() + "\n\n" + message.getEmbeds().get(0).getImage().map(EmbedImage::getUrl).map(URL::toString).orElse(message.getEmbeds().get(0).getDescription().orElse("")), null);
-                                message.edit(embed.addField("\u200B", "Das Zitat wurde reportet."));
+                                message.edit(embed.addField("\u200B", Zitat.REPORT_EMOJI + "  Zitat wurde reportet."));
                             } else {
-                                if (event.getReaction().get().getEmoji().equalsEmoji(Zitat.UPVOTE_EMOJI)) {
+                                String rating = Zitat.getRating(zid);
+                                if (event.getReaction().map(Reaction::getEmoji).map(Zitat.UPVOTE_EMOJI::equalsEmoji).orElse(false)) {
                                     Zitat.rateQuote(zid, 1);
                                 }
-                                if (event.getReaction().get().getEmoji().equalsEmoji(downvote)) {
+                                if (event.getReaction().map(Reaction::getEmoji).map(emoji -> emoji.equalsEmoji(Zitat.DOWNVOTE_EMOJI)).orElse(false)) {
                                     Zitat.rateQuote(zid, -1);
                                 }
 
-                                message.edit(embed.removeAllFields().setImage("").addField("\u200B", Zitat.UPVOTE_EMOJI + ": " + Zitat.getRating(zid)));
+                                if(!rating.equals(Zitat.getRating(zid))) {
+                                    message.edit(embed.removeAllFields().addField("\u200B", Zitat.UPVOTE_EMOJI.getMentionTag() + ": " + Zitat.getRating(zid)));
+                                }
                             }
                         } catch (NullPointerException e) {
                             func.handle(e);
@@ -57,22 +59,27 @@ public class ZitatBewerter {
 
         @Override
         public void onReactionRemove(ReactionRemoveEvent event) {
-            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null) return;
+            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null || event.getReaction().isEmpty()) return;
             try {
-                Message message = event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join();
+                Message message = event.getMessage()
+                        .orElse(event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join());
                 String zid = getZid(event, message);
                 if (!zid.isEmpty()) {
                     try {
-                        EmbedBuilder embed = message.getEmbeds().get(0).toBuilder();
+                        String rating = Zitat.getRating(zid);
 
                         if (event.getReaction().map(Reaction::getEmoji).map(Zitat.UPVOTE_EMOJI::equalsEmoji).orElse(false)) {
                             Zitat.rateQuote(zid, -1);
                         }
-                        if (event.getReaction().map(Reaction::getEmoji).map(emoji -> emoji.equalsEmoji(downvote)).orElse(false)) {
+                        if (event.getReaction().map(Reaction::getEmoji).map(emoji -> emoji.equalsEmoji(Zitat.DOWNVOTE_EMOJI)).orElse(false)) {
                             Zitat.rateQuote(zid, 1);
                         }
 
-                        message.edit(embed.removeAllFields().setImage("").addField("\u200B", Zitat.UPVOTE_EMOJI + ": " + Zitat.getRating(zid)));
+                        if(!rating.equals(Zitat.getRating(zid))) {
+                            EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
+                            //message.getEmbeds().get(0).getImage().ifPresent(image -> embed.setImage(image.downloadAsBufferedImage(message.getApi()).join()));
+                            message.edit(embed.removeAllFields().addField("\u200B", Zitat.UPVOTE_EMOJI.getMentionTag() + ": " + Zitat.getRating(zid)));
+                        }
                     } catch (NullPointerException e) {
                         func.handle(e);
                     }
