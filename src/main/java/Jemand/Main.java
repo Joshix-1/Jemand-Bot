@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,6 +38,20 @@ public class Main {
 
 	public static void main(String[] args) {
 		func.getApi().updateStatus(UserStatus.DO_NOT_DISTURB);
+
+		//func.getApi().getCachedUserById(331793234252660738L).ifPresent(user -> {
+		//	user.updateNickname(user.getApi().getServerById(367648314184826880L).get(), "Herr Oberfaschist").join();
+		//});
+
+		//func.getApi().getServerById(367648314184826880L).ifPresent(server -> {
+		//	server.addUserChangeNicknameListener(event -> {
+		//		if (event.getUser().getId() == 331793234252660738L) {
+		//			if (event.getNewNickname().orElse("").equalsIgnoreCase("Ken der Guru")) {
+		//				event.getUser().updateNickname(server, "Herr Oberfaschist").join();
+		//			}
+		//		}
+		//	});
+		//});
 
 
 		try {
@@ -191,6 +206,7 @@ public class Main {
 					server.addServerChannelDeleteListener(event -> {
 						try {
 							event.getServer().getAuditLog(1, AuditLogActionType.CHANNEL_DELETE).join().getInvolvedUsers().forEach(user1 -> {
+								if(user1.getId() == 705674876148645908L) return;
 								user1.removeRole(func.getApi().getRoleById(367649615484551179L).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Channel got deleted").join();
 								func.getApi().getUserById(230800661837512705L).join().
 										sendMessage(user1.getDisplayName(server) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").join();
@@ -201,11 +217,13 @@ public class Main {
 						}
 					});
 
-					server.addUserStartTypingListener(event -> {
-						if (event.getUser().getRoles(server).size() < 2) {
+					server.addMessageCreateListener(event -> {
+						if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;
+						User user = event.getMessageAuthor().asUser().orElse(null);
+						if (user != null && user.getRoles(server).size() < 2) {
 							try {
-								event.getUser().addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-								event.getUser().addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+								user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+								user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
 							} catch (Exception e) {
 								func.handle(e);
 							}

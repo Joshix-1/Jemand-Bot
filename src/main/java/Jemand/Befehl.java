@@ -1139,7 +1139,7 @@ public class Befehl {
                     if (func.getRandom(0, 20) == 1) {
                         js = func.readJsonFromUrl("https://yesno.wtf/api/?force=maybe");
                     } else {
-                        func.readJsonFromUrl("https://yesno.wtf/api/");
+                        js = func.readJsonFromUrl("https://yesno.wtf/api/");
                     }
                 } catch(ParseException e) {
                     func.handle(e);
