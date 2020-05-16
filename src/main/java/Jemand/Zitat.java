@@ -141,7 +141,7 @@ public class Zitat {
 
         final String zid2 = getZid();
 
-        embed.setUrl("https://asozialesnetzwerk.github.io/zitate/?id=" + zid2);
+        embed.setUrl("https://asozialesnetzwerk.github.io/zitate/#/" + zid2);
 
         embed.addField("\u200B", upvote + ": " + getRating(zid2)).setTitle("Zitat-Id: "+ zid2).setDescription(func.LinkedEmbed(ZITATE[zitat]) + "\n\n- " + func.LinkedEmbed(NAMEN[name]));
 

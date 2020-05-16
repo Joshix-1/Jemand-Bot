@@ -1,6 +1,7 @@
 package Jemand;
 
 import com.vdurmont.emoji.EmojiParser;
+import org.javacord.api.util.DiscordRegexPattern;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -67,8 +68,8 @@ public class Memes {
                 break;
             case DRAKE1:
                 coordinates = new int[][]{
-                        {600, 1200, 0, 600, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
-                        {600, 1200, 600, 1200, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2}
+                        {600, 1200 - 5, 0, 600, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
+                        {600, 1200 - 5, 600, 1200, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2}
                 };
                 break;
             case LISA_PRESENTATION:
@@ -78,15 +79,15 @@ public class Memes {
                 break;
             case WINNIE_2:
                 coordinates = new int[][]{
-                        {346, 800, 0, 294, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
-                        {346, 800, 297, 582, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 3}
+                        {346, 800 - 5, 0, 294, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
+                        {346, 800 - 5, 297, 582, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 3}
                 };
                 break;
             case WINNIE_3:
                 coordinates = new int[][]{
-                        {298, 666, 0, 235, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
-                        {298, 666, 238, 469, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
-                        {298, 666, 472, 704, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 3}
+                        {298, 666 - 5, 0, 235, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
+                        {298, 666 - 5, 238, 469, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 2},
+                        {298, 666 - 5, 472, 704, Color.WHITE.getRGB(), Color.BLACK.getRGB(), 3}
                 };
                 break;
             case WORSE_THAN_HITLER:
