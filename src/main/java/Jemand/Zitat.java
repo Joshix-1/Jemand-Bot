@@ -19,7 +19,7 @@ public class Zitat {
     static public final String DOWNVOTE_EMOJI = EmojiParser.parseToUnicode(":thumbsdown:");
     static public final String REPORT_EMOJI = EmojiParser.parseToUnicode(":warning:");
 
-    static public String[] NAMEN = func.readtextoffile("namen.txt").split("\n");
+    static public String[] NAMEN;
     static public String[] ZITATE;
     static public JSONObject BEWERTUNGEN;
 
@@ -31,6 +31,7 @@ public class Zitat {
             BEWERTUNGEN = func.JsonFromFile("bewertung_zitate.json");
         }
         updateQuotes();
+        updateNames();
     }
     static {
         if(UPVOTE_EMOJI == null) {
@@ -47,7 +48,43 @@ public class Zitat {
     }
 
     static void updateNames() {
-        NAMEN = func.readtextoffile("namen.txt").split("\n");
+        try {
+            NAMEN = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/namen.txt").split("\n");
+        } catch (IOException e) {
+            NAMEN = func.readtextoffile("namen.txt").split("\n");
+            func.handle(e);
+        }
+    }
+
+    static void addName(String name) {
+        String names = getNameString();
+        if(!names.endsWith("\n")) names += "\n";
+        try {
+            func.setGithub("zitate", "namen.txt", names + name);
+            NAMEN = (names + name).split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void addQuote(String quote) {
+        try {
+            String quotes = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt");
+            if(!quotes.endsWith("\n")) quotes += "\n";
+            func.setGithub("zitate", "zitate.txt", quotes + quote);
+            updateQuotes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static String getNameString() {
+        try {
+            return func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/namen.txt");
+        } catch (IOException e) {
+            func.handle(e);
+            return  func.readtextoffile("namen.txt");
+        }
     }
 
     static public void rateQuote(String id, int rating) {
@@ -87,7 +124,7 @@ public class Zitat {
             if (!func.getGithub("zitate", "bewertung_zitate.json").equals(bewertung))
                 func.setGithub("zitate", "bewertung_zitate.json", bewertung);
         } catch (IOException e) {
-            e.printStackTrace();
+            func.handle(e);
         }
         func.JsonToFile(BEWERTUNGEN, "bewertung_zitate.json");
 
@@ -98,7 +135,7 @@ public class Zitat {
             ZITATE = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt").split("\n");
         } catch (IOException e) {
             ZITATE = func.readtextoffile("zitate.txt").split("\n");
-            e.printStackTrace();
+            func.handle(e);
         }
     }
 

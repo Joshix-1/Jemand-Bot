@@ -970,37 +970,30 @@ public class func {
     }
 
     public static long getMinPoints(long level) {
-        return (long) (0.5*level*(level+5));
+        return (level * level)/2 + 1;
     }
     //rank //top //long
     public static long getLevel(long points) {
-        //long i = 3;
-        //long lvl = 0;
-        //while (points - i >= 0) {
-        //    lvl++;
-        //    points -= i;
-        //    i += 1;
-        //}
-        long l = 0;
-        while(getMinPoints(l) < points) {
-            l++;
+        long level = (long) Math.sqrt(2 * (points + 1));
+        if(points < getMinPoints(level)) {
+            level--;
         }
-        if(getMinPoints(l) != points) l--;
-        return l;
+        return level;
     }
+
     public static long getXp(long points) {
         return points  * 88 / 15;
     }
 
-
     public static String getLvlPercent(long points) {
-        long i = 3;
-        while (points - i >= 0) {
-            points -= i;
-            i += 1;
+        if(points == 0) {
+            return "0/6";
         }
-        return getXp(points) + "/" + getXp((long) i);
+        long level = getLevel(points);
+        long minPointsNow = getMinPoints(level);
+        return getXp(points -  minPointsNow) + "/" +  getXp(getMinPoints(level + 1) - minPointsNow);
     }
+
     public static Map<String, Long> sortByValue(Map<String, Long> unsortMap, final boolean order) {
         List<Map.Entry<String, Long>> list = new LinkedList<>(unsortMap.entrySet());
 
@@ -1109,14 +1102,6 @@ public class func {
             handle(e);
             return min;
         }
-    }
-
-    public static String longToBinaryBlankString(long l) {
-        return Long.toBinaryString(l).replace('0', '\u200B').replace('1', '\u200D');
-    }
-
-    public static long longOfBinaryBlankString(String str) {
-        return  Long.valueOf(str.replace('\u200B', '0').replace('\u200D', '1'), 2);
     }
 
     //robot

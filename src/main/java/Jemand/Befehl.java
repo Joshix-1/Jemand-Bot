@@ -787,6 +787,7 @@ public class Befehl {
         //an only //&& (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L)
         if ((befehl.get().equalsIgnoreCase("goq") || befehl.get().equalsIgnoreCase("game-of-quotes"))) {
             Zitat.updateQuotes();
+            Zitat.updateNames();
             final String[] zitate = Zitat.ZITATE;
             final String[] namen = Zitat.NAMEN;
             AtomicReference<Boolean> boo = new AtomicReference<>(true);
@@ -853,7 +854,7 @@ public class Befehl {
                                                     mc = mc.substring(0, 1).toUpperCase() + mc.substring(1);
                                                     message.delete();
 
-                                                    if (func.goq_replace(func.readtextoffile("namen.txt").toLowerCase()).contains(func.goq_replace(mc.toLowerCase()))) {
+                                                    if (func.goq_replace(Zitat.getNameString().toLowerCase()).contains(func.goq_replace(mc.toLowerCase()))) {
                                                         for (int j = 0; j < namen.length; j++) {
                                                             if (func.goq_replace(namen[j]).equals(func.goq_replace(mc))) {
                                                                 in.set(j);
@@ -866,16 +867,7 @@ public class Befehl {
                                                             mc = mc.substring(1, mc.length() - 1);
                                                         }
                                                         in.set(namen.length);
-                                                        String str = func.readtextoffile("namen.txt");
-                                                        if(!str.endsWith("\n")) str += "\n";
-                                                        func.writetexttofile(str + mc, "namen.txt");
-                                                        Zitat.updateNames();
-                                                        try {
-                                                            if (!func.getGithub("zitate", "namen.txt").equals(str + mc))
-                                                                func.setGithub("zitate", "namen.txt", str + mc);
-                                                        } catch (IOException e) {
-                                                            e.printStackTrace();
-                                                        }
+                                                        Zitat.addName(mc);
                                                     }
                                                     event3.getMessage().delete();
                                                     try {
@@ -1685,7 +1677,7 @@ public class Befehl {
                     if (i1 != -1) {
                         User user1 = event.getApi().getUserById(id2).get();
                         //String str = "Platz: **" + Long.toString(i1 +1 ) + "** \n xp: **" + (top.get(id2) * 17 / 3) + "**";
-                        String str = texte.get("Rank", Long.toString(i1 + 1), Long.toString(func.getLevel(top.get(id2))), func.getLvlPercent(top.get(id2)), Long.toString(func.getXp(top.get(id2))));
+                        String str = texte.get("Rank", Long.toString(i1 + 1), Long.toString((long)func.getLevel(top.get(id2))), func.getLvlPercent(top.get(id2)), Long.toString((long)func.getXp(top.get(id2))));
 
                         event.getChannel().sendMessage(embed.setDescription(str).setTitle(user1.getDisplayName(server) + " (" + user1.getDiscriminatedName() + "):"));
                     }
@@ -1705,11 +1697,11 @@ public class Befehl {
                                     String platz;
                                     if (i + fix < 3) {
                                         platz = texte.get("TopPlatz", zahl[i + 1 + fix]);
-                                        embed2 = embed2.addField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server),  Long.toString(func.getLevel(top.get(keys[i]))), Long.toString(func.getXp(top.get(keys[i])))));
+                                        embed2 = embed2.addField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server),  Long.toString((long)func.getLevel(top.get(keys[i]))), Long.toString((long)func.getXp(top.get(keys[i])))));
 
                                     } else {
                                         platz = texte.get("TopPlatz", Integer.toString(i + 1 + fix));
-                                        embed2 = embed2.addInlineField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString(func.getLevel(top.get(keys[i]))), Long.toString(func.getXp(top.get(keys[i])))));
+                                        embed2 = embed2.addInlineField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString((long)func.getLevel(top.get(keys[i]))), Long.toString((long)func.getXp(top.get(keys[i])))));
                                     }
                                 } else {
                                     fix--;
@@ -1751,10 +1743,10 @@ public class Befehl {
                                                     String platz;
                                                     if (i + fix2 < 3) {
                                                         platz = texte.get("TopPlatz", zahl[i + 1 + fix2]);
-                                                        embed3.addField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString(func.getLevel(top.get(keys[i]))), Long.toString(func.getXp(top.get(keys[i])))));
+                                                        embed3.addField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString((long) func.getLevel(top.get(keys[i]))), Long.toString((long) func.getXp(top.get(keys[i])))));
                                                     } else {
                                                         platz = texte.get("TopPlatz", Integer.toString(i + 1 + fix2));
-                                                        embed3.addInlineField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString(func.getLevel(top.get(keys[i]))), Long.toString(func.getXp(top.get(keys[i])))));
+                                                        embed3.addInlineField(platz, texte.get("TopField", event.getApi().getUserById(keys[i]).get().getDisplayName(server), Long.toString((long) func.getLevel(top.get(keys[i]))), Long.toString((long) func.getXp(top.get(keys[i])))));
                                                     }
                                                 } else {
                                                     fix2--;

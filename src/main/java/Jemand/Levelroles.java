@@ -102,7 +102,7 @@ public class Levelroles {
                     final long level = Long.parseLong(levels.get(user.getIdAsString()).toString());
                     AtomicLong key = new AtomicLong();
                     map.forEach((k, val) -> {
-                        key.set(func.getMinPoints(k));
+                        key.set((long) func.getMinPoints(k));
                         if (level >= key.get()) {
                             Role r = user.getApi().getRoleById(val).orElse(null);
                             if(r != null && !server.getRoles(user).contains(r)) {

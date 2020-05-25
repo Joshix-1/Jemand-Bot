@@ -19,12 +19,13 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.util.cache.MessageCache;
+import org.javacord.api.util.logging.ExceptionLogger;
 import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +54,63 @@ public class Main {
 		//	});
 		//});
 
+		//nt posName = Zitat.NAMEN.length;
+		//nt posZitat = Zitat.ZITATE.length;
+
+		//tring[] newQuotes = ("").split("\n");
+		//tring[] newNames = ("").split("\n");
+
+		//itat.updateNames();
+
+		//tringBuilder namenToAdd = new StringBuilder();
+		//tringBuilder quotesToAdd = new StringBuilder();
+
+		//tringBuilder alteNamn = new StringBuilder();
+		//or (int i = 0; i < Zitat.NAMEN.length; i++) {
+		//	alteNamn.append(Zitat.NAMEN[i]).append("\n");
+		//
+
+		//tring[] NAMEN = alteNamn.toString().split("\n");
+
+
+		//ashMap<String, Integer> namenIndex = new HashMap<>();
+		//or (int i = 0; i < newNames.length; i++) {
+		//	int zitatPos = -1;
+		//	for (int j = 0; j < Zitat.ZITATE.length; j++) {
+		//		if(Zitat.ZITATE[j].equalsIgnoreCase("\"" + newQuotes[i] + "\"")) {
+		//			zitatPos = j;
+		//			break;
+		//		}
+		//	}
+
+		//	if (zitatPos == -1) {
+		//		zitatPos = posZitat++;
+		//		quotesToAdd.append("\"").append(newQuotes[i]).append("\"\n");
+		//	}
+
+		//	int namenPos = -1;
+
+		//	if(namenIndex.containsKey(newNames[i])) {
+		//		namenPos = namenIndex.get(newNames[i]);
+		//	} else {
+		//		for (int j = 0; j < NAMEN.length; j++) {
+		//			if(NAMEN[j].equalsIgnoreCase(newNames[i])) {
+		//				namenPos = j;
+		//				break;
+		//			}
+		//		}
+
+		//		if (namenPos == -1) {
+		//			namenPos = posName++;
+		//			namenToAdd.append(newNames[i]).append("\n");
+		//		}
+		//		namenIndex.put(newNames[i], namenPos);
+		//	}
+
+		//	Zitat.rateQuote(zitatPos + "-" + namenPos, 1);
+		//
+		//itat.addName(namenToAdd.toString());
+		//itat.saveRating();
 
 		try {
 			MessageCache messageCache = new MessageCache() {
