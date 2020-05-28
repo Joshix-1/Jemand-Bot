@@ -867,7 +867,7 @@ public class Befehl {
                                                             mc = mc.substring(1, mc.length() - 1);
                                                         }
                                                         in.set(namen.length);
-                                                        Zitat.addName(mc);
+                                                        Zitat.addName(mc, user);
                                                     }
                                                     event3.getMessage().delete();
                                                     try {
@@ -1158,12 +1158,13 @@ public class Befehl {
                 return true;
             }
 
+            //encrypt //crypt
             if(befehl.get().equals("encrypt")) {
                 if (func.stringIsBlank(subtext1.get())) {
                     event.getChannel().sendMessage(func.Fehler("Encrypt", user));
                     return (false);
                 } else {
-                    BufferedImage bi = ImageIO.read(func.getImageURL(event.getMessage()).orElse(event.getMessageAuthor().getAvatar().getUrl()));
+                    BufferedImage bi = ImageIO.read(func.getImageURL(event.getMessage()).orElseGet(() -> event.getMessageAuthor().getAvatar().getUrl()));
                     bi = func.imgEncrypt(subtext1.get(), bi);
                     embed.setTitle("Encrypt");
                     try {

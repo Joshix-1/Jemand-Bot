@@ -109,9 +109,13 @@ public class func {
     }
 
     public static void setGithub(String repository, String file, String text) throws IOException {
+        setGithub(repository, file, text, "by Jemand");
+    }
+
+    public static void setGithub(String repository, String file, String text, String commitMessage) throws IOException {
         GHContent content = github.getOrganization("asozialesnetzwerk").getRepository(repository).getFileContent(file);
 
-        content.update(text.getBytes(StandardCharsets.UTF_8), "by Jemand");
+        content.update(text.getBytes(StandardCharsets.UTF_8), commitMessage);
     }
 
     static public final EmbedBuilder getNormalEmbed(MessageCreateEvent event) {
@@ -972,6 +976,7 @@ public class func {
     public static long getMinPoints(long level) {
         return (level * level)/2 + 1;
     }
+
     //rank //top //long
     public static long getLevel(long points) {
         long level = (long) Math.sqrt(2 * (points + 1));

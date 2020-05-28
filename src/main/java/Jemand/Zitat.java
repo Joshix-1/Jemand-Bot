@@ -5,6 +5,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 import org.json.simple.JSONObject;
 
 import java.awt.image.BufferedImage;
@@ -56,11 +57,15 @@ public class Zitat {
         }
     }
 
-    static void addName(String name) {
+    static void addName(String name, User user) {
         String names = getNameString();
         if(!names.endsWith("\n")) names += "\n";
         try {
-            func.setGithub("zitate", "namen.txt", names + name);
+            if(user == null) {
+                func.setGithub("zitate", "namen.txt", names + name);
+            } else {
+                func.setGithub("zitate", "namen.txt", '"' + names + name, name + "\" zur Namensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
+            }
             NAMEN = (names + name).split("\n");
         } catch (IOException e) {
             e.printStackTrace();
