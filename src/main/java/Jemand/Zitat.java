@@ -62,9 +62,9 @@ public class Zitat {
         if(!names.endsWith("\n")) names += "\n";
         try {
             if(user == null) {
-                func.setGithub("zitate", "namen.txt", names + name);
+                func.setGithub("zitate", "namen.txt", names + name, "Neuer Autor: '" + name + "'");
             } else {
-                func.setGithub("zitate", "namen.txt", '"' + names + name, name + "\" zur Namensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
+                func.setGithub("zitate", "namen.txt", '"' + names + name, name + "\" zur Autorensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
             }
             NAMEN = (names + name).split("\n");
         } catch (IOException e) {
@@ -72,16 +72,16 @@ public class Zitat {
         }
     }
 
-    static void addQuote(String quote) {
-        try {
-            String quotes = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt");
-            if(!quotes.endsWith("\n")) quotes += "\n";
-            func.setGithub("zitate", "zitate.txt", quotes + quote);
-            updateQuotes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //static void addQuote(String quote) {
+    //    try {
+    //        String quotes = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt");
+    //        if(!quotes.endsWith("\n")) quotes += "\n";
+    //        func.setGithub("zitate", "zitate.txt", quotes + quote);
+    //        updateQuotes();
+    //    } catch (IOException e) {
+    //        e.printStackTrace();
+    //    }
+    //}
 
     static String getNameString() {
         try {
@@ -127,7 +127,7 @@ public class Zitat {
         try {
             bewertung = bewertung.replace(",", ",\n");
             if (!func.getGithub("zitate", "bewertung_zitate.json").equals(bewertung))
-                func.setGithub("zitate", "bewertung_zitate.json", bewertung);
+                func.setGithub("zitate", "bewertung_zitate.json", bewertung, "Bewertungen hinzugefügt.");
         } catch (IOException e) {
             func.handle(e);
         }
