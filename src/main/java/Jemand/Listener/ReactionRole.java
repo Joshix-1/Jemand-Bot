@@ -71,7 +71,7 @@ public class ReactionRole {
             || emoji.isEmpty()
             || e.getServerTextChannel().isEmpty()) return Optional.empty();
 
-        Message m = e.getMessage().orElse(e.getApi().getMessageById(e.getMessageId(), e.getChannel()).exceptionally(t -> null).join());
+        Message m = e.getMessage().orElseGet(() -> e.getApi().getMessageById(e.getMessageId(), e.getChannel()).exceptionally(t -> null).join());
 
         if(m == null
                 || !m.getAuthor().isYourself()

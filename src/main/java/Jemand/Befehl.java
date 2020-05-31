@@ -265,10 +265,11 @@ public class Befehl {
         //restart
         if(befehl.get().equalsIgnoreCase("restart") && func.getFileSeparator().equals("/")) {
             if(!func.userIsTrusted(user)) return false;
-            if(func.getFileSeparator().equals("/")) Runtime.getRuntime().exec("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand");
-            func.shutdown();
-            System.exit(69);
-            return true;
+            if(func.getFileSeparator().equals("/")) if(Runtime.getRuntime().exec("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
+                func.shutdown();
+                System.exit(69);
+                return true;
+            } else return false;
         }
 
         //allQuotes //zitat
