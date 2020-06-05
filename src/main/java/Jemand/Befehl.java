@@ -344,7 +344,7 @@ public class Befehl {
         //speak
         if(befehl.get().equalsIgnoreCase("speak")) {
             if(func.userIsTrusted(user)) {
-                event.getChannel().sendMessage(subtext1.get());
+                event.getMessage().toMessageBuilder().send(event.getChannel());
                 event.getMessage().delete();
             } else return false;
         }

@@ -432,7 +432,6 @@ public class Main {
 									}
 									TriggerReactMessage(event, "nein", "doch");
 									TriggerReactMessage(event, "doch", "Oh");
-									TriggerReactMessage(event, "oh", "nein");
 
 									if (TriggerReactText(event, "nicht witzig", "n")) {
 										event.getMessage().addReaction("i2:703595186629902438");
@@ -493,7 +492,6 @@ public class Main {
 		func.getApi().getCustomEmojiById(630814528266960909L).ifPresent(event::removeReactionByEmojiFromMessage); //loading
 		if (b1) {
 			event.addReactionToMessage("☑️").join();
-			new Coins(event.getMessageAuthor().getId()).addCoins(BigInteger.ONE);
 		} else {
 			event.addReactionToMessage("❌").join();
 		}

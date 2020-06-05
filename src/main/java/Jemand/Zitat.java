@@ -64,7 +64,7 @@ public class Zitat {
             if(user == null) {
                 func.setGithub("zitate", "namen.txt", names + name, "Neuer Autor: '" + name + "'");
             } else {
-                func.setGithub("zitate", "namen.txt", '"' + names + name, name + "\" zur Autorensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
+                func.setGithub("zitate", "namen.txt",  names + name, name + "\" zur Autorensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
             }
             NAMEN = (names + name).split("\n");
         } catch (IOException e) {
@@ -85,7 +85,7 @@ public class Zitat {
 
     static String getNameString() {
         try {
-            return func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/namen.txt");
+            return func.getGithub("zitate", "namen.txt");
         } catch (IOException e) {
             func.handle(e);
             return  func.readtextoffile("namen.txt");
