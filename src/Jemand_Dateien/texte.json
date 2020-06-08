@@ -1,0 +1,720 @@
+{
+  "Weiterleitung" : {
+    "en": "Your message has been send to the owner of this bot."
+    "de": "Deine Nachricht wurde an den Bot-Owner weitergeleitet."
+  }
+  "Prefix" : {
+    "en": "The prefix of this guild is \"**J!**\"."
+    "de": "Das Prefix dieser Gilde ist \"**J!**\"."
+  }
+  "JoinMessage" : {
+    "en": "<User> has joined this guild. Hey o/"
+    "de": "<User> hat diese Gilde betreten. Hallo o/"
+  }
+  "LeaveMessage" : {
+    "en": "<User> has left this guild. :("
+    "de": "<User> hat uns verlassen. :("
+  }
+  "Coins" : {
+    "en": "coins"
+    "de": "Coins"
+  }
+  "ReactionRoleDesc" : {
+    "en" : "React with the corresponding emoji to get the role. Remove your reaction to remove the role."
+    "de" : "Reagier mit dem zugehörigen Emoji, um die Rolle zu bekommen. Entferne die Reaktion, um die Rolle zu entfernen."
+  }
+  "ReactionRoleNo" : {
+    "en" : "No valid role id given. (A valid role id belongs to a role you can manage.)"
+    "de" : "Keine valide Rollenid angegeben. (Eine valide Rollenid gehört zu einer Rolle, die du verwalten kannst.)"
+  }
+  "CannotMangeRoles" : {
+    "en": "I can't give you this role. To give you this role my highest role has to be above this role and I need the permission 'Manage Roles'."
+    "de": "Ich kann dir diese Rolle nicht geben. Um die Rolle zu vergeben muss meine höchste Rolle, über der zu Vergebenden sein und ich benötige mit irgendeiner meiner Rollen die Berechtigung 'Rollen verwalten'."
+  }
+  "CoinsMessage" : {
+    "en": "<@<VAR1>> has <VAR2> coins."
+    "de": "<@<VAR1>> hat <VAR2> Coins."
+  }
+  "CoinsGive" : {
+    "en": "<@<VAR1>> gave <VAR3> coins to <@<VAR2>>."
+    "de": "<@<VAR1>> hat <@<VAR2>> <VAR3> Coins gegeben."
+  }
+  "CoinsMissing" : {
+    "en": "You don't have enough coins."
+    "de": "Du hast nicht genug Coins."
+  }
+
+  "MessageRemoved" : {
+    "en": "Successfully removed the message. It won't send be send."
+    "de": "Die Nachricht wurde erfolgreich entfernt. Sie wird nicht mehr gesendet werden."
+  }
+  "MessageAdd" : {
+    "en": "Successfully added the message. It will be send."
+    "de": "Die Nachricht wurde erfolgreich hinzugefügt. Sie wird ab jetzt gesendet."
+  }
+  "ChannelAdd" : {
+    "en": "Successfully set the channel. if activated the message now will be send to <#<VAR1>>."
+    "de": "Der Textchannel wurde erfolgreich geändert die Nachrichten werden nun nach <#<VAR1>> gesendet."
+  }
+  "BackupStarted" : {
+    "en": "You will get a .zip file with the backup. This can take some time, so don't be angry, when it takes too long."
+    "de": "Du wirst ein .zip File zugeschickt bekommen. Dies dauert leider lange, deswegen sei nicht wütend, wenn du warten musst."
+  }
+  "LevelRolesTitle" : {
+    "en": "level-roles:"
+    "de": "LevelRoles:"
+  }
+  "LevelRolesText" : {
+    "en": "level <VAR1>: <VAR2>"
+    "de": "Level <VAR1>: <VAR2>"
+  }
+  "LevelRolesInfo" : {
+    "en": "React with the numbers to stop giving the roles to users."
+    "de": "Reagiere mit den Zahlen, um die jeweiligen Rollen nicht mehr verteilen zu lassen."
+  }
+  "LevelRolesAdded" : {
+    "en": "Successfully added the role."
+    "de": "Die Rolle wurde erfolgreich hinzugefügt."
+  }
+  "LevelRolesAddHelp" : {
+    "en": "Add a role with \"J!lr add [level] [role_name | role_id | role_mention]\"."
+    "de": "Füge eine Rolle mit \"J!LR add [Level] [Rollename | Rollenid | Rollenmakierung]\" hinzu."
+  }
+  "RoleName" : {
+    "en": "aCoolRole"
+    "de": "EineTolleRolle"
+  }
+  "BackupRateLimit" : {
+    "en" : "Please wait until the currently running backup has finnished."
+    "de" : "Bitte warte, bis das zurzeit laufende Backup beendet wurde."
+  }
+  "OwO5" : {
+    "en": "You can maximal upload 5."
+    "de": "Du kannst maximal 5 anhängen."
+  }
+  "Replacements" : {
+    "en": "<user> -> to show the name of the user\n<guild> -> to show the name of the guild\n<member_count> -> shows the member count of the guild\n<user_count> -> show the count of normal users on the guild\n<bot_count> -> shows the count of bots on the guild\n<offline_count> -> shows the count of offline members\n<online_count> -> shows the count of online members\n<uses> -> shows how often the message has been sent (it gets reset when you remove the message)"
+    "de": "<user> -> zeigt den Namen des Nutzers.\n<guild> -> zeigt den Namen der Gilde.\n<member_count> -> gibt die Anzahl an Accounts auf dieser Gilde an.\n<user_count> -> gibt die Anzahl an normalen Nutzern auf dieser Gilde an.\n<bot_count> -> gibt die Anzahl an Bots auf dieser Gilde an.\n<offline_count> -> gibt die Anzahl an Mitgliedern an, die offline sind.\n<online_count> -> gibt die Anzahl an Mitgliedern an, die online sind.\n<uses> -> gibt an wie oft die Nachricht versendet wurde. (wird zurückgesetzt, wenn die Nachricht entfernt wird)"
+  }
+  "NoMessage" : {
+    "en": "Sadly there is no message, you have to activate it first."
+    "de": "Du musst die Nachricht erst aktivieren um sie dir anzeigen zu können."
+  }
+  "NoChannel" : {
+    "en": "I couldn't find the channel."
+    "de": "Ich konnte diesen Textchannel nicht finden."
+  }
+  "Cleared" : {
+    "en": "The last <VAR1> messages in this text channel have been successfully deleted."
+    "de": "Die letzten <VAR1> Nachrichten in diesem Textchannel wurden erfolgreich gelöscht."
+  }
+  "Mention" : {
+    "en": "Try sending \"**J!help**\" to get a list of great commands.\n\nDu kannst diesen Bot auch auf Deutsch nutzen. Sende dafür \"**J!language de**\"."
+    "de": "Gib doch mal \"**J!Help**\" ein und gucke was passiert.\n\nYou can also use this bot in English. If you want this send \"**J!Language en**\"."
+  }
+  "ReportText" : {
+    "en": "Message successfully sent to the owner of this bot."
+    "de": "Fehler wurde erfolgreich übermittelt."
+  }
+  "NormalEmbedFooter" : {
+    "en": "Requested by <USER_DISC_NAME>"
+    "de": "Angefordert von <USER_DISC_NAME>"
+  }
+  "StatsTitle" : {
+    "en": "Game statistics:"
+    "de": "Spielstatistiken:"
+  }
+  "StatsField" : {
+    "en": "wins: <VAR1>\nloses: <VAR2>\ndraws: <VAR3>\ngames: <VAR4>"
+    "de": "Siege: <VAR1>\nNiederlagen: <VAR2>\nUnentschieden: <VAR3>\nSpiele: <VAR4>"
+  }
+  "4GTitle" : {
+    "en": "Connect four:"
+    "de": "4-Gewinnt:"
+  }
+  "TTTTitle" : {
+    "en": "tic tac toe:"
+    "de": "Tic Tac Toe:"
+  }
+  "FehlerTitle" : {
+    "en": "Missing argument!"
+    "de": "Syntaxfehler!"
+  }
+  "ZeitAbgelaufen" : {
+    "en": "Time is up!"
+    "de": "Zeit abgelaufen."
+  }
+  "FehlerDesc" : {
+    "en": "The command \"**<VAR1>**\" needs another argument. Use \"J!help\" to gain more information."
+    "de": "Der Befehl \"**<VAR1>**\" braucht ein weiteres Argument. Nutze \"J!Help\", um mehr Informationen zu bekommen."
+  }
+  "Fehler2Title" : {
+    "en": "Missing permission!"
+    "de": "Fehlende Berechtigung!"
+  }
+  "Fehler2Desc" : {
+    "en": "You do not have the permission to use the command \"**<VAR1>**\"."
+    "de": "Dir fehlt die Berechtigung den Befehl \"**<VAR1>**\" zu benutzen."
+  }
+  "MissingPermission" : {
+    "en": "You do not have the permission <VAR1>."
+    "de": "Dir fehlt die Berechtigung <VAR1>."
+  }
+  "NichtMehrMöglich" : {
+    "en": "Not possible anymore!"
+    "de": "Nicht mehr möglich!"
+  }
+  "SSSGewählt" : {
+    "en": "Your opponent already chose."
+    "de": "Dein Gegner hat sich bereits entschieden."
+  }
+  "SSSOhneBrunnen" : {
+    "en": "You play without well."
+    "de": "Ihr spielt ohne Brunnen."
+  }
+  "SSSTitle" : {
+    "en": "rock paper scissors:"
+    "de": "Schnick-Schnack-Schnuck:"
+  }
+  "SSSDesc" : {
+    "en": "Choose one of the symbols. Use <:ohne_brunnen:573077018640515112> to disable well."
+    "de": "Wähle eins der Symbole. Wenn du zuerst <:ohne_brunnen:573077018640515112> drückst, spielt ihr ohne Brunnen."
+  }
+  "SSSEndMessage" : {
+    "en": "Nice! <@<VAR1>> wins with <VAR2> against <VAR4>, picked by <@<VAR3>>."
+    "de": "Herzlichen Glückwunsch! <@<VAR1>> hat mit <VAR2> gegen <@<VAR3>>, welche(r) <VAR4> gewählt hat, **gewonnen**."
+  }
+  "SSSUnentschieden" : {
+    "en": "It is a tie. You both picked <VAR1>."
+    "de": "**Unentschieden**. Beide haben <VAR1> gewählt."
+  }
+  "SSSLangsam" : {
+    "en": "<VAR1> was to slow."
+    "de": "<VAR1> war zu langsam."
+  }
+  "SSSLangsam2" : {
+    "en": "Both of you were to slow."
+    "de": "Beide waren leider zu langsam."
+  }
+  "SSSPlatzField" : {
+    "en": "points: <VAR1> (got with: <VAR2>)"
+    "de": "Punkte: <VAR1> (Erziehlt mit: <VAR2>)"
+  }
+  "DeleteReason" : {
+    "en": "Message was only to trigger a command."
+    "de": "Nachricht war zum ausführen eines Befehls."
+  }
+  "FehlerAufgetreten" : {
+    "en": "An error occurred."
+    "de": "Es ist ein Fehler aufgetreten."
+  }
+  "Kategorien" : {
+    "en": "Bot Images Memes Fun Games Guild Other"
+    "de": "Bot Bilder Memes Spaß Spiele Gilde Anderes"
+  }
+  "4GUnentschieden" : {
+    "en": "It is a **draw**. Nobody loses. But sadly nobody wins too."
+    "de": "**Unentschieden**, keiner hat verloren!"
+  }
+  "4GGewonnen" : {
+    "en": "wins!"
+    "de": "hat gewonnen!"
+  }
+  "4GVerloren" : {
+    "en": "loses! :("
+    "de": "hat verloren! :("
+  }
+  "PrefixChanged" : {
+    "en": "<USER_MENTION> the prefix of this guild successfully changed to \"**J!**\"."
+    "de": "<USER_MENTION> das Gilden-Prefix wurde erfolgreich zu \"**J!**\" geändert."
+  }
+  "KeyExNicht" : {
+    "en": "The key <VAR1> does not exist."
+    "de": "Der Key <VAR1> existiert nicht."
+  }
+  "KeyExBereits" : {
+    "en": "The key <VAR1> already exists."
+    "de": "Der Key <VAR1> existiert bereits."
+  }
+  "UseRename" : {
+    "en": "Use **J!rename** to change the key."
+    "de": "Nutze **J!Rename**, um den Key zu ändern, wenn du einen bestimmten haben willst."
+  }
+  "Erfolgreich" : {
+    "en": "Successfully!"
+    "de": "Erfolgreich!"
+  }
+  "NichtsGefunden" : {
+    "en": "Nothing found."
+    "de": "Nichts gefunden!"
+  }
+  "SaveEmbedFooter" : {
+    "en": "Created by <VAR1>"
+    "de": "Erstellt von <VAR1>"
+  }
+  "ZeitFormat" : {
+    "en": "MM/dd/yy"
+    "de": "dd.MM.yy"
+  }
+  "Rename" : {
+    "en": "The key \"<VAR1>\" successfully changed to \"<VAR2>\"."
+    "de": "Der Key \"<VAR1>\" wurde erfolgreich in \"<VAR2>\" umbenannt!"
+  }
+  "SaveTitle" : {
+    "en": "Saved with following key:"
+    "de": "Unter folgendem Key gespeichert:"
+  }
+  "SaveFieldTitle" : {
+    "en": "Hint:"
+    "de": "Tipp:"
+  }
+  "SaveField" : {
+    "en": "Use \"**J!load <VAR1>**\", to load the saved tag."
+    "de": "Nutze \"**J!Load <VAR1>**\", um das Gespeicherte aufzurufen."
+  }
+  "DeleteFalse" : {
+    "en": ""
+    "de": "Du hast keine Berechtigung diesen Key zu löschen!"
+  }
+  "DeleteTrue" : {
+    "en": "The key \"<VAR1>\" has been successfully deleted."
+    "de": "Der Key \"<VAR1>\" wurde erfolgreich gelöscht und ist nun nicht mehr aufrufbar."
+  }
+  "PrefixMax" : {
+    "en": "The prefix can not be longer than 10 characters."
+    "de": "Das Prefix darf maximal 10 Zeichen lang sein."
+  }
+  "EditTitle" : {
+    "en": "Following has been edited:"
+    "de": "Folgender Key wurde bearbeitet:"
+  }
+  "Rank" : {
+    "en": "rank: **<VAR1>** \nlevel: **<VAR2>**\nlevel progress: **<VAR3>xp**\ntotal xp: **<VAR4>**"
+    "de": "Platz: **<VAR1>** \nLevel: **<VAR2>**\nLevel-Fortschritt: **<VAR3>XP**\nGesamt-XP: **<VAR4>**"
+  }
+  "TopField" : {
+    "en": "<VAR1>: level <VAR2> (**<VAR3>**xp)"
+    "de": "<VAR1>: Level <VAR2> (**<VAR3>**XP)"
+  }
+  "TopPlatz" : {
+    "en": "rank <VAR1>:"
+    "de": "Platz <VAR1>:"
+  }
+  "SpracheChanged" : {
+    "en": "Language successfully changed."
+    "de": "Sprache erfolgreich geändert."
+  }
+  "SpracheFehler" : {
+    "en": "Language could not be changed."
+    "de": "Sprache konnte nicht geändert werden."
+  }
+  "Invite" : {
+    "en": "invite:"
+    "de": "Einladungslink:"
+  }
+  "HelpErklärung" : {
+    "en": "[] = important argument\n() = optional argument\n| = or, separates different options\n\nIf you react with an emote corresponding to a command with an example, this example will be executed."
+    "de": "[] = Pflichtargument\n() = optionales Argument\n| = oder, trennt verschiedene Optionen\n\nWenn du mit einem Emote reagierst, welches zu einem Befehl mit einem Beispiel zu gehört, dann wird dieses Beispiel ausgeführt."
+  }
+  "InviteArguments" : {
+    "en": "J!invite"
+    "de": "J!Invite"
+  }
+  "ReportArguments" : {
+    "en": "J!report [text]"
+    "de": "J!Report [Text]"
+  }
+  "HelpArguments" : {
+    "en": "J!help"
+    "de": "J!Help"
+  }
+  "PrefixArguments" : {
+    "en": "J!prefix (new prefix)"
+    "de": "J!Prefix (neues Prefix)"
+  }
+  "LanguageArguments" : {
+    "en": "J!language [\"en\"/\"ger\"]"
+    "de": "J!Language [\"en\"/\"de\"]"
+  }
+  "Fake-PersonArguments" : {
+    "en": "J!fake-person (size of image)"
+    "de": "J!Fake-Person (Größe des Bildes)"
+  }
+  "Fake-CatArguments" : {
+    "en": "J!fake-cat (size of image)"
+    "de": "J!Fake-Cat (Größe des Bildes)"
+  }
+  "Random-PictureArguments" : {
+    "en": "J!random-picture (size of image) (\"bg\")"
+    "de": "J!Random-Picture (Größe des Bildes) (\"bg\")"
+  }
+  "Random-RobotArguments" : {
+    "en": "J!random-robot (size of image) (\"bg\")"
+    "de": "J!Random-Robot (Größe des Bildes) (\"bg\")"
+  }
+  "Random-FaceArguments" : {
+    "en": "J!random-face (size of image) (\"bg\")"
+    "de": "J!Random-Face (Größe des Bildes) (\"bg\")"
+  }
+  "Random-AlienArguments" : {
+    "en": "J!random-alien (size of image) (\"bg\")"
+    "de": "J!Random-Alien (Größe des Bildes) (\"bg\")"
+  }
+  "Random-CatArguments" : {
+    "en": "J!random-cat (size of image) (\"bg\")"
+    "de": "J!Random-Cat (Größe des Bildes) (\"bg\")"
+  }
+  "Random-HumanArguments" : {
+    "en": "J!random-human (size of image) (\"bg\")"
+    "de": "J!Random-Human (Größe des Bildes) (\"bg\")"
+  }
+  "ResizeArguments" : {
+    "en": "J!resize (link) [factor]"
+    "de": "J!Resize (Link) [Faktor]"
+  }
+  "8-BallArguments" : {
+    "en": "J!8-ball (question)"
+    "de": "J!8-Ball (Frage)"
+  }
+  "EmoteArguments" : {
+    "en": "J!emote [text]"
+    "de": "J!Emote [Text]"
+  }
+  "ReactArguments" : {
+    "en": "J!react (message id) [Text]"
+    "de": "J!React (Nachrichten ID) [Text]"
+  }
+  "RollArguments" : {
+    "en": "J!roll (Integer)"
+    "de": "J!Roll (Zahl)"
+  }
+  "SayArguments" : {
+    "en": "J!say [text]"
+    "de": "J!Say [Text]"
+  }
+  "PingArguments" : {
+    "en": "J!ping"
+    "de": "J!Ping"
+  }
+  "PongArguments" : {
+    "en": "J!pong"
+    "de": "J!Pong"
+  }
+  "ZitatArguments" : {
+    "en": "J!zitat {It is a german only command}"
+    "de": "J!Zitat (Zitat ID) (\"Bild\") (\"witzig\"/\"nicht witzig\") {Nur auf dieser Gilde verfügbar.}"
+  }
+  "GOQArguments" : {
+    "en": "J!goq {It is a german only command}"
+    "de": "J!GOQ (\"Bild\") {Nur auf dieser Gilde verfügbar.}"
+  }
+  "4-GewinntArguments" : {
+    "en": "J!Connect-Four (user mention)"
+    "de": "J!4-Gewinnt (Erwähnung)"
+  }
+  "SSSArguments" : {
+    "en": "J!rps (user mention)"
+    "de": "J!SSS (Erwähnung)"
+  }
+  "TTTArguments" : {
+    "en": "J!ttt (user mention)"
+    "de": "J!TTT (Erwähnung)"
+  }
+  "GuildInviteArguments" : {
+    "en": "J!guild-invite [duration in h] [max uses]"
+    "de": "J!Gildeninvite [Dauer in h] [Anzahl Nutzungen]"
+  }
+  "SaveArguments" : {
+    "en": "J!save (text)"
+    "de": "J!Save (Text)"
+  }
+  "Save-PrivateArguments" : {
+    "en": "J!save-private (text)"
+    "de": "J!Save-Private (Text)"
+  }
+  "SaveAsArguments" : {
+    "en": "J!saveas [key] (text)"
+    "de": "J!SaveAs [Key] (Text)"
+  }
+  "LoadArguments" : {
+    "en": "J!load [key] (raw)"
+    "de": "J!Load [Key] (raw)"
+  }
+  "DeleteArguments" : {
+    "en": "J!delete [key]"
+    "de": "J!delete [Key]"
+  }
+  "RenameArguments" : {
+    "en": "J!rename [key] [new key]"
+    "de": "J!Rename [Key] [neuer Key]"
+  }
+  "EditArguments" : {
+    "en": "J!edit [key] (new text)"
+    "de": "J!Edit [key] (neuer Text)"
+  }
+  "CalculateArguments" : {
+    "en": "J!calculate [calculation]"
+    "de": "J!calculate [Rechnung]"
+  }
+  "RankArguments" : {
+    "en": "J!rank (user mention/rank)"
+    "de": "J!Rank (Erwähnung/Platz)"
+  }
+  "TopArguments" : {
+    "en": "J!top (1-25)"
+    "de": "J!Top (Anzahl Anzuzeigender)"
+  }
+  "StatsArguments" : {
+    "en": "J!stats (user mention)"
+    "de": "J!Stats (Erwähnung)"
+  }
+  "ClearArguments" : {
+    "en": "J!clear (count of messages)"
+    "de": "J!Clear (Anzahl der Nachrichten)"
+  }
+  "Welcome-MessageArguments" : {
+    "en": "J!wm [add | remove | help | channel] (text channel) (message text)"
+    "de": "J!WM [Add | Remove | Help | Channel] (Textchannel) (message text)"
+  }
+  "Leave-MessageArguments" : {
+    "en": "J!lm [add | remove | help | channel] (text channel) (message text)"
+    "de": "J!LM [Add | Remove | Help | Channel] (Textchannel) (message text)"
+  }
+  "BackupArguments" : {
+    "en": "J!backup"
+    "de": "J!Backup"
+  }
+  "QRArguments" : {
+    "en": "J!qr [read | create] (link | text)"
+    "de": "J!QR [read | create] (Link | Text)"
+  }
+  "Dice-GameArguments" : {
+    "en": "J!dice-game (coins)"
+    "de": "J!Dice-Game (Coins)"
+  }
+  "DonaldArguments" : {
+    "en": "J!donald [link | text]"
+    "de": "J!Donald [Link | Text]"
+  }
+  "LisaArguments" : {
+    "en": "J!lisa [link | text]"
+    "de": "J!Lisa [Link | Text]"
+  }
+  "DrakeArguments" : {
+    "en": "J!drake [link | text] '|' [link | text]"
+    "de": "J!Drake [Link | Text] '|' [Link | Text]"
+  }
+  "WinnieArguments" : {
+    "en": "J!winnie [link | text] '|' [link | text] ('|') (link | text)"
+    "de": "J!winnie [Link | Text] '|' [Link | Text] ('|') (Link | Text)"
+  }
+  "WTHArguments" : {
+    "en": "J!wth [link | text]"
+    "de": "J!WTH [Link | Text]"
+  }
+  "Reaction-RoleArguments" : {
+    "en": "J!reaction-role [role-mention | role-id] ..."
+    "de": "J!Reaction-Role [Rollenmakierung | Rollenid] ..."
+  }
+
+  "InviteHelptext" : {
+    "en": "Sends an invite to this ~~great~~ bot.\ne.g.: \"J!invite\""
+    "de": "Sendet einen Invite, mit dem du diesen ~~tollen~~ Bot auf deine Gilde einladen kannst.\nz.B.: \"J!Invite\""
+  }
+  "ReportHelptext" : {
+    "en": "Report a problem or a bug to rhe owner of the bot.\ne.g.: \"J!report You wrote rhe instead of the. In the description of the report command.\""
+    "de": "Melde dem Owner des Bots probleme oder Bugs die aufgetreten sind.\nz.B.: \"J!Report Beim Text zum Report-Befehl hast du Probleme klein geschrieben.\""
+  }
+  "HelpHelptext" : {
+    "en": "Use this command to show this message."
+    "de": "Lasse dir diese Nachricht anzeigen."
+  }
+  "PrefixHelptext" : {
+    "en": "Change the prefix of this guild. Whithout argument it shows this prefix.\ne.g.: \"J!prefix\""
+    "de": "Ändere das Prefix auf dieser Gilde in ein Anderes. Wenn du kein Argument nutzt, dann wird dir das aktuelle Prefix angezeigt.\nz.B.: \"J!Prefix\""
+  }
+  "LanguageHelptext" : {
+    "en": "Send \"J!Language de\", to change the language to german.\ne.g.: \"J!language ger\""
+    "de": "Sende \"J!Language en\", um die Sprache zu Englisch zu ändern.\nz.B.: \"J!Language en\""
+  }
+  "Fake-PersonHelptext" : {
+    "en": "Sends an image of a person generated by a GAN (generative adversarial network). You can change the size of the image, by adding an integer to the command.\ne.g.: \"J!fp <RAND_NUM>\""
+    "de": "Du bekommst ein durch eine Künstliche Intelligenz generiertes Bild eines Menschen. Du kannst sogar die Größe des Bildes ändern. Beende dazu den Befehl mit der gewollten Größe. \nz.B.: \"J!FP <RAND_NUM>\""
+  }
+  "Fake-CatHelptext" : {
+    "en": "Sends an image of a cat generated by a GAN (generative adversarial network). You can change the size of the image, by adding an integer to the command.\ne.g.: \"J!fc <RAND_NUM>\""
+    "de": "Du bekommst ein durch eine Künstliche Intelligenz generiertes Bild einer Katze. Du kannst sogar die Größe des Bildes ändern. Beende den Befehl dazu mit der gewollten Größe. \nz.B.: \"J!FC <RAND_NUM>\""
+  }
+  "Random-PictureHelptext" : {
+    "en": "Sends a random image. It can be a robot, a face, a alien, a cat or a human. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!rp bg <RAND_NUM>\""
+    "de": "Sendet ein zufälliges Bild. Es kann ein Roboter, ein Gesicht, ein Alien, eine Katze oder auch ein Mensch sein.\nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RP bg <RAND_NUM>\""
+  }
+  "Random-RobotHelptext" : {
+    "en": "Sends a random image of a robot. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!rr bg <RAND_NUM>\""
+    "de": "Sendet das Bild eines zufälligen Roboters. \nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RR bg <RAND_NUM>\""
+  }
+  "Random-FaceHelptext" : {
+    "en": "Sends a random image of a face. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!rf bg <RAND_NUM>\""
+    "de": "Sendet das Bild eines zufälligen Gesichtes. \nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RF bg <RAND_NUM\""
+  }
+  "Random-AlienHelptext" : {
+    "en": "Sends a random image of a alien. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!ra bg <RAND_NUM>\""
+    "de": "Sendet das Bild eines zufälligen Aliens. \nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RA bg <RAND_NUM>\""
+  }
+  "Random-CatHelptext" : {
+    "en": "Sends a random image of a cat. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!rc bg <RAND_NUM>\""
+    "de": "Sendet das Bild einer zufälligen Katze. \nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RC bg <RAND_NUM>\""
+  }
+  "Random-HumanHelptext" : {
+    "en": "Sends a random image of a human. Add \"bg\" to your command to add a beautiful background to the image. Change the size of the image, by adding an integer to the command.\ne.g.: \"J!rh bg <RAND_NUM>\""
+    "de": "Sendet das Bild eines zufälligen Menschens, wenn du Angst vor der Digitalisierung hast. \nHänge \"bg\" an den Befehl an, um dem Bild einen Hintergrund zu verpassen. Beende den Befehl mit einer Zahl, um die Größe des Bildes zu ändern.\nz.B.: \"J!RH bg <RAND_NUM>\""
+  }
+  "ResizeHelptext" : {
+    "en": "Resize an image by a factor. Attach an image or use a link.\ne.g.: \"J!resize <USER_AVATAR_LINK> 0.5\""
+    "de": "Ändere die Größe eines Bildes, um einen Faktor. Du kannst auch ein Bild anhängen, wenn du keinen Link hast.\nz.B.: \"J!Resize <USER_AVATAR_LINK> 0.5\""
+  }
+  "8-BallHelptext" : {
+    "en": "Ask the 8 ball an important question. It will maybe answer with yes or no.\ne.g.: \"J!8ball Should I go to bed?\""
+    "de": "Stelle eine Ja-Nein-Frage. Sie wird dir vielleicht beantwortet werden.\nz.B.: \"J!8Ball Soll ich jetzt etwas essen?\""
+  }
+  "EmoteHelptext" : {
+    "en": "Replace letters with emotes.\ne.g.: \"J!emote A really important text.\""
+    "de": "Lasse die gesendeten Zeichen in Emotes umwandeln.\nz.B.: \"J!Emote Ein spannender Text.\""
+  }
+  "ReactHelptext" : {
+    "en": "React to a Message with a text.\ne.g.: \"J!react owo\""
+    "de": "Reagier auf eine Nachricht mit einem Text. Um die Nachrichten-ID zubekommen, musst du in den Einstellungen den Entwicklermodus aktivieren.\nz.B.: \"J!React owo\""
+  }
+  "RollHelptext" : {
+    "en": "Let the bot throw a dice with a minimum of 1 side.\ne.g.: \"J!roll <rand12:1200>\""
+    "de": "Lasse den Bot einen Würfel mit einer bestimmten Anzahl an Seiten werfen.\nz.B.: \"J!Roll <rand12:1200>\""
+  }
+  "SayHelptext" : {
+    "en": "Let the bot say something.\ne.g.: \"J!say <USER_DISP_NAME> is a really nice person.\""
+    "de": "Zwinge den Bot einen Text zu sagen.\nz.B.: \"J!say <USER_DISP_NAME> ist eine wirklich tolle Person.\""
+  }
+  "PingHelptext" : {
+    "en": "pong!"
+    "de": "Pong!"
+  }
+  "PongHelptext" : {
+    "en": "ping!"
+    "de": "Ping!"
+  }
+  "ZitatHelptext" : {
+    "en": "Learn german."
+    "de": "Guck mal in #Zitate, da siehst du wie es funktioniert."
+  }
+  "GOQHelptext" : {
+    "en": "Really! Learn German!"
+    "de": "Guck mal in #GOQ, da siehst du wie es funktioniert."
+  }
+  "4-GewinntHelptext" : {
+    "en": "Play Connect-Four against a friend on discord.\ne.g.: \"J!c4 <USER_MENTION>\""
+    "de": "Spiele 4 Gewinnt gegen einen Freund auf Discord.\nz.B.: \"J!4G <USER_MENTION>\""
+  }
+  "SSSHelptext" : {
+    "en": "Play rock-paper-scissors against the bot or the mentioned user.\ne.g.: \"J!rps\""
+    "de": "Spiele Schnick-Schnack-Schnuck gegen den Bot oder einen makierten Nutzer.\nz.B.: \"J!SSPB\""
+  }
+  "TTTHelptext" : {
+    "en": "Play tic-tac-toe against a friend or a bot on discord.\ne.g.: \"J!ttt\""
+    "de": "Spiele Tic-Tac-Toe gegen einen Freund oder einen Bot auf Discord.\nz.B.: \"J!TTT\""
+  }
+  "GuildInviteHelptext" : {
+    "en": "Let the bot create an invite to this guild."
+    "de": "Lasse den Bot einen Gildeninvite erstellen."
+  }
+  "SaveHelptext" : {
+    "en": "Save cool stuff with a random key. You can attach some cool stuff too."
+    "de": "Speichere coole Sachen unter einem zufälligem Key ab. Du kannst auch Dateien anhängen."
+  }
+  "Save-PrivateHelptext" : {
+    "en": "Save cool stuff with a random and secure key. You can attach some cool stuff too. Your data will be encrypted and saved anonymously. Only you can get the saved stuff."
+    "de": "Speichere coole Sachen, wie angehängte Dateien oder geschriebenen Text, unter einem zufälligem sicheren Key ab. Deine gespeicherten Sachen werden anhand deiner User-ID verschlüsselt und ohne diese gespeichert. Deswegen können die Sachen, zwar nur von dir korrekt aufgerufen werden, aber nicht bearbeitet werden. Du bekommst den Key per Direkt-Nachricht gesendet und die Nachricht, die diesen Befehl aufruft, wird gelöscht."
+  }
+  "SaveAsHelptext" : {
+    "en": "Save cool stuff with a key. You can attach some cool stuff too."
+    "de": "Speichere coole Sachen unter einem  Key ab. Du kannst auch Dateien anhängen."
+  }
+  "LoadHelptext" : {
+    "en": "Load a cool key to get the stuff someone saved.\ne.g.: \"J!l 4v5DLTnmC50ws\""
+    "de": "Zeige einen Key mit coolem Content an.\nz.B.: \"J!L 4v5DLTnmC5Ows\""
+  }
+  "DeleteHelptext" : {
+    "en": "Delete a key you created."
+    "de": "Lösche einen Key, den du erstellt hast, wenn er dir nicht mehr gefällt."
+  }
+  "RenameHelptext" : {
+    "en": "Change the key to a new one."
+    "de": "Ändere den Key, wenn du den Key doof findest."
+  }
+  "EditHelptext" : {
+    "en": "Edit the content of the key."
+    "de": "Edit den zugehörigen Text und die Anhänge eines Keys"
+  }
+  "CalculateHelptext" : {
+    "en": "Calculate some calculations.\ne.g.: \"J!calc (49^3 - 47^3 - 24^3) * (2(4^3) - 5^3) * cbrt(343)\""
+    "de": "Lasse den Bot für dich Rechnungen lösen.\nz.B.: \"J!calc (49^3 - 47^3 - 24^3) * (2(4^3) - 5^3) * cbrt(343)\""
+  }
+  "RankHelptext" : {
+    "en": "Show your rank, the rank of a mentioned person or a person on a specified rank."
+    "de": "Zeige den Rang einer makierten Person an oder den einer Person auf einem bestimmten Platz. Wenn du kein Argument angibst siehst du deinen eigenen Rang."
+  }
+  "TopHelptext" : {
+    "en": "Show the best 1 - 25 of a guild.\ne.g.: \"J!top <rand3:15>\""
+    "de": "Zeige die 1 - 25 besten einer Gilde an.\nz.B.: \"J!Top <rand3:15>\""
+  }
+  "StatsHelptext" : {
+    "en": "Shows the game statistics of you, or the mentioned user.\ne.g.: \"J!stats\""
+    "de": "Zeigt entweder deine, oder die Spielstatistiken eines makierten Nutzers.\nz.B.: \"J!Stats\""
+  }
+  "ClearHelptext" : {
+    "en": "Deletes the last Messages."
+    "de": "Löscht die letzten Nachrichten."
+  }
+  "Welcome-MessageHelptext" : {
+    "en": "Welcome new members with a message."
+    "de": "Heiße neue Mitglieder willkommen."
+  }
+  "Leave-MessageHelptext" : {
+    "en": "Say goodbye to members, who left the guild."
+    "de": "Verabschiede Mitglieder, die diese Gilde verlassen haben."
+  }
+  "BackupHelptext" : {
+    "en": "Create a backup of all the messages in this guild. This will take some time."
+    "de": "Erstelle ein Backup von allen Textnachrichten in dieser Gilde."
+  }
+  "QRHelptext" : {
+    "en": "Create or read a QR Code. You can read a qr code from a link or an attached file. \ne.g.: \"J!qr create <USER_DISP_NAME> is really cute.\""
+    "de": "Erstelle oder lese einen QR Code. \nz.B.: \"J!QR create <USER_DISP_NAME> ist einfach toll.\""
+  }
+  "Dice-GameHelptext" : {
+    "en": "Play against the bot and win or lose coins. \ne.g.: \"J!dg\""
+    "de": "Spiele gegen den Bot um eine gewisse Anzahl an Coins.\nz.B.: \"J!DG\""
+  }
+  "DonaldHelptext" : {
+    "en": "Create a meme with Donald Trump."
+    "de": "Erstelle ein Meme mit Donald Trump."
+  }
+  "LisaHelptext" : {
+    "en": "Create a meme with Lisa Simpson."
+    "de": "Erstelle ein Meme mit Lisa Simpson."
+  }
+  "DrakeHelptext" : {
+    "en": "Create a meme with the cool Drake template."
+    "de": "Erstelle ein Meme mit dem Drake Template."
+  }
+  "WinnieHelptext" : {
+    "en": "Create a meme with Winnie-the-Pooh. I hope you aren't in china."
+    "de": "Erstelle ein Meme mit Pu dem Bär. Ich hoffe mal du bist nicht in China."
+  }
+  "WTHHelptext" : {
+    "en": "Create a meme worse than hitler."
+    "de": "Erstelle ein Meme schlechter als Hitler."
+  }
+  "Reaction-RoleHelptext" : {
+    "en": "Create a message wich allows users to get roles. (At maximum 20 roles per message.)"
+    "de": "Erstelle eine Nachricht, die es Nutzern erlaubt sich Rollen geben zu lassen. (Maximal 20 Rollen pro Nachricht.)"
+  }
+}

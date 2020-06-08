@@ -8,3 +8,20 @@
 *.iml
 *.ipr
 *.iws
+
+# private data:
+src/Jemand_Dateien/tokens.txt
+src/Jemand_Dateien/secret/*
+src/Jemand_Dateien/tmp/*
+src/Jemand_Dateien/roles/*
+src/Jemand_Dateien/listeners/*
+src/Jemand_Dateien/games/*
+src/Jemand_Dateien/backups/*
+src/Jemand_Dateien/spam_id.txt
+src/Jemand_Dateien/channelportal.txt
+src/Jemand_Dateien/prefix.json
+src/Jemand_Dateien/sprachliste.json
+src/Jemand_Dateien/xp/*
+src/Jemand_Dateien/prouser.json
+src/Jemand_Dateien/save.json
+
