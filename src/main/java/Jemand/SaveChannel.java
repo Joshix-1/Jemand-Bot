@@ -1,10 +1,5 @@
 package Jemand;
 
-
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.WebhookClientBuilder;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -14,7 +9,6 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.entity.webhook.WebhookBuilder;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -55,7 +49,7 @@ public class SaveChannel {
     private static final DiscordApi api = func.getApi();
     private ServerTextChannel channel;
     private Map<Long, Map<Integer, String>> channelmap;
-    private Webhook wh;
+    //private Webhook wh;
     private Map<String, String> usersDisc = new HashMap<>();
     private Map<String, String> usersName = new HashMap<>();
     private Map<String, Color> usersColor = new HashMap<>();
@@ -206,38 +200,39 @@ public class SaveChannel {
     }
 
     public final SaveChannel applyToChannel(ServerTextChannel textChannel) {
-        wh = new WebhookBuilder(textChannel).setAvatar(api.getYourself().getAvatar()).setName("test").create().join();
-        final Stream<Long> keys = channelmap.keySet().parallelStream().sorted();
-        keys.forEachOrdered(time -> {
-                try {
-                    Map<Integer, String> content = channelmap.get(time);
-                    AtomicReference<User> user = new AtomicReference<>(null);
-                    String name, icon;
-                    user.set(textChannel.getServer().getMemberById(content.get(0)).orElse(null));
-
-                    if(user.get() != null) {
-                        name = user.get().getDisplayName(textChannel.getServer());
-                        icon = user.get().getAvatar().getUrl().toString();
-                    } else {
-                        name = content.get(3);
-                        icon = content.get(4);
-                    }
-                    if(!func.isURL(icon)) icon = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
-                    if(!content.get(1).isEmpty()) {
-                        wh = wh.createUpdater().setAvatar(new URL(icon)).setName(name).update().join();
-                        textChannel.getApi().getYourself().getLatestInstance().join();
-                        textChannel.getApi().getYourself().getLatestInstance().join();
-                        TemporalAccessor ta = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(Instant.ofEpochMilli(time).toString());
-                        WebhookEmbed we = new WebhookEmbedBuilder().setDescription(content.get(1)).setTimestamp(ta).build();
-                        try (WebhookClient webhookClient = new WebhookClientBuilder("https://discordapp.com/api/webhooks/" + wh.getId() + "/" + wh.getToken().orElse("")).setWait(true).build()) {
-                            webhookClient.send(we).join();
-                        }
-                    }
-                } catch (Exception e) {
-                    func.handle(e);
-                }
-            });
-        wh.delete("I am cleaning.");
+     //   wh = new WebhookBuilder(textChannel).setAvatar(api.getYourself().getAvatar()).setName("test").create().join();
+     //   final Stream<Long> keys = channelmap.keySet().parallelStream().sorted();
+     //   keys.forEachOrdered(time -> {
+     //           try {
+     //               Map<Integer, String> content = channelmap.get(time);
+     //               AtomicReference<User> user = new AtomicReference<>(null);
+     //               String name, icon;
+     //               user.set(textChannel.getServer().getMemberById(content.get(0)).orElse(null));
+//
+     //               if(user.get() != null) {
+     //                   name = user.get().getDisplayName(textChannel.getServer());
+     //                   icon = user.get().getAvatar().getUrl().toString();
+     //               } else {
+     //                   name = content.get(3);
+     //                   icon = content.get(4);
+     //               }
+     //               if(!func.isURL(icon)) icon = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+     //               if(!content.get(1).isEmpty()) {
+     //                   wh = wh.createUpdater().setAvatar(new URL(icon)).setName(name).update().join();
+     //                   textChannel.getApi().getYourself().getLatestInstance().join();
+     //                   textChannel.getApi().getYourself().getLatestInstance().join();
+     //                   TemporalAccessor ta = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(Instant.ofEpochMilli(time).toString());
+     //                   WebhookEmbed we = new WebhookEmbedBuilder().setDescription(content.get(1)).setTimestamp(ta).build();
+     //                   try (WebhookClient webhookClient = new WebhookClientBuilder("https://discordapp.com/api/webhooks/" + wh.getId() + "/" + wh.getToken().orElse("")).setWait(true).build()) {
+     //                       webhookClient.send(we).join();
+     //                   }
+     //               }
+     //           } catch (Exception e) {
+     //               func.handle(e);
+     //           }
+     //       });
+     //   wh.delete("I am cleaning.");
+     //   return this;
         return this;
     }
 
@@ -550,7 +545,7 @@ public class SaveChannel {
     public void delete() {
         this.channel = null;
         this.channelmap  = null;
-        this.wh  = null;
+        //this.wh  = null;
         this.usersDisc = null;
         this.usersName  = null;
         this.usersColor  = null;

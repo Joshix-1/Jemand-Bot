@@ -299,6 +299,7 @@ public class Main {
 			if(func.getFileSeparator().equals("/")) {
 				func.getApi().addMessageDeleteListener(new CommandCleanupListener());
 				func.getApi().addMessageCreateListener(new Channelportal());
+				func.getApi().addReactionAddListener(new Channelportal());
 				func.getApi().addReactionAddListener(new ZitatBewerter.Add());
 				func.getApi().addReactionRemoveListener(new ZitatBewerter.Remove());
 				func.getApi().addReactionAddListener(new ReactionRole.Add());

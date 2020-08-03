@@ -1,21 +1,22 @@
 package Jemand.Listener;
 
 import Jemand.func;
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.user.User;
-import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.entity.webhook.WebhookBuilder;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
+import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
+import org.javacord.api.listener.message.reaction.ReactionAddListener;
+import org.javacord.api.util.DiscordRegexPattern;
+import org.javacord.api.util.logging.ExceptionLogger;
 
-import java.awt.*;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
+import java.util.regex.Matcher;
 
-public class Channelportal implements MessageCreateListener {
+public class Channelportal implements MessageCreateListener, ReactionAddListener {
     static String[][] channels; //unser
     static  {
         String[] lol = func.readtextoffile("channelportal.txt").split("\\s+");
@@ -31,7 +32,7 @@ public class Channelportal implements MessageCreateListener {
             for (int i = 0; i < channel.length; i++) {
                 if (channel[i].equals(event.getChannel().getIdAsString())) {
                     try {
-                        mirror_message(event.getMessage(), channel[(i + 1) % 2]);
+                        mirrorMessage(event.getMessage(), channel[(i + 1) % 2]);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -41,38 +42,60 @@ public class Channelportal implements MessageCreateListener {
         }
     }
 
-    private void mirror_message(Message m, String channel_id) throws  Exception {
+    static private void mirrorMessage(Message m, String channel_id) {
         m.getApi().getServerTextChannelById(channel_id).ifPresent(channel ->{
-            AtomicReference<Webhook> w = new AtomicReference<>(null);
-            channel.getWebhooks().join().forEach(webhook -> {
-                if(m.getApi().getYourself().getId() == webhook.getCreator().map(User::getId).orElse(0L)) {
-                    w.set(webhook);
+            List<IncomingWebhook> webhooks = channel.getIncomingWebhooks().join();
+            IncomingWebhook webhook = webhooks.size() == 0 ? channel.createWebhookBuilder()
+                    .setAvatar(m.getApi().getYourself().getAvatar()).setName(m.getApi().getYourself().getName()).create().join()
+                    : webhooks.get(0);
+
+            WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
+
+            m.getAuthor().asUser().ifPresent(u -> {
+                if(channel.getServer().getMembers().contains(u)) {
+                    mb.setDisplayName(u.getDisplayName(channel.getServer()));
                 }
             });
-            User u = m.getUserAuthor().orElse(m.getApi().getYourself());
-            Webhook w2;
-            String DisplayName = u.getNickname(channel.getServer()).orElse(u.getDisplayName(m.getServer().get()));
 
-            if(w.get() == null) {
-                w2 = new WebhookBuilder(channel).setAvatar(u.getAvatar()).setName(DisplayName + " (" + u.getDiscriminatedName() + ")").create().join();
-            } else {
-                w2  = w.get().createUpdater().setAvatar(u.getAvatar()).setName(DisplayName + " (" + u.getDiscriminatedName() + ")").update().join();
-            }
-            WebhookClient client = WebhookClient.withId(w2.getId(), w2.getToken().get());
+            String id = func.longToBinaryBlankString(m.getId()) + '\u200C';
             String content = m.getContent();
-            if(content.isEmpty() && m.getEmbeds().size() > 0)
-                content = m.getEmbeds().get(0).getDescription().orElse("");
+            mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
-            int roleColor = u.getRoleColor(channel.getServer()).flatMap(color -> Optional.of(color.getRGB())).orElse(u.getRoleColor(m.getServer().get()).flatMap(color -> Optional.of(color.getRGB())).orElse(Color.GRAY.getRGB()));
-            WebhookEmbedBuilder embed = new WebhookEmbedBuilder()
-                    .setColor(roleColor)
-                    .setDescription(content);
+            mb.setAllowedMentions(new AllowedMentionsBuilder().build());
 
-            m.getAttachments().forEach(att ->{
-                embed.addField(new WebhookEmbed.EmbedField(false, "\u200B", att.getUrl().toString()));
-            });
+            mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
+        });
+    }
 
-            client.send(embed.build()).join();
+    @Override
+    public void onReactionAdd(ReactionAddEvent event) {
+        for (String[] channel : channels) {
+            for (int i = 0; i < channel.length; i++) {
+                if (channel[i].equals(event.getChannel().getIdAsString())) {
+                    int other = (i + 1) % 2;
+                    event.getApi().getMessageById(event.getMessageId(), event.getChannel()).thenAccept(m -> mirrorReactions(event, m, channel[other]));
+                    break;
+                }
+            }
+        }
+    }
+
+    static private void mirrorReactions(ReactionAddEvent event, Message m, String channel_id) {
+        m.getApi().getServerTextChannelById(channel_id).ifPresent(channel -> {
+            Message other = null;
+            if (m.getAuthor().isWebhook()) {
+                if (m.getContent().contains("\u200C")) {
+                    other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split("\u200C", 2)[0]), channel).join();
+                }
+            } else {
+                String blank = func.longToBinaryBlankString(m.getId()) + "\u200C";
+                other = channel.getMessagesAfter(10, m).join().getNewestMessage()
+                        .filter(message -> message.getAuthor().isWebhook() && message.getContent().startsWith(blank)).orElse(null);
+            }
+
+            if (other != null) {
+                other.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
+            }
         });
     }
 }

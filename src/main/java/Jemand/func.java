@@ -166,6 +166,14 @@ public class func {
         return System.getProperty("file.separator");
     }
 
+    public static String longToBinaryBlankString(long l)  {
+        return Long.toBinaryString(l).replace('0', '\u200B').replace('1', '\u200D');
+    }
+
+    public static long binaryBlankStringToLong(String str)  {
+        return Long.parseLong(str.replace('\u200B', '0').replace('\u200D', '1'), 2);
+    }
+
     static public void reactText(MessageCreateEvent event, String text, String messageId) {
         text = text.toLowerCase();
 

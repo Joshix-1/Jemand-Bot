@@ -1,5 +1,6 @@
 package Jemand.Listener;
 
+import Jemand.func;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.message.Message;
@@ -26,17 +27,17 @@ public class CommandCleanupListener implements MessageDeleteListener {
      */
 
     public static EmbedBuilder insertResponseTracker(EmbedBuilder builder, long trackedMessageId, String footerContent) {
-        return builder.setFooter(longToBinaryBlankString(trackedMessageId) + footerContent);
+        return builder.setFooter(func.longToBinaryBlankString(trackedMessageId) + footerContent);
     }
 
     public static EmbedBuilder insertResponseTracker(EmbedBuilder builder, long trackedMessageId, String footerContent, Icon footerIcon) {
         if(footerIcon == null) return insertResponseTracker(builder, trackedMessageId, footerContent);
-        return builder.setFooter(longToBinaryBlankString(trackedMessageId) + footerContent, footerIcon);
+        return builder.setFooter(func.longToBinaryBlankString(trackedMessageId) + footerContent, footerIcon);
     }
 
     public static EmbedBuilder insertResponseTracker(EmbedBuilder builder, long trackedMessageId, String footerContent, String footerIconUrl) {
         if(footerIconUrl == null) return insertResponseTracker(builder, trackedMessageId, footerContent);
-        return builder.setFooter(longToBinaryBlankString(trackedMessageId) + footerContent, footerIconUrl);
+        return builder.setFooter(func.longToBinaryBlankString(trackedMessageId) + footerContent, footerIconUrl);
     }
 
     @Override
@@ -55,16 +56,12 @@ public class CommandCleanupListener implements MessageDeleteListener {
     }
 
     private Predicate<Message> isOurResponseTo(long messageId) {
-        String tracker = longToBinaryBlankString(messageId);
+        String tracker = func.longToBinaryBlankString(messageId);
         return message -> !message.getEmbeds().isEmpty()
                 && message.getAuthor().isYourself()
                 && message.getEmbeds().get(0).getFooter()
                 .flatMap(EmbedFooter::getText)
                 .filter(text -> text.startsWith(tracker))
                 .isPresent();
-    }
-
-    private static String longToBinaryBlankString(long l)  {
-        return Long.toBinaryString(l).replace('0', '\u200B').replace('1', '\u200D');
     }
 }
