@@ -1,10 +1,10 @@
 package Jemand.Listener;
 
 import Jemand.func;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
@@ -24,10 +24,8 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
         for (int i = 0; i < lol.length; i++)
             channels[i] = lol[i].split("_");
     }
-    private static Pattern WEBHOOK_MENTION = Pattern.compile("@(?<name>.{1,32})#0000");
-
-
-
+    private static final Pattern WEBHOOK_MENTION = Pattern.compile("@(?<name>.{1,32})#0000");
+    private static final String SEPARATOR = "\u200C";
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
@@ -56,9 +54,14 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
 
             m.getAuthor().asUser().ifPresent(u -> {
+                //String name;
                 if(channel.getServer().getMembers().contains(u)) {
                     mb.setDisplayName(u.getDisplayName(channel.getServer()));
+                } /* else {
+                    name = m.getAuthor().getDisplayName();
                 }
+                mb.setDisplayName(func.longToBinaryBlankString(u.getId()) + SEPARATOR + name);
+                */
             });
 
             String content = m.getContent();
@@ -67,24 +70,31 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
 
             Matcher mentions = WEBHOOK_MENTION.matcher(content);
             while (mentions.find()) {
+                //String id = mentions.group("id");
+                //if (id != null) {
+                //    id = channel.getServer().getMemberById(func.binaryBlankStringToLong(id)).map(DiscordEntity::getIdAsString).orElse(null);
+                //}
                 String name = mentions.group("name");
-                User user = m.getServer()
-                        .map(server -> server.getMembersByDisplayName(name))
-                        .flatMap(users -> users.stream()
-                                .filter(u -> channel.getServer().getMembers().contains(u)).findFirst())
-                        .orElseGet(() -> channel.getServer().getMembersByDisplayName(name).stream().findFirst().orElse(null));
-                if (user == null) {
-                    content = mentions.replaceFirst("@invalid-user");
+                //if (id == null) {
+                String id = m.getServer()
+                            .map(server -> server.getMembersByDisplayName(name))
+                            .flatMap(users -> users.stream()
+                                    .filter(u -> channel.getServer().getMembers().contains(u)).findFirst())
+                            .map(DiscordEntity::getIdAsString)
+                            .orElseGet(() -> channel.getServer().getMembersByDisplayName(name).stream().findFirst().map(DiscordEntity::getIdAsString).orElse(null));
+                //}
+                if (id == null) {
+                    content = mentions.replaceFirst("@" + name);
                 } else {
-                    amb.addUser(user.getId());
-                    content = mentions.replaceFirst(user.getMentionTag());
+                    amb.addUser(id);
+                    content = mentions.replaceFirst("<@" + id + ">");
                 }
                 mentions.reset(content);
             }
 
             mb.setAllowedMentions(amb.build());
 
-            String id = func.longToBinaryBlankString(m.getId()) + '\u200C';
+            String id = func.longToBinaryBlankString(m.getId()) + SEPARATOR;
             mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
             mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
@@ -109,11 +119,11 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             Message other = null;
             if (m.getAuthor().isWebhook()) {
                 if (m.getContent().contains("\u200C")) {
-                    other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split("\u200C", 2)[0]), channel).join();
+                    other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split(SEPARATOR, 2)[0]), channel).join();
                 }
             } else {
-                String blank = func.longToBinaryBlankString(m.getId()) + '\u200C';
-                other = channel.getMessagesAfterUntil(message ->  message.getAuthor().isWebhook() && message.getContent().startsWith(blank), m).join().getNewestMessage().orElse(null);
+                String blank = func.longToBinaryBlankString(m.getId()) + SEPARATOR;
+                other = channel.getMessagesBetweenUntil(message ->  message.getAuthor().isWebhook() && message.getContent().startsWith(blank), m.getId(), m.getId() + 7549747200000L /*30 Minuten in millis + 22 leere bits*/).join().getNewestMessage().orElse(null);
             }
 
             if (other != null) {
