@@ -2,7 +2,6 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -17,8 +16,9 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
-import org.javacord.api.event.user.UserChangeActivityEvent;
+import org.javacord.api.event.user.*;
 import org.javacord.api.util.logging.ExceptionLogger;
+import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
 
@@ -27,6 +27,7 @@ public class GuildCloner {
     static private final long COPY = 740214894036779009L;
     static public final long MITGLIED = 367649615484551179L;
     static public final long ROLLENMEISTER = 493572898577973249L;
+    static public final long LOGS = 559451873015234560L;
 
     public GuildCloner(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
@@ -36,7 +37,52 @@ public class GuildCloner {
             server.addServerChannelDeleteListener(this::channelDeleted);
             server.addRoleChangePermissionsListener(this::roleChangedPermission);
             server.addUserChangeActivityListener(this::activityChanged);
+
+            server.addUserChangeNameListener(this::userChangedName);
+            server.addUserChangeDiscriminatorListener(this::userChangedDiscriminator);
+            server.addUserChangeNicknameListener(this::userChangedNickname);
+            server.addUserChangeAvatarListener(this::userChangedAvatar);
         });
+    }
+
+    private static void sendEmbedToLogs(EmbedBuilder embed, DiscordApi api) {
+        api.getServerTextChannelById(LOGS).ifPresent(channel -> {
+            func.getIncomingWebhook(channel).sendMessage(embed, api.getYourself().getName(), api.getYourself().getAvatar()).exceptionally(ExceptionLogger.get());
+        });
+    }
+
+    private static EmbedBuilder getUserUpdatedEmbedBuilder(User user) {
+        return new EmbedBuilder().setTitle(((UserImpl) user).toString() + " wurde aktualisiert.").setImage(user.getAvatar()).setColor(user.getRoleColor(user.getApi().getServerById(AN).orElse(null)).orElse(Color.BLACK)).setTimestampToNow();
+    }
+
+    private void userChangedName(UserChangeNameEvent event) {
+        userChangedDiscriminatedName(event.getUser(), event.getOldName() + "#" + event.getUser().getDiscriminator(), event.getNewName() + "#" + event.getUser().getDiscriminator());
+    }
+
+    private void userChangedDiscriminator(UserChangeDiscriminatorEvent event) {
+        userChangedDiscriminatedName(event.getUser(), event.getUser().getName() + "#" + event.getOldDiscriminator(), event.getUser().getName() + "#" + event.getNewDiscriminator());
+    }
+
+    private static void userChangedDiscriminatedName(User user, String oldName, String newName) {
+        sendEmbedToLogs(getUserUpdatedEmbedBuilder(user)
+                .addField("Name:", xToY(oldName, newName))
+                , user.getApi());
+    }
+
+    private void userChangedNickname(UserChangeNicknameEvent event) {
+        sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
+                        .addField("Nickname:", xToY(event.getOldNickname().orElse(event.getUser().getName()), event.getNewNickname().orElse(event.getUser().getName())))
+                , event.getUser().getApi());
+    }
+
+    private void userChangedAvatar(UserChangeAvatarEvent event) {
+        sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
+                        .addField("Avatar:", xToY(event.getOldAvatar().getUrl().toString(), event.getNewAvatar().getUrl().toString()))
+                , event.getUser().getApi());
+    }
+
+    private static String xToY(String x, String y) {
+        return "`" + x + "` -> `" + y + "`";
     }
 
     private void roleChangedPermission(RoleChangePermissionsEvent event) {
@@ -56,7 +102,7 @@ public class GuildCloner {
     private void userAddedRole(UserRoleAddEvent event) {
         if (event.getRole().getId() == MITGLIED) {
             event.getUser().sendMessage("Herzlichen Glückwunsch. Du bist nun Mitglied auf der Gilde des Asozialen Netzwerkes.").exceptionally(ExceptionLogger.get());
-            event.getServer().getTextChannelsByName("logs").stream().findFirst().ifPresent(channel -> channel.sendMessage(event.getUser().getIdAsString() + " ist nun Mitglied.").exceptionally(ExceptionLogger.get()));
+            event.getServer().getTextChannelById(LOGS).ifPresent(channel -> channel.sendMessage(event.getUser().getIdAsString() + " ist nun Mitglied.").exceptionally(ExceptionLogger.get()));
         }
     }
 
