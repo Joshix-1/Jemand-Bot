@@ -14,6 +14,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
+import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.user.*;
@@ -42,7 +43,16 @@ public class GuildCloner {
             server.addUserChangeDiscriminatorListener(this::userChangedDiscriminator);
             server.addUserChangeNicknameListener(this::userChangedNickname);
             server.addUserChangeAvatarListener(this::userChangedAvatar);
+
+            server.addServerMemberJoinListener(this::userJoined);
         });
+    }
+
+    private void userJoined(ServerMemberJoinEvent event) {
+        sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
+                .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
+                .addField("Name:", event.getUser().getDiscriminatedName())
+                , event.getApi());
     }
 
     private static void sendEmbedToLogs(EmbedBuilder embed, DiscordApi api) {
