@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -16,8 +17,6 @@ import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.util.logging.ExceptionLogger;
-
-import java.util.List;
 
 public class GuildCloner {
     static public final long AN = 367648314184826880L;
@@ -51,25 +50,17 @@ public class GuildCloner {
 
     private void userAddedRole(UserRoleAddEvent event) {
         if (event.getRole().getId() == MITGLIED) {
-            event.getUser().sendMessage("Herzlichen Glückwunsch. Du bist nun Mitglied auf der Gilde des asozialen Netzwerkes.").exceptionally(ExceptionLogger.get());
+            event.getUser().sendMessage("Herzlichen Glückwunsch. Du bist nun Mitglied auf der Gilde des Asozialen Netzwerkes.").exceptionally(ExceptionLogger.get());
+            event.getServer().getTextChannelsByName("logs").stream().findFirst().ifPresent(channel -> channel.sendMessage(event.getUser().getIdAsString() + " ist nun Mitglied.").exceptionally(ExceptionLogger.get()));
         }
     }
 
     private void messageCreated(MessageCreateEvent event) {
-        event.getApi().getServerById(COPY).ifPresent(copy -> {
-            List<ServerTextChannel> channels = copy.getTextChannelsByName(event.getChannel().getIdAsString());
-            ServerTextChannel channel;
-            if (channels.size() > 0) {
-                channel = channels.get(0);
-            } else {
-                ServerTextChannel old = event.getServerTextChannel().get();
-                channel = new ServerTextChannelBuilder(copy)
-                        .setName(old.getIdAsString())
-                        .setSlowmodeDelayInSeconds(old.getSlowmodeDelayInSeconds())
-                        .setTopic(old.getTopic()).create().join();
-            }
-            event.getMessage().toWebhookMessageBuilder().send(func.getIncomingWebhook(channel)).exceptionally(ExceptionLogger.get());
-        });
+        event.getMessage()
+                .toWebhookMessageBuilder()
+                .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
+                .setAllowedMentions(new AllowedMentionsBuilder().build())
+                .send(func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null)))).exceptionally(ExceptionLogger.get());
 
         if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;
         User user = event.getMessageAuthor().asUser().orElse(null);
@@ -82,6 +73,33 @@ public class GuildCloner {
                 func.handle(e);
             }
         }
+    }
+
+    private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
+        Server copy = channel.getApi().getServerById(COPY).orElse(null);
+        if (copy == null) return null;
+        ServerTextChannel stc = copy.getTextChannelsByName(channel.getIdAsString()).stream().findAny().orElse(null);
+        String newTopic = channel.getMentionTag() + "\n" + channel.getTopic();
+        if (newTopic.length() > 1024) {
+            newTopic = newTopic.substring(0, 1023);
+        }
+        if (stc == null) {
+            stc = new ServerTextChannelBuilder(copy)
+                    .setName(channel.getIdAsString())
+                    .setSlowmodeDelayInSeconds(channel.getSlowmodeDelayInSeconds())
+                    .setTopic(newTopic).create().join();
+        } else {
+            if (!stc.getTopic().equals(newTopic)
+                    || stc.getSlowmodeDelayInSeconds() != channel.getSlowmodeDelayInSeconds()
+                    || stc.isNsfw() != channel.isNsfw()) {
+                stc.createUpdater()
+                        .setSlowmodeDelayInSeconds(channel.getSlowmodeDelayInSeconds())
+                        .setNsfwFlag(channel.isNsfw())
+                        .setTopic(newTopic)
+                        .update().exceptionally(ExceptionLogger.get());
+            }
+        }
+        return stc;
     }
 
     private void memberBanned(ServerMemberBanEvent event) {
