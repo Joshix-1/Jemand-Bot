@@ -2,11 +2,12 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
-import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
@@ -16,7 +17,10 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
+import org.javacord.api.event.user.UserChangeActivityEvent;
 import org.javacord.api.util.logging.ExceptionLogger;
+
+import java.awt.*;
 
 public class GuildCloner {
     static public final long AN = 367648314184826880L;
@@ -31,6 +35,7 @@ public class GuildCloner {
             server.addServerMemberBanListener(this::memberBanned);
             server.addServerChannelDeleteListener(this::channelDeleted);
             server.addRoleChangePermissionsListener(this::roleChangedPermission);
+            server.addUserChangeActivityListener(this::activityChanged);
         });
     }
 
@@ -121,25 +126,27 @@ public class GuildCloner {
         }
     }
 
-//Fortnite-Detektor:
-        //server.addUserChangeActivityListener(event -> {
-        //	server.getTextChannelById(623940807619248148L).ifPresent(textchannel -> {
-        //		event.getNewActivity().ifPresent(activity -> {
-        //			event.getOldActivity().ifPresent(oldactivity -> {
-        //				if (!oldactivity.getApplicationId().orElse(0L).equals(activity.getApplicationId().orElse(1L)) && ((activity.getType().equals(ActivityType.PLAYING) && activity.getName().equals("Fortnite")) || (activity.getApplicationId().orElse(0L) == 432980957394370572L))) {
-        //					EmbedBuilder embed = new EmbedBuilder()
-        //							.setColor(Color.RED)
-        //							.setTimestampToNow()
-        //							.setFooter(event.getUser().getDiscriminatedName(), event.getUser().getAvatar());
-        //					activity.getDetails().ifPresent(string -> {
-        //						embed.addField("\u200B", "\nDetails: (" + string + ")");
-        //					});
-        //					textchannel.sendMessage(embed.setDescription(event.getUser().getMentionTag() + " spielt " + activity.getName() + "."));
-        //					func.getApi().getRoleById(623193804551487488L).ifPresent(event.getUser()::addRole);
-        //				}
-        //			});
-        //		});
-        //	});
-        //	//}
-        //});
+    //Fortnite-Detektor
+    private void activityChanged(UserChangeActivityEvent event) {
+        event.getApi().getServerTextChannelById(623940807619248148L).ifPresent(textchannel -> {
+    		event.getNewActivity().ifPresent(activity -> {
+    			event.getOldActivity().ifPresent(oldactivity -> {
+    				if (!oldactivity.getApplicationId().orElse(0L).equals(activity.getApplicationId().orElse(1L))
+                            && ((activity.getType().equals(ActivityType.PLAYING)
+                            && activity.getName().equals("Fortnite"))
+                            || (activity.getApplicationId().orElse(0L) == 432980957394370572L))) {
+    					EmbedBuilder embed = new EmbedBuilder()
+    							.setColor(Color.RED)
+    							.setTimestampToNow()
+    							.setFooter(event.getUser().getDiscriminatedName(), event.getUser().getAvatar());
+    					activity.getDetails().ifPresent(string -> {
+    						embed.addField("\u200B", "\nDetails: (" + string + ")");
+    					});
+    					textchannel.sendMessage(embed.setDescription(event.getUser().getMentionTag() + " spielt " + activity.getName() + "."));
+    					func.getApi().getRoleById(623193804551487488L).ifPresent(event.getUser()::addRole);
+    				}
+    			});
+    		});
+    	});
+    }
 }
