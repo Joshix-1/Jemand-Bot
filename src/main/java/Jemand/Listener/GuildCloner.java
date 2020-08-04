@@ -2,6 +2,7 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
@@ -32,6 +33,7 @@ public class GuildCloner {
     static public final long MITGLIED = 367649615484551179L;
     static public final long ROLLENMEISTER = 493572898577973249L;
     static public final long LOGS = 559451873015234560L;
+    static public final long ACTIVITY_LOGS = 740337061524930671L;
 
     public GuildCloner(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
@@ -59,13 +61,17 @@ public class GuildCloner {
     }
 
     private static void sendEmbedToLogs(EmbedBuilder embed, DiscordApi api) {
-        api.getServerTextChannelById(LOGS).ifPresent(channel -> {
+        sendEmbedToId(embed, LOGS, api);
+    }
+
+    private static void sendEmbedToId(EmbedBuilder embed, long Id, DiscordApi api) {
+        api.getServerTextChannelById(Id).ifPresent(channel -> {
             func.getIncomingWebhook(channel).sendMessage(embed, api.getYourself().getName(), api.getYourself().getAvatar()).exceptionally(ExceptionLogger.get());
         });
     }
 
     private static EmbedBuilder getUserUpdatedEmbedBuilder(User user) {
-        return new EmbedBuilder().setTitle(((UserImpl) user).toString() + " wurde aktualisiert.").setImage(user.getAvatar()).setColor(user.getRoleColor(user.getApi().getServerById(AN).orElse(null)).orElse(Color.BLACK)).setTimestampToNow();
+        return new EmbedBuilder().setTitle(((UserImpl) user).toString() + " wurde aktualisiert.").setFooter(user.getDiscriminatedName(), user.getAvatar()).setColor(user.getRoleColor(user.getApi().getServerById(AN).orElse(null)).orElse(Color.BLACK)).setTimestampToNow();
     }
 
     private void userChangedName(UserChangeNameEvent event) {
@@ -214,7 +220,7 @@ public class GuildCloner {
         String o = getActivity(event.getOldActivity().orElse(null));
         String n = getActivity(event.getNewActivity().orElse(null));
         if (!o.equals(n)) {
-            sendEmbedToLogs(embed.addField("Activity:", xToY(o, n)), event.getApi());
+            sendEmbedToId(embed.addField("Activity:", xToY(o, n)), ACTIVITY_LOGS, event.getApi());
         }
     }
 
