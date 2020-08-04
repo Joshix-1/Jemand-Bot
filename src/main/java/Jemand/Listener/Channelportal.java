@@ -4,6 +4,7 @@ import Jemand.func;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
@@ -12,15 +13,21 @@ import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.util.logging.ExceptionLogger;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Channelportal implements MessageCreateListener, ReactionAddListener {
-    static String[][] channels; //unser
+    private static final String[][] channels; //unser
     static  {
         String[] lol = func.readtextoffile("channelportal.txt").split("\\s+");
         channels = new String[lol.length][2];
         for (int i = 0; i < lol.length; i++)
             channels[i] = lol[i].split("_");
     }
+    private static Pattern WEBHOOK_MENTION = Pattern.compile("@(?<name>.{1,32})#0000");
+
+
+
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
@@ -54,11 +61,31 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
                 }
             });
 
-            String id = func.longToBinaryBlankString(m.getId()) + '\u200C';
             String content = m.getContent();
-            mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
-            mb.setAllowedMentions(new AllowedMentionsBuilder().setMentionEveryoneAndHere(false).setMentionUsers(true).setMentionRoles(false).build());
+            AllowedMentionsBuilder amb = new AllowedMentionsBuilder();
+
+            Matcher mentions = WEBHOOK_MENTION.matcher(content);
+            while (mentions.find()) {
+                String name = mentions.group("name");
+                User user = m.getServer()
+                        .map(server -> server.getMembersByDisplayName(name))
+                        .flatMap(users -> users.stream()
+                                .filter(u -> channel.getServer().getMembers().contains(u)).findFirst())
+                        .orElseGet(() -> channel.getServer().getMembersByDisplayName(name).stream().findFirst().orElse(null));
+                if (user == null) {
+                    content = mentions.replaceFirst("@invalid-user");
+                } else {
+                    amb.addUser(user.getId());
+                    content = mentions.replaceFirst(user.getMentionTag());
+                }
+                mentions.reset(content);
+            }
+
+            mb.setAllowedMentions(amb.build());
+
+            String id = func.longToBinaryBlankString(m.getId()) + '\u200C';
+            mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
             mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
         });
