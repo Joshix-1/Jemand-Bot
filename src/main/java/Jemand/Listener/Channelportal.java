@@ -46,10 +46,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
 
     static private void mirrorMessage(Message m, String channel_id) {
         m.getApi().getServerTextChannelById(channel_id).ifPresent(channel ->{
-            List<IncomingWebhook> webhooks = channel.getIncomingWebhooks().join();
-            IncomingWebhook webhook = webhooks.size() == 0 ? channel.createWebhookBuilder()
-                    .setAvatar(m.getApi().getYourself().getAvatar()).setName(m.getApi().getYourself().getName()).create().join()
-                    : webhooks.get(0);
+            IncomingWebhook webhook = func.getIncomingWebhook(channel);
 
             WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
 

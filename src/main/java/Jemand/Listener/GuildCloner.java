@@ -3,7 +3,10 @@ package Jemand.Listener;
 import Jemand.func;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
+import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -59,8 +62,13 @@ public class GuildCloner {
             if (channels.size() > 0) {
                 channel = channels.get(0);
             } else {
-
+                ServerTextChannel old = event.getServerTextChannel().get();
+                channel = new ServerTextChannelBuilder(copy)
+                        .setName(old.getIdAsString())
+                        .setSlowmodeDelayInSeconds(old.getSlowmodeDelayInSeconds())
+                        .setTopic(old.getTopic()).create().join();
             }
+            event.getMessage().toWebhookMessageBuilder().send(func.getIncomingWebhook(channel)).exceptionally(ExceptionLogger.get());
         });
 
         if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;

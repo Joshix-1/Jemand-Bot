@@ -8,11 +8,13 @@ import org.apfloat.ApfloatMath;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.json.JSONException;
@@ -1115,6 +1117,14 @@ public class func {
             handle(e);
             return min;
         }
+    }
+
+    public static IncomingWebhook getIncomingWebhook (ServerTextChannel channel) {
+        List<IncomingWebhook> webhooks = channel.getIncomingWebhooks().join();
+        return webhooks.size() == 0 ? channel.createWebhookBuilder()
+                .setAvatar(channel.getApi().getYourself().getAvatar()).setName(channel.getApi().getYourself().getName()).create().join()
+                : webhooks.get(0);
+
     }
 
     //robot
