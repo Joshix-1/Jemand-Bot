@@ -20,6 +20,7 @@ public class GuildCloner {
     static public final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
     static public final long MITGLIED = 367649615484551179L;
+    static public final long ROLLENMEISTER = 493572898577973249L;
 
     public GuildCloner(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
@@ -32,10 +33,16 @@ public class GuildCloner {
     }
 
     private void roleChangedPermission(RoleChangePermissionsEvent event) {
-        if (event.getRole().getName().equalsIgnoreCase("muted")) {
-            event.getRole().updatePermissions(Permissions.fromBitmask(0)).exceptionally(ExceptionLogger.get());
-        } else if (event.getRole().getId() != MITGLIED) {
-            event.getRole().updatePermissions(Permissions.fromBitmask(267902401)).exceptionally(ExceptionLogger.get());
+        long role = event.getRole().getId();
+        if (event.getRole().isEveryoneRole()) {
+            if (event.getNewPermissions().getAllowedBitmask() != 70321344) //https://discordapi.com/permissions.html#70321344
+                event.getRole().updatePermissions(Permissions.fromBitmask(70321344)).exceptionally(ExceptionLogger.get());
+        } else if (role != MITGLIED && role != ROLLENMEISTER) {
+            if (event.getRole().getName().toLowerCase().contains("mitlgied")) { //vorläufiges Mitglied, rest braucht die Rechte nicht
+                if (event.getNewPermissions().getAllowedBitmask() != 267902401) //https://discordapi.com/permissions.html#267902401
+                    event.getRole().updatePermissions(Permissions.fromBitmask(267902401)).exceptionally(ExceptionLogger.get());
+            } else if (event.getNewPermissions().getAllowedBitmask() != 0)
+                event.getRole().updatePermissions(Permissions.fromBitmask(0)).exceptionally(ExceptionLogger.get());
         }
     }
 
