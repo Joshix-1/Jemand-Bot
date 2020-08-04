@@ -3,18 +3,15 @@ package Jemand.Listener;
 import Jemand.func;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
-import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
-import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.logging.ExceptionLogger;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
 public class Channelportal implements MessageCreateListener, ReactionAddListener {
     static String[][] channels; //unser
@@ -61,7 +58,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             String content = m.getContent();
             mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
-            mb.setAllowedMentions(new AllowedMentionsBuilder().build());
+            mb.setAllowedMentions(new AllowedMentionsBuilder().setMentionEveryoneAndHere(false).setMentionUsers(true).setMentionRoles(false).build());
 
             mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
         });
@@ -88,9 +85,8 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
                     other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split("\u200C", 2)[0]), channel).join();
                 }
             } else {
-                String blank = func.longToBinaryBlankString(m.getId()) + "\u200C";
-                other = channel.getMessagesAfter(10, m).join().getNewestMessage()
-                        .filter(message -> message.getAuthor().isWebhook() && message.getContent().startsWith(blank)).orElse(null);
+                String blank = func.longToBinaryBlankString(m.getId()) + '\u200C';
+                other = channel.getMessagesAfterUntil(message ->  message.getAuthor().isWebhook() && message.getContent().startsWith(blank), m).join().getNewestMessage().orElse(null);
             }
 
             if (other != null) {

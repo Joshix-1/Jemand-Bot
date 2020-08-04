@@ -1029,7 +1029,7 @@ public class func {
     }
 
     static public boolean userIsTrusted(DiscordEntity user) {
-        return user.getId() == api.getOwnerId() || user.getId() == 396294727814610944L || user.getId() == 564843886434975745L;
+        return user.getId() == api.getOwnerId() || user.getId() == 396294727814610944L || user.getId() == 564843886434975745L || user.getId() == 230800661837512705L;
     }
 
     //zitat // goq
