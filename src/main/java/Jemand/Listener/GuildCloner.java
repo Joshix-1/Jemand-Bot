@@ -9,9 +9,9 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import java.util.List;
 
 public class GuildCloner {
-    static private final long AN = 367648314184826880L;
+    static public final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
-    static private final long MITGLIED = 367649615484551179L;
+    static public final long MITGLIED = 367649615484551179L;
 
     public GuildCloner(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
