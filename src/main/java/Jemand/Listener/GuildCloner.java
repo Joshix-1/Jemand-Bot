@@ -232,14 +232,13 @@ public class GuildCloner {
             case CUSTOM:
                 type = activity.getEmoji().map(Mentionable::getMentionTag).orElse("") + " " + activity.getState().orElse("");
                 return type.length() == 1 ? "none" : type;
+            case STREAMING:
+                return "Streamt " + activity.getStreamingUrl().orElse(activity.getName());
             case WATCHING:
                 type = "Schaut %s";
                 break;
             case LISTENING:
                 type = "Hört %s zu";
-                break;
-            case STREAMING:
-                type = "Streamt %s";
                 break;
             default:
                 type = "Spielt %s";
