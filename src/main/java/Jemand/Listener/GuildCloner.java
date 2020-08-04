@@ -2,6 +2,8 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -22,6 +24,7 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
+import java.util.Optional;
 
 public class GuildCloner {
     static public final long AN = 367648314184826880L;
@@ -184,6 +187,8 @@ public class GuildCloner {
 
     //Fortnite-Detektor
     private void activityChanged(UserChangeActivityEvent event) {
+        if (event.getUser().isBot()) return;
+
         event.getApi().getServerTextChannelById(623940807619248148L).ifPresent(textchannel -> {
     		event.getNewActivity().ifPresent(activity -> {
     			event.getOldActivity().ifPresent(oldactivity -> {
@@ -204,5 +209,35 @@ public class GuildCloner {
     			});
     		});
     	});
+
+        EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
+        String o = getActivity(event.getOldActivity().orElse(null));
+        String n = getActivity(event.getNewActivity().orElse(null));
+        if (!o.equals(n)) {
+            sendEmbedToLogs(embed.addField("Activity:", xToY(o, n)), event.getApi());
+        }
+    }
+
+    private static String getActivity(Activity activity) {
+        if (activity == null) return "none";
+
+        String type;
+        switch (activity.getType()) {
+            case CUSTOM:
+                type = activity.getEmoji().map(Mentionable::getMentionTag).orElse("") + " " + activity.getState().orElse("");
+                return type.length() == 1 ? "none" : type;
+            case WATCHING:
+                type = "Schaut %s";
+                break;
+            case LISTENING:
+                type = "Hört %s zu";
+                break;
+            case STREAMING:
+                type = "Streamt %s";
+                break;
+            default:
+                type = "Spielt %s";
+        }
+        return String.format(type, activity.getName());
     }
 }
