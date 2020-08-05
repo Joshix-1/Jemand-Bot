@@ -11,8 +11,10 @@ import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.embed.EmbedField;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
@@ -22,6 +24,8 @@ import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
 import org.javacord.api.event.server.role.UserRoleAddEvent;
+import org.javacord.api.event.server.role.UserRoleEvent;
+import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.*;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
@@ -57,7 +61,19 @@ public class GuildUtilities {
 
             server.addServerMemberJoinListener(this::userJoined);
             server.addReactionAddListener(this::reactionAdded);
+
+            server.addUserRoleAddListener(event -> updatedRolesUser(event, true));
+            server.addUserRoleRemoveListener(event -> updatedRolesUser(event, false));
         });
+    }
+
+    private void updatedRolesUser(UserRoleEvent event, boolean added) {
+        EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
+        embed.addField(added ? "Rolle hinzugefügt:" : "Rolle entfernt:", event.getRole().getName() + " (" + event.getRole().getId() + ")");
+        StringBuilder roles = new StringBuilder();
+        event.getUser().getRoles(event.getServer()).forEach(role -> roles.append(role.getMentionTag()).append("\n"));
+        embed.addField("Rollen:", roles.toString());
+        sendEmbedToLogs(embed, event.getApi());
     }
 
     private void reactionAdded(ReactionAddEvent event) {
@@ -68,12 +84,20 @@ public class GuildUtilities {
                 if (reaction.getCount() == 1) {
                     sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
                         messageCompletableFuture.thenAccept(message -> {
-                            message.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
+                            message.addReaction(reaction.getEmoji()).exceptionally(ExceptionLogger.get());
                         });
                     });
                 }
             });
         }
+        //else if (event.getChannel().getId() == WITZIG_KANAL && event.getEmoji().getMentionTag().equals(QUESTION_MARK)) {
+        //    event.requestMessage().thenAccept(message -> {
+        //       if (message.getAuthor().isWebhook() && message.getContent().contains(Channelportal.SEPARATOR)) {
+        //            long id = func.binaryBlankStringToLong(message.getContent().split(Channelportal.SEPARATOR, 2)[0]);
+        //            event.getUser().sendMessage(func.getApi().getMessageById)
+        //       }
+        //    });
+        //}
     }
 
     private void userJoined(ServerMemberJoinEvent event) {

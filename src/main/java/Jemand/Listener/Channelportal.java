@@ -25,7 +25,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             channels[i] = lol[i].split("_");
     }
     private static final Pattern WEBHOOK_MENTION = Pattern.compile("@(?<name>.{1,32})#0000");
-    private static final String SEPARATOR = "\u200C";
+    public static final String SEPARATOR = "\u200C";
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
