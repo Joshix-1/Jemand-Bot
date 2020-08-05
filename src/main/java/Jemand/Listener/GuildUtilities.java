@@ -122,6 +122,7 @@ public class GuildUtilities {
     private void userChangedAvatar(UserChangeAvatarEvent event) {
         sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
                         .setImage(event.getNewAvatar())
+                        .setFooter(event.getUser().getDiscriminatedName(), event.getOldAvatar())
                         .addField("Avatar:", getHyperLink(event.getOldAvatar().getUrl().toString(), "Alt") + " -> " + getHyperLink(event.getNewAvatar().getUrl().toString(), "Neu"))
                 , event.getUser().getApi());
     }
