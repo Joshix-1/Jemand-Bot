@@ -2,13 +2,14 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
@@ -16,6 +17,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
@@ -26,14 +28,18 @@ import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class GuildCloner {
-    static public final long AN = 367648314184826880L;
+    static private final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
-    static public final long MITGLIED = 367649615484551179L;
-    static public final long ROLLENMEISTER = 493572898577973249L;
-    static public final long LOGS = 559451873015234560L;
-    static public final long ACTIVITY_LOGS = 740337061524930671L;
+    static private final long MITGLIED = 367649615484551179L;
+    static private final long ROLLENMEISTER = 493572898577973249L;
+    static private final long LOGS = 559451873015234560L;
+    static private final long ACTIVITY_LOGS = 740337061524930671L;
+
+    static private final long WITZIG_KANAL = 740498116171792395L;
+    static private final long WITZIG_EMOJI = 609012744578007071L;
 
     public GuildCloner(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
@@ -50,7 +56,18 @@ public class GuildCloner {
             server.addUserChangeAvatarListener(this::userChangedAvatar);
 
             server.addServerMemberJoinListener(this::userJoined);
+            server.addReactionAddListener(this::reactionAdded);
         });
+    }
+
+    private void reactionAdded(ReactionAddEvent event) {
+        if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == WITZIG_EMOJI) {
+            sendWebhookMessageBuilderToId(event.requestMessage().join().toWebhookMessageBuilder(), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
+                messageCompletableFuture.thenAccept(message -> {
+                   message.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
+                });
+            });
+        }
     }
 
     private void userJoined(ServerMemberJoinEvent event) {
@@ -60,14 +77,16 @@ public class GuildCloner {
                 , event.getApi());
     }
 
+    private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
+        return api.getServerTextChannelById(id).map(serverTextChannel -> wmb.send(func.getIncomingWebhook(serverTextChannel)).exceptionally(ExceptionLogger.get()));
+    }
+
     private static void sendEmbedToLogs(EmbedBuilder embed, DiscordApi api) {
         sendEmbedToId(embed, LOGS, api);
     }
 
-    private static void sendEmbedToId(EmbedBuilder embed, long Id, DiscordApi api) {
-        api.getServerTextChannelById(Id).ifPresent(channel -> {
-            func.getIncomingWebhook(channel).sendMessage(embed, api.getYourself().getName(), api.getYourself().getAvatar()).exceptionally(ExceptionLogger.get());
-        });
+    private static void sendEmbedToId(EmbedBuilder embed, long id, DiscordApi api) {
+        sendWebhookMessageBuilderToId(new WebhookMessageBuilder().addEmbed(embed).setDisplayName(api.getYourself().getName()).setDisplayAvatar(api.getYourself().getAvatar()), id, api);
     }
 
     private static EmbedBuilder getUserUpdatedEmbedBuilder(User user) {
