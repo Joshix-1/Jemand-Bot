@@ -61,11 +61,17 @@ public class GuildCloner {
     }
 
     private void reactionAdded(ReactionAddEvent event) {
-        if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == WITZIG_EMOJI) {
-            sendWebhookMessageBuilderToId(event.requestMessage().join().toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
-                messageCompletableFuture.thenAccept(message -> {
-                   message.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
-                });
+        if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == WITZIG_EMOJI
+                && event.getChannel().getId() != WITZIG_KANAL) {
+            Message m = event.requestMessage().join();
+            m.getReactions().stream().filter(reaction -> reaction.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == WITZIG_EMOJI).findFirst().ifPresent(reaction -> {
+                if (reaction.getCount() == 1) {
+                    sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
+                        messageCompletableFuture.thenAccept(message -> {
+                            message.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
+                        });
+                    });
+                }
             });
         }
     }
@@ -145,6 +151,12 @@ public class GuildCloner {
     }
 
     private void messageCreated(MessageCreateEvent event) {
+        //delete meessages in #witzig
+        if (event.getChannel().getId() == WITZIG_KANAL && event.getMessageAuthor().isUser()) {
+            event.getMessage().delete();
+            return;
+        }
+
         event.getMessage()
                 .toWebhookMessageBuilder()
                 .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
