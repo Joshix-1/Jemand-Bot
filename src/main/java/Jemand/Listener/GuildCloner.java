@@ -220,7 +220,7 @@ public class GuildCloner {
         String o = getActivity(event.getOldActivity().orElse(null));
         String n = getActivity(event.getNewActivity().orElse(null));
         if (!o.equals(n)) {
-            sendEmbedToId(embed.addField("Activity:", xToY(o, n)), ACTIVITY_LOGS, event.getApi());
+            sendEmbedToId(embed.addField("Activity:", o + " -> " + n), ACTIVITY_LOGS, event.getApi());
         }
     }
 
@@ -230,18 +230,21 @@ public class GuildCloner {
         String type;
         switch (activity.getType()) {
             case CUSTOM:
-                type = activity.getEmoji().map(Mentionable::getMentionTag).orElse("") + " " + activity.getState().orElse("");
-                return type.length() == 1 ? "none" : type;
+                if (activity.getState().isPresent() || activity.getEmoji().isPresent()) {
+                    return  (activity.getEmoji().isPresent() ? activity.getEmoji().get().getMentionTag() : "")
+                            + (activity.getEmoji().isPresent() && activity.getState().isPresent() ? " " : "")
+                            + (activity.getState().isPresent() ? "`" + activity.getState().get() + "`" : "");
+                }
             case STREAMING:
-                return "Streamt " + activity.getStreamingUrl().orElse(activity.getName());
+                return "`Streamt " + activity.getStreamingUrl().orElse(activity.getName()) + "`";
             case WATCHING:
-                type = "Schaut %s";
+                type = "`Schaut %s`";
                 break;
             case LISTENING:
-                type = "Hört %s zu";
+                type = "`Hört %s zu`";
                 break;
             default:
-                type = "Spielt %s";
+                type = "`Spielt %s`";
         }
         return String.format(type, activity.getName());
     }
