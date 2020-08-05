@@ -2306,7 +2306,7 @@ public class Befehl {
                 String Bilder = "Fake-Person Fake-Cat Random-Picture Random-Robot Random-Face Random-Alien Random-Cat Random-Human Resize QR";
                 String Memes = "Donald WTH Lisa Drake Winnie";
                 String Spaß = "8-Ball Emote React Roll Say Ping Pong";
-                if (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
+                if (server.getId() == GuildCloner.AN || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
                 String Spiele = "4-Gewinnt SSS TTT Stats Dice-Game";
                 String Server = "Rank Top Prefix GuildInvite Clear Welcome-Message Leave-Message Backup Reaction-Role";
                 String Anderes = "Save SaveAs Save-Private Load Delete Rename Edit Calculate";

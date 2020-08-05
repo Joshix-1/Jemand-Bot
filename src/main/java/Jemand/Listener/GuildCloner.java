@@ -31,9 +31,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildCloner {
-    static private final long AN = 367648314184826880L;
+    static public final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
-    static private final long MITGLIED = 367649615484551179L;
+    static public final long MITGLIED = 367649615484551179L;
     static private final long ROLLENMEISTER = 493572898577973249L;
     static private final long LOGS = 559451873015234560L;
     static private final long ACTIVITY_LOGS = 740337061524930671L;
@@ -62,7 +62,7 @@ public class GuildCloner {
 
     private void reactionAdded(ReactionAddEvent event) {
         if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == WITZIG_EMOJI) {
-            sendWebhookMessageBuilderToId(event.requestMessage().join().toWebhookMessageBuilder(), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
+            sendWebhookMessageBuilderToId(event.requestMessage().join().toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
                 messageCompletableFuture.thenAccept(message -> {
                    message.addReaction(event.getEmoji()).exceptionally(ExceptionLogger.get());
                 });
