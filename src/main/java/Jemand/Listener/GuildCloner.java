@@ -236,10 +236,12 @@ public class GuildCloner {
     	});
 
         EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
-        String o = getActivity(event.getOldActivity().orElse(null));
         String n = getActivity(event.getNewActivity().orElse(null));
-        if (!o.equals(n)) {
-            sendEmbedToId(embed.addField("Activity:", o + " -> " + n), ACTIVITY_LOGS, event.getApi());
+        if (!n.equals("none")) {
+            String o = getActivity(event.getOldActivity().orElse(null));
+            if (!o.equals(n)) {
+                sendEmbedToId(embed.addField("Activity:", o + " -> " + n), ACTIVITY_LOGS, event.getApi());
+            }
         }
     }
 
