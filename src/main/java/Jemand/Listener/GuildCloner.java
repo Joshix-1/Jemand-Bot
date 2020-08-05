@@ -248,8 +248,8 @@ public class GuildCloner {
     	});
 
         EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
-        String n = getActivity(event.getNewActivity().orElse(null));
-        if (!n.equals("none")) {
+        if (event.getNewActivity().isPresent()) {
+            String n = getActivity(event.getNewActivity().get());
             String o = getActivity(event.getOldActivity().orElse(null));
             if (!o.equals(n)) {
                 sendEmbedToId(embed.addField("Activity:", o + " -> " + n), ACTIVITY_LOGS, event.getApi());
