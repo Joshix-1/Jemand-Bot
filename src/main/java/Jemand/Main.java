@@ -3,7 +3,7 @@ package Jemand;
 import Jemand.Listener.Channelportal;
 import Jemand.Listener.CommandCleanupListener;
 import Jemand.Listener.ReactionRole;
-import Jemand.Listener.GuildCloner;
+import Jemand.Listener.GuildUtilities;
 import Jemand.Listener.ZitatBewerter;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.io.FileUtils;
@@ -234,7 +234,7 @@ public class Main {
 				func.getApi().addReactionRemoveListener(new ZitatBewerter.Remove());
 				func.getApi().addReactionAddListener(new ReactionRole.Add());
 				func.getApi().addReactionRemoveListener(new ReactionRole.Remove());
-				new GuildCloner(func.getApi());
+				new GuildUtilities(func.getApi());
 			}
 
 			func.getApi().addMessageCreateListener(event -> {

@@ -30,7 +30,7 @@ import java.awt.*;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class GuildCloner {
+public class GuildUtilities {
     static public final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
     static public final long MITGLIED = 367649615484551179L;
@@ -41,7 +41,7 @@ public class GuildCloner {
     static private final long WITZIG_KANAL = 740498116171792395L;
     static private final long WITZIG_EMOJI = 609012744578007071L;
 
-    public GuildCloner(DiscordApi api) {
+    public GuildUtilities(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
             server.addUserRoleAddListener(this::userAddedRole);
             server.addMessageCreateListener(this::messageCreated);
@@ -121,8 +121,13 @@ public class GuildCloner {
 
     private void userChangedAvatar(UserChangeAvatarEvent event) {
         sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
-                        .addField("Avatar:", xToY(event.getOldAvatar().getUrl().toString(), event.getNewAvatar().getUrl().toString()))
+                        .setImage(event.getNewAvatar())
+                        .addField("Avatar:", getHyperLink(event.getOldAvatar().getUrl().toString(), "Alt") + " -> " + getHyperLink(event.getNewAvatar().getUrl().toString(), "Neu"))
                 , event.getUser().getApi());
+    }
+
+    private static String getHyperLink (String url, String text) {
+        return String.format("[%s](%s)", text, url);
     }
 
     private static String xToY(String x, String y) {

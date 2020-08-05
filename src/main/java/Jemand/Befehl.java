@@ -1,7 +1,7 @@
 package Jemand;
 
 import Jemand.Listener.CommandCleanupListener;
-import Jemand.Listener.GuildCloner;
+import Jemand.Listener.GuildUtilities;
 import Jemand.Listener.ReactionRole;
 import com.vdurmont.emoji.EmojiParser;
 import me.bramhaag.owo.OwO;
@@ -275,9 +275,9 @@ public class Befehl {
 
         //mitglied
         if (befehl.get().equalsIgnoreCase("mitglied")) {
-            if(!func.userIsTrusted(user) || server.getId() != GuildCloner.AN) return false;
+            if(!func.userIsTrusted(user) || server.getId() != GuildUtilities.AN) return false;
             server.getMemberById(func.LongFromString(subtext1.get(), 0L)).ifPresent(u -> {
-                server.getRoleById(GuildCloner.MITGLIED).ifPresent(role -> {
+                server.getRoleById(GuildUtilities.MITGLIED).ifPresent(role -> {
                     role.addUser(u, user.getId() + " wollte es so.").join();
                 });
             });
@@ -2306,7 +2306,7 @@ public class Befehl {
                 String Bilder = "Fake-Person Fake-Cat Random-Picture Random-Robot Random-Face Random-Alien Random-Cat Random-Human Resize QR";
                 String Memes = "Donald WTH Lisa Drake Winnie";
                 String Spaß = "8-Ball Emote React Roll Say Ping Pong";
-                if (server.getId() == GuildCloner.AN || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
+                if (server.getId() == GuildUtilities.AN || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
                 String Spiele = "4-Gewinnt SSS TTT Stats Dice-Game";
                 String Server = "Rank Top Prefix GuildInvite Clear Welcome-Message Leave-Message Backup Reaction-Role";
                 String Anderes = "Save SaveAs Save-Private Load Delete Rename Edit Calculate";
