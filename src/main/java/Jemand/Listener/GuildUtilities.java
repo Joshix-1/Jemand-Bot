@@ -45,6 +45,8 @@ public class GuildUtilities {
     static private final long WITZIG_KANAL = 740498116171792395L;
     static private final long WITZIG_EMOJI = 609012744578007071L;
 
+    static private final long BOT_MITGLIED = 559440621815857174L;
+
     public GuildUtilities(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
             server.addUserRoleAddListener(this::userAddedRole);
@@ -68,12 +70,16 @@ public class GuildUtilities {
     }
 
     private void updatedRolesUser(UserRoleEvent event, boolean added) {
-        EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
-        embed.addField(added ? "Rolle hinzugefügt:" : "Rolle entfernt:", event.getRole().getName() + " (" + event.getRole().getId() + ")");
-        StringBuilder roles = new StringBuilder();
-        event.getUser().getRoles(event.getServer()).forEach(role -> roles.append(role.getMentionTag()).append("\n"));
-        embed.addField("Rollen:", roles.toString());
-        sendEmbedToLogs(embed, event.getApi());
+        if (added && event.getRole().getId() == BOT_MITGLIED && !event.getUser().isBot()) {
+            event.getUser().removeRole(event.getRole()).exceptionally(ExceptionLogger.get());
+        } else {
+            EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
+            embed.addField(added ? "Rolle hinzugefügt:" : "Rolle entfernt:", event.getRole().getName() + " (" + event.getRole().getId() + ")");
+            StringBuilder roles = new StringBuilder();
+            event.getUser().getRoles(event.getServer()).forEach(role -> roles.append(role.getMentionTag()).append("\n"));
+            embed.addField("Rollen:", roles.toString());
+            sendEmbedToLogs(embed, event.getApi());
+        }
     }
 
     private void reactionAdded(ReactionAddEvent event) {
@@ -162,15 +168,22 @@ public class GuildUtilities {
     private void roleChangedPermission(RoleChangePermissionsEvent event) {
         long role = event.getRole().getId();
         if (event.getRole().isEveryoneRole()) {
-            if (event.getNewPermissions().getAllowedBitmask() != 70321344) //https://discordapi.com/permissions.html#70321344
-                event.getRole().updatePermissions(Permissions.fromBitmask(70321344)).exceptionally(ExceptionLogger.get());
+            updatePermissions(event, 70321344); //https://discordapi.com/permissions.html#70321344
+        } else if (role == BOT_MITGLIED) {
+            updatePermissions(event, 804773313); //https://discordapi.com/permissions.html#804773313
         } else if (role != MITGLIED && role != ROLLENMEISTER) {
-            if (event.getRole().getName().toLowerCase().contains("mitlgied")) { //vorläufiges Mitglied, rest braucht die Rechte nicht
-                if (event.getNewPermissions().getAllowedBitmask() != 267902401) //https://discordapi.com/permissions.html#267902401
-                    event.getRole().updatePermissions(Permissions.fromBitmask(267902401)).exceptionally(ExceptionLogger.get());
-            } else if (event.getNewPermissions().getAllowedBitmask() != 0)
-                event.getRole().updatePermissions(Permissions.fromBitmask(0)).exceptionally(ExceptionLogger.get());
+            if (event.getRole().getName().toLowerCase().contains("mitglied")) { //vorläufiges Mitglied, rest braucht die Rechte nicht
+                updatePermissions(event, 267902401); //https://discordapi.com/permissions.html#267902401
+            } else {
+                updatePermissions(event, 0);
+            }
         }
+    }
+
+    private static void updatePermissions(RoleChangePermissionsEvent event, int bitmask) {
+        if (event.getNewPermissions().getAllowedBitmask() == bitmask) return;
+
+        event.getRole().updatePermissions(Permissions.fromBitmask(bitmask)).exceptionally(ExceptionLogger.get());
     }
 
     private void userAddedRole(UserRoleAddEvent event) {
