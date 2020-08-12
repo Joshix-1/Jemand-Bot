@@ -12,7 +12,6 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.util.logging.ExceptionLogger;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,10 +25,11 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
     }
     private static final Pattern WEBHOOK_MENTION = Pattern.compile("@(?<name>.{1,32})#0000");
     public static final String SEPARATOR = "\u200C";
+    public static final Pattern CLONED_MESSAGE = Pattern.compile("(?s)^[\u200D\u200B]{42,64}\u200C.*");
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if(event.getMessageAuthor().isWebhook() || event.getServer().isEmpty()) return;
+        if(event.getServer().isEmpty() || (event.getMessageAuthor().isWebhook() && CLONED_MESSAGE.matcher(event.getMessage().getContent()).matches())) return;
         for (String[] channel : channels) {
             for (int i = 0; i < channel.length; i++) {
                 if (channel[i].equals(event.getChannel().getIdAsString())) {
@@ -51,14 +51,9 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
 
             m.getAuthor().asUser().ifPresent(u -> {
-                //String name;
                 if(channel.getServer().getMembers().contains(u)) {
                     mb.setDisplayName(u.getDisplayName(channel.getServer()));
-                } /* else {
-                    name = m.getAuthor().getDisplayName();
                 }
-                mb.setDisplayName(func.longToBinaryBlankString(u.getId()) + SEPARATOR + name);
-                */
             });
 
             String content = m.getContent();
@@ -67,12 +62,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
 
             Matcher mentions = WEBHOOK_MENTION.matcher(content);
             while (mentions.find()) {
-                //String id = mentions.group("id");
-                //if (id != null) {
-                //    id = channel.getServer().getMemberById(func.binaryBlankStringToLong(id)).map(DiscordEntity::getIdAsString).orElse(null);
-                //}
                 String name = mentions.group("name");
-                //if (id == null) {
                 String id = m.getServer()
                             .map(server -> server.getMembersByDisplayName(name))
                             .flatMap(users -> users.stream()
@@ -114,10 +104,8 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
     static private void mirrorReactions(ReactionAddEvent event, Message m, String channel_id) {
         m.getApi().getServerTextChannelById(channel_id).ifPresent(channel -> {
             Message other = null;
-            if (m.getAuthor().isWebhook()) {
-                if (m.getContent().contains("\u200C")) {
-                    other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split(SEPARATOR, 2)[0]), channel).join();
-                }
+            if (CLONED_MESSAGE.matcher(m.getContent()).matches()) {
+                other = m.getApi().getMessageById(func.binaryBlankStringToLong(m.getContent().split(SEPARATOR, 2)[0]), channel).exceptionally(ExceptionLogger.get()).join();
             } else {
                 String blank = func.longToBinaryBlankString(m.getId()) + SEPARATOR;
                 other = channel.getMessagesBetweenUntil(message ->  message.getAuthor().isWebhook() && message.getContent().startsWith(blank), m.getId(), m.getId() + 7549747200000L /*30 Minuten in millis + 22 leere bits*/).join().getNewestMessage().orElse(null);
