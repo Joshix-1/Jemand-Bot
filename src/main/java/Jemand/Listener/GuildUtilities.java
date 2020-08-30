@@ -172,7 +172,7 @@ public class GuildUtilities {
 
         long role = event.getRole().getId();
         if (event.getRole().isEveryoneRole()) {
-            updatePermissions(event, 70599744); //https://discordapi.com/permissions.html#70599744 old:70321344
+            updatePermissions(event, 104154176); //https://discordapi.com/permissions.html#104154176 old:70321344
         } else if (role == BOT_MITGLIED) {
             updatePermissions(event, 804773313); //https://discordapi.com/permissions.html#804773313
         } else if (role != MITGLIED && role != ROLLENMEISTER) {
