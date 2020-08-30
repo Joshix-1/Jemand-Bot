@@ -45,46 +45,47 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
     }
 
     static private void mirrorMessage(Message m, String channel_id) {
-        m.getApi().getServerTextChannelById(channel_id).ifPresent(channel ->{
-            IncomingWebhook webhook = func.getIncomingWebhook(channel);
+        m.getApi().getServerTextChannelById(channel_id).ifPresent(channel -> {
+            func.getIncomingWebhook(channel).ifPresent( webhook -> {
 
-            WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
+                WebhookMessageBuilder mb = m.toWebhookMessageBuilder();
 
-            m.getAuthor().asUser().ifPresent(u -> {
-                if(channel.getServer().getMembers().contains(u)) {
-                    mb.setDisplayName(u.getDisplayName(channel.getServer()));
-                }
-            });
+                m.getAuthor().asUser().ifPresent(u -> {
+                    if (channel.getServer().getMembers().contains(u)) {
+                        mb.setDisplayName(u.getDisplayName(channel.getServer()));
+                    }
+                });
 
-            String content = m.getContent();
+                String content = m.getContent();
 
-            AllowedMentionsBuilder amb = new AllowedMentionsBuilder();
+                AllowedMentionsBuilder amb = new AllowedMentionsBuilder();
 
-            Matcher mentions = WEBHOOK_MENTION.matcher(content);
-            while (mentions.find()) {
-                String name = mentions.group("name");
-                String id = m.getServer()
+                Matcher mentions = WEBHOOK_MENTION.matcher(content);
+                while (mentions.find()) {
+                    String name = mentions.group("name");
+                    String id = m.getServer()
                             .map(server -> server.getMembersByDisplayName(name))
                             .flatMap(users -> users.stream()
                                     .filter(u -> channel.getServer().getMembers().contains(u)).findFirst())
                             .map(DiscordEntity::getIdAsString)
                             .orElseGet(() -> channel.getServer().getMembersByDisplayName(name).stream().findFirst().map(DiscordEntity::getIdAsString).orElse(null));
-                //}
-                if (id == null) {
-                    content = mentions.replaceFirst("@" + name);
-                } else {
-                    amb.addUser(id);
-                    content = mentions.replaceFirst("<@" + id + ">");
+                    //}
+                    if (id == null) {
+                        content = mentions.replaceFirst("@" + name);
+                    } else {
+                        amb.addUser(id);
+                        content = mentions.replaceFirst("<@" + id + ">");
+                    }
+                    mentions.reset(content);
                 }
-                mentions.reset(content);
-            }
 
-            mb.setAllowedMentions(amb.build());
+                mb.setAllowedMentions(amb.build());
 
-            String id = func.longToBinaryBlankString(m.getId()) + SEPARATOR;
-            mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
+                String id = func.longToBinaryBlankString(m.getId()) + SEPARATOR;
+                mb.setContent(id + (content.length() > 2000 - id.length() ? content.substring(0, 2000 - id.length()) : content));
 
-            mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
+                mb.send(webhook).exceptionally(ExceptionLogger.get()).join();
+            });
         });
     }
 

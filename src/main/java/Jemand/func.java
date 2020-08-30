@@ -17,6 +17,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.util.DiscordRegexPattern;
+import org.javacord.api.util.logging.ExceptionLogger;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -1119,12 +1120,14 @@ public class func {
         }
     }
 
-    public static IncomingWebhook getIncomingWebhook (ServerTextChannel channel) {
+    public static Optional<IncomingWebhook> getIncomingWebhook (ServerTextChannel channel) {
+        if (channel == null) {
+            return Optional.empty();
+        }
         List<IncomingWebhook> webhooks = channel.getIncomingWebhooks().join();
-        return webhooks.size() == 0 ? channel.createWebhookBuilder()
-                .setAvatar(channel.getApi().getYourself().getAvatar()).setName(channel.getApi().getYourself().getName()).create().join()
-                : webhooks.get(0);
-
+        return webhooks.size() == 0 ? Optional.ofNullable(channel.createWebhookBuilder()
+                .setAvatar(channel.getApi().getYourself().getAvatar()).setName(channel.getApi().getYourself().getName()).create().exceptionally(ExceptionLogger.get()).join())
+                : Optional.of(webhooks.get(0));
     }
 
     //robot

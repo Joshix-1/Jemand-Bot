@@ -17,6 +17,7 @@ import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
@@ -116,7 +117,7 @@ public class GuildUtilities {
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
-        return api.getServerTextChannelById(id).map(serverTextChannel -> wmb.send(func.getIncomingWebhook(serverTextChannel)).exceptionally(ExceptionLogger.get()));
+        return api.getServerTextChannelById(id).flatMap(serverTextChannel -> func.getIncomingWebhook(serverTextChannel).map(webhook -> wmb.send(webhook).exceptionally(ExceptionLogger.get())));
     }
 
     private static void sendEmbedToLogs(EmbedBuilder embed, DiscordApi api) {
@@ -204,13 +205,13 @@ public class GuildUtilities {
             return;
         }
 
-        try {
-            event.getMessage()
-                    .toWebhookMessageBuilder()
-                    .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
-                    .setAllowedMentions(new AllowedMentionsBuilder().build())
-                    .send(func.getIncomingWebhook(Objects.requireNonNull(cloneTextchannel(Objects.requireNonNull(event.getServerTextChannel().orElse(null)))))).exceptionally(ExceptionLogger.get());
-        } catch (NullPointerException ignored) {}
+
+        func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null))).ifPresent(webhook -> event.getMessage()
+                            .toWebhookMessageBuilder()
+                            .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
+                            .setAllowedMentions(new AllowedMentionsBuilder().build())
+                            .send(webhook).exceptionally(ExceptionLogger.get())
+        );
 
         if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;
 
@@ -231,6 +232,10 @@ public class GuildUtilities {
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
+        if (channel == null) {
+            return null;
+        }
+        
         Server copy = channel.getApi().getServerById(COPY).orElse(null);
         if (copy == null) return null;
         ServerTextChannel stc = copy.getTextChannelsByName(channel.getIdAsString()).stream().findAny().orElse(null);
