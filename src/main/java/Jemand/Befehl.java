@@ -1075,7 +1075,7 @@ public class Befehl {
                     event.getChannel().sendMessage(func.Fehler("Calculate", user));
                     return (false);
                 } else {
-                    long t = System.currentTimeMillis();
+                    long t = System.nanoTime();
                     try {
                         String output = "```\n" + subtext1.get() + " = " ;
 
@@ -1094,7 +1094,7 @@ public class Befehl {
                             output = output.substring(0, 2048 - 3 - 3) + "...";
                         }
 
-                        event.getChannel().sendMessage(embed.setDescription(output + "```").addField("\u200B", (System.currentTimeMillis() - t) + "ms")).join();
+                        event.getChannel().sendMessage(embed.setDescription(output + "```").addField("\u200B", (((System.nanoTime() - t)/100000L)/10000.0) + "ms")).join();
                     } catch (Exception e) {
                         event.getChannel().sendMessage(embed.setTitle("Fehler:").setUrl("https://www.wolframalpha.com/input/?i=" + subtext1.get().replace(" ", "")).setColor(new Color(func.getRandom(250, 255), func.getRandom(0, 5), func.getRandom(0, 5))).setDescription(e.getMessage())).join();
                     }

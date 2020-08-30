@@ -31,6 +31,8 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
+import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -166,9 +168,11 @@ public class GuildUtilities {
     }
 
     private void roleChangedPermission(RoleChangePermissionsEvent event) {
+        if (event.getRole().isManaged()) return;
+
         long role = event.getRole().getId();
         if (event.getRole().isEveryoneRole()) {
-            updatePermissions(event, 70321344); //https://discordapi.com/permissions.html#70321344
+            updatePermissions(event, 70599744); //https://discordapi.com/permissions.html#70599744 old:70321344
         } else if (role == BOT_MITGLIED) {
             updatePermissions(event, 804773313); //https://discordapi.com/permissions.html#804773313
         } else if (role != MITGLIED && role != ROLLENMEISTER) {
@@ -200,22 +204,29 @@ public class GuildUtilities {
             return;
         }
 
-        event.getMessage()
-                .toWebhookMessageBuilder()
-                .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
-                .setAllowedMentions(new AllowedMentionsBuilder().build())
-                .send(func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null)))).exceptionally(ExceptionLogger.get());
+        try {
+            event.getMessage()
+                    .toWebhookMessageBuilder()
+                    .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
+                    .setAllowedMentions(new AllowedMentionsBuilder().build())
+                    .send(func.getIncomingWebhook(Objects.requireNonNull(cloneTextchannel(Objects.requireNonNull(event.getServerTextChannel().orElse(null)))))).exceptionally(ExceptionLogger.get());
+        } catch (NullPointerException ignored) {}
 
         if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;
+
         User user = event.getMessageAuthor().asUser().orElse(null);
         Server server = event.getServer().orElse(null);
-        if (user != null && server != null && user.getRoles(server).size() < 2) {
-            try {
-                user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-            } catch (Exception e) {
-                func.handle(e);
-            }
+        if (user != null && server != null && user.getRoles(server).size() == 1 /*@everyone role*/) {
+            user.getJoinedAtTimestamp(server).ifPresent(joinStamp -> {
+                if (joinStamp.isBefore(Instant.ofEpochMilli(System.currentTimeMillis() - (10 * 60 * 1000)))) { //is at least 10min on server
+                    try {
+                        user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+                        user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+                    } catch (Exception e) {
+                        func.handle(e);
+                    }
+                }
+            });
         }
     }
 
