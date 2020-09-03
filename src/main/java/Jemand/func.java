@@ -178,6 +178,8 @@ public class func {
     }
 
     static public void reactText(MessageCreateEvent event, String text, String messageId) {
+        if (messageId == null || event == null || text == null) return;
+        
         text = text.toLowerCase();
 
 
