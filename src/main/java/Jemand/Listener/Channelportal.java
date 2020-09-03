@@ -2,6 +2,7 @@ package Jemand.Listener;
 
 import Jemand.func;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
@@ -45,6 +46,8 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
     }
 
     static private void mirrorMessage(Message m, String channel_id) {
+        if (m.getContent().isEmpty() && m.getEmbeds().isEmpty()) return;
+
         m.getApi().getServerTextChannelById(channel_id).ifPresent(channel -> {
             func.getIncomingWebhook(channel).ifPresent( webhook -> {
 

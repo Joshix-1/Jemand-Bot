@@ -205,6 +205,7 @@ public class GuildUtilities {
             return;
         }
 
+        if (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty()) return;
 
         func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null))).ifPresent(webhook -> event.getMessage()
                             .toWebhookMessageBuilder()
@@ -213,7 +214,7 @@ public class GuildUtilities {
                             .send(webhook).exceptionally(ExceptionLogger.get())
         );
 
-        if(!event.getMessageAuthor().isRegularUser() || (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty())) return;
+        if(!event.getMessageAuthor().isRegularUser()) return;
 
         User user = event.getMessageAuthor().asUser().orElse(null);
         Server server = event.getServer().orElse(null);
