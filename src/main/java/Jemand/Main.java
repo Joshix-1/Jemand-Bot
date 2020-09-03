@@ -358,26 +358,8 @@ public class Main {
 											xd.set(xd.get().replace(" " + id + "_" + serverid, ""));
 										}, 45, TimeUnit.SECONDS);
 									}
-
-									if (event.getMessageAuthor().asUser().get().isBotOwner() && event.getMessageContent().toLowerCase().contains(" ne ")) {
-										event.getMessage().addReaction(EmojiParser.parseToUnicode(":middle_finger:"));
-									}
-									TriggerReactMessage(event, "nein", "doch");
-									TriggerReactMessage(event, "doch", "Oh");
-
-									if (TriggerReactText(event, "nicht witzig", "n")) {
-										event.getMessage().addReaction("i2:703595186629902438");
-										func.reactText(event, "ch", "");
-										event.getMessage().addReactions("t1:703595173342347314","leerzeichen:703321360180445224" );
-									}
-									TriggerReactText(event, "witzig", "witzig");
-									TriggerReactText(event, "no u", "no u");
-									TriggerReactText(event, "nou", "no u");
-
 									triggerreact(event, "einzigst", EmojiParser.parseToUnicode(":face_palm:"));
 									triggerreact(event, "zumindestens", EmojiParser.parseToUnicode(":face_palm:"));
-
-									triggerreact(event, "owo", "owo:703596847385673790");
 									triggerreact(event, ":joy:", EmojiParser.parseToUnicode(":joy:"));
 									triggerreact(event, EmojiParser.parseToUnicode(":joy:"), EmojiParser.parseToUnicode(":joy:"));
 								}
