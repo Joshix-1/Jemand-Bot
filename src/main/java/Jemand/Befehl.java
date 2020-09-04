@@ -82,7 +82,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {/*"tw",*/ "ddg", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {/*"tw",*/ "ddg", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -1133,6 +1133,22 @@ public class Befehl {
                 if (size > 1024) size = 1024;
                 ImageResizer ir = new ImageResizer(new URL("https://thiscatdoesnotexist.com/"));
                 addRerun(event.getChannel().sendMessage(embed.setImage(ir.resize(size, size).getBufferedImage()).setAuthor("thiscatdoesnotexist.com", "https://thiscatdoesnotexist.com", "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/docomo/205/cat-face_1f431.png")));
+                return true;
+            }
+
+            if (befehl.get().equalsIgnoreCase("Fake-Horse") || befehl.get().equalsIgnoreCase("fh")) {
+                int size = func.IntFromString(subtext1.get(), 256);
+                if (size > 1512) size = 1512;
+                ImageResizer ir = new ImageResizer(new URL("https://thishorsedoesnotexist.com/"));
+                addRerun(event.getChannel().sendMessage(embed.setImage(ir.resize(size, size).getBufferedImage()).setAuthor("thishorsedoesnotexist.com", "https://thishorsedoesnotexist.com/", "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/60/docomo/205/horse_1f40e.png")));
+                return true;
+            }
+            //fake-cat //fc
+            if (befehl.get().equalsIgnoreCase("Fake-Art") || befehl.get().equalsIgnoreCase("fa")) {
+                int size = func.IntFromString(subtext1.get(), 512);
+                if (size > 1024) size = 1024;
+                ImageResizer ir = new ImageResizer(new URL("https://thisartworkdoesnotexist.com/"));
+                addRerun(event.getChannel().sendMessage(embed.setImage(ir.resize(size, size).getBufferedImage()).setAuthor("thisartworkdoesnotexist.com", "https://thisartworkdoesnotexist.com", "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/60/au-kddi/194/artist-palette_1f3a8.png")));
                 return true;
             }
 
