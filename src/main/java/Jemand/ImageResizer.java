@@ -76,19 +76,23 @@ public class ImageResizer {
         return resize(width, height);
     }
 
-    public ImageResizer resize(int Width, int Height) {
+    public ImageResizer resize(int width, int height) {
 
-        if(Width > MAX_SIZE) Width = MAX_SIZE;
-        else if(Width < 1) Width = 1;
+        if (getWidth() == width && getHeight() == height) {
+            return this;
+        }
 
-        if(Height > MAX_SIZE) Height = MAX_SIZE;
-        else if(Height < 1) Height = 1;
+        if(width > MAX_SIZE) width = MAX_SIZE;
+        else if(width < 1) width = 1;
+
+        if(height > MAX_SIZE) height = MAX_SIZE;
+        else if(height < 1) height = 1;
 
 
         if(InputName.endsWith("gif"))
-            image.setImage(getBufferedImage().getScaledInstance(Width, Height, Image.SCALE_DEFAULT));
+            image.setImage(getBufferedImage().getScaledInstance(width, height, Image.SCALE_DEFAULT));
         else
-            image.setImage(getBufferedImage().getScaledInstance(Width, Height, Image.SCALE_AREA_AVERAGING));
+            image.setImage(getBufferedImage().getScaledInstance(width, height, Image.SCALE_AREA_AVERAGING));
 
 
         setWH(null);
@@ -96,8 +100,8 @@ public class ImageResizer {
         return this;
     }
 
-    public ImageResizer resize(double Width, double Height) {
-        return resize((int) Width, (int) Height);
+    public ImageResizer resize(double width, double height) {
+        return resize((int) width, (int) height);
     }
 
     public int getHeight() {
