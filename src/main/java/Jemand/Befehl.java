@@ -2319,7 +2319,7 @@ public class Befehl {
                 String[] kategorien = texte.get("Kategorien").split(" ");
 
                 String Bot = "Invite Report Help Language";
-                String Bilder = "Fake-Person Fake-Cat Random-Picture Random-Robot Random-Face Random-Alien Random-Cat Random-Human Resize QR";
+                String Bilder = "Fake-Person Fake-Cat Fake-Horse Fake-Art Random-Picture Random-Robot Random-Face Random-Alien Random-Cat Random-Human Resize QR";
                 String Memes = "Donald WTH Lisa Drake Winnie";
                 String Spaß = "8-Ball Emote React Roll Say Ping Pong";
                 if (server.getId() == GuildUtilities.AN || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
@@ -2348,7 +2348,7 @@ public class Befehl {
 
                 event.getChannel().sendMessage("", helpembed).thenAccept(helpmessage -> {
                     helpmessage.addReaction(EmojiParser.parseToUnicode(":arrow_backward:"));
-                    func.react(helpmessage, helpabc, 10);
+                    func.react(helpmessage, helpabc, 12);
 
                     //if(!func.stringIsBlank(subtext1.get()) && befehlestr.toLowerCase().contains(" " + subtext1.get().toLowerCase() +  " ")) {
                     //
