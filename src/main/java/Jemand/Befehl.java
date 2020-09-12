@@ -1162,6 +1162,10 @@ public class Befehl {
                     users.addAll(api.getCachedUsersByDisplayName(s, server));
                 }
 
+                if (users.size() == 0) {
+                    users.add(user);
+                }
+
                 List<Long> handled = new LinkedList<>();
                 users.forEach(user -> {
                     if (handled.contains(user.getId())) {
@@ -1174,7 +1178,7 @@ public class Befehl {
                     embed.addInlineField("Name", user.getDiscriminatedName());
                     user.getNickname(server).ifPresent(nickname -> embed.addInlineField("Nickname", nickname));
                     embed.addInlineField("Mention", "`" + user.getMentionTag() + "`");
-                    embed.addInlineField("CreatedAt",  user.getCreationTimestamp().toString());
+                    embed.addInlineField("CreatedAt", user.getCreationTimestamp().toString());
                     embed.addInlineField("Bot", user.isBot() ? "Yes" : "No");
                     embed.addInlineField("OnServer", isOnServer ? "Yes" : "No");
                     embed.addInlineField("Status", user.getStatus().getStatusString());
@@ -1189,7 +1193,7 @@ public class Befehl {
                     event.getChannel().sendMessage(embed.setTitle("UserInfo")).join();
                 });
 
-                return users.size() != 0;
+                return true;
             }
 
 
