@@ -82,7 +82,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {/*"tw",*/ "ddg", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {/*"tw",*/ "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -1152,29 +1152,95 @@ public class Befehl {
                 return true;
             }
 
+            if (befehl.get().equalsIgnoreCase("userinfo")) {
+                List<User> users = new LinkedList<>();
+                String[] subtext = WHITE_SPACES.split(subtext1.get());
+
+                for (String s : subtext) {
+                    api.getUserById(s).thenAccept(users::add).join();
+                    users.addAll(api.getCachedUsersByName(s));
+                    users.addAll(api.getCachedUsersByDisplayName(s, server));
+                }
+
+                users.forEach(user -> {
+                    boolean isOnServer = server.getMemberById(user.getId()).isPresent();
+
+                    embed.addInlineField("Id", user.getIdAsString());
+                    embed.addInlineField("Name", user.getDiscriminatedName());
+                    user.getNickname(server).ifPresent(nickname -> embed.addInlineField("Nickname", nickname));
+                    embed.addInlineField("Mention", "`" + user.getMentionTag() + "`");
+                    embed.addInlineField("CreatedAt",  user.getCreationTimestamp().toString());
+                    embed.addInlineField("Bot", user.isBot() ? "Yes" : "No");
+                    embed.addInlineField("OnServer", isOnServer ? "Yes" : "No");
+                    embed.addInlineField("Status", user.getStatus().getStatusString());
+                    if (isOnServer) {
+                        user.getJoinedAtTimestamp(server).ifPresent(instant -> embed.addInlineField("JoinedServerAt", instant.toString()));
+                        embed.addInlineField("RoleCount", user.getRoles(server).size() + "");
+                        embed.addInlineField("Permissions", "[" + server.getPermissions(user).getAllowedBitmask() + "](https://discordapi.com/permissions.html#" + server.getPermissions(user).getAllowedBitmask() + ")");
+                    }
+
+                    embed.setImage(user.getAvatar());
+
+                    event.getChannel().sendMessage(embed.setTitle("UserInfo")).join();
+                });
+
+                return users.size() != 0;
+            }
+
+
+            if (befehl.get().equalsIgnoreCase("roleinfo")) {
+                List<Role> roles = new LinkedList<>();
+                String[] subtext = WHITE_SPACES.split(subtext1.get());
+
+                for (String s : subtext) {
+                    api.getRoleById(s).ifPresent(roles::add);
+                    roles.addAll(server.getRolesByNameIgnoreCase(s));
+                }
+
+                roles.forEach(role -> {
+                    embed.addInlineField("Id", role.getIdAsString());
+                    embed.addInlineField("Name", role.getName());
+                    role.getColor().ifPresent(color -> embed.addInlineField("Color", "#" + Integer.toHexString(color.getRGB())));
+                    embed.addInlineField("Mention", "`" + role.getMentionTag() + "`");
+                    embed.addInlineField("Managed", role.isManaged() ? "Yes" : "No");
+                    embed.addInlineField("Position", role.getPosition() + "");
+                    embed.addInlineField("Mentionable", role.isMentionable() ? "Yes" : "No");
+                    embed.addInlineField("CreatedAt",  role.getCreationTimestamp().toString());
+                    embed.addInlineField("MemberCount", role.getUsers().size() + "");
+                    embed.addInlineField("Displayed Seperatly", role.isDisplayedSeparately() ? "Yes" : "No");
+                    embed.addInlineField("Permissions", "[" + role.getPermissions().getAllowedBitmask() + "](https://discordapi.com/permissions.html#" + role.getPermissions().getAllowedBitmask() + ")");
+
+                    event.getChannel().sendMessage(embed.setTitle("RoleInfo")).join();
+                });
+
+                return roles.size() != 0;
+            }
+
             //https://yesno.wtf/# //8ball
             if (befehl.get().equalsIgnoreCase("8ball") || befehl.get().equalsIgnoreCase("8-ball")) {
-                JSONObject js = null;
+                String answer;
 
-                try {
-                    if (func.getRandom(0, 20) == 1) {
-                        js = func.readJsonFromUrl("https://yesno.wtf/api/?force=maybe");
-                    } else {
-                        js = func.readJsonFromUrl("https://yesno.wtf/api/");
-                    }
-                } catch(ParseException e) {
-                    func.handle(e);
+                int hash = subtext1.get().length() == 0 ? func.getRandom(0, 20) : subtext1.get().toLowerCase().hashCode() % 21;
+                if (hash == 0) {
+                    answer = "maybe";
+                } else if (hash > 10) {
+                    answer = "yes";
+                } else {
+                    answer = "no";
                 }
+
+                JSONObject js = func.readJsonFromUrl("https://yesno.wtf/api/?force=" + answer);
+
                 String str = "";
                 if (!subtext1.get().isEmpty()) {
                     str = subtext1.get() + " - ";
                 }
                 if (texte.getSprache().equals("de")) {
-                    str += js.get("answer").toString().replace("yes", "Ja!").replace("maybe", "Vielleicht!").replace("no", "Nein!");
+                    str += answer.replace("yes", "Ja").replace("maybe", "Vielleicht").replace("no", "Nein") + "!";
                 } else {
-                    str += js.get("answer").toString() + "!";
+                    str += answer + "!";
                 }
-                addRerun(event.getChannel().sendMessage(embed.setImage(js.get("image").toString()).setThumbnail(new File(func.filepathof("8ball.png"))).setAuthor(str, "https://yesno.wtf/", "")).join());
+                event.getChannel().sendMessage(embed.setImage(js.get("image").toString()).setThumbnail(new File(func.filepathof("8ball.png"))).setAuthor(str, "https://yesno.wtf/", "")).join();
                 return true;
             }
 
