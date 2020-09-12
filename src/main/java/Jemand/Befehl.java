@@ -1157,7 +1157,7 @@ public class Befehl {
                 String[] subtext = WHITE_SPACES.split(subtext1.get());
 
                 for (String s : subtext) {
-                    api.getUserById(s).thenAccept(users::add).join();
+                    api.getUserById(func.LongFromString(s, 0L)).thenAccept(users::add).exceptionally((e) -> null).join();
                     users.addAll(api.getCachedUsersByName(s));
                     users.addAll(api.getCachedUsersByDisplayName(s, server));
                 }
@@ -1193,7 +1193,7 @@ public class Befehl {
                 String[] subtext = WHITE_SPACES.split(subtext1.get());
 
                 for (String s : subtext) {
-                    api.getRoleById(s).ifPresent(roles::add);
+                    api.getRoleById(func.LongFromString(s, 0)).ifPresent(roles::add);
                     roles.addAll(server.getRolesByNameIgnoreCase(s));
                 }
 
@@ -1220,7 +1220,7 @@ public class Befehl {
             if (befehl.get().equalsIgnoreCase("8ball") || befehl.get().equalsIgnoreCase("8-ball")) {
                 String answer;
 
-                int hash = subtext1.get().length() == 0 ? func.getRandom(0, 20) : subtext1.get().toLowerCase().hashCode() % 21;
+                int hash = subtext1.get().length() == 0 ? func.getRandom(0, 20) : subtext1.get().toLowerCase().replace("<@!", "<@").hashCode() % 21;
                 if (hash == 0) {
                     answer = "maybe";
                 } else if (hash > 10) {
