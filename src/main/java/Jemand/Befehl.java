@@ -1162,7 +1162,12 @@ public class Befehl {
                     users.addAll(api.getCachedUsersByDisplayName(s, server));
                 }
 
+                List<Long> handled = new LinkedList<>();
                 users.forEach(user -> {
+                    if (handled.contains(user.getId())) {
+                        return;
+                    }
+                    handled.add(user.getId());
                     boolean isOnServer = server.getMemberById(user.getId()).isPresent();
 
                     embed.addInlineField("Id", user.getIdAsString());
@@ -1197,7 +1202,13 @@ public class Befehl {
                     roles.addAll(server.getRolesByNameIgnoreCase(s));
                 }
 
+                List<Long> handled = new LinkedList<>();
+
                 roles.forEach(role -> {
+                    if (handled.contains(role.getId())) {
+                        return;
+                    }
+                    handled.add(role.getId());
                     embed.addInlineField("Id", role.getIdAsString());
                     embed.addInlineField("Name", role.getName());
                     role.getColor().ifPresent(color -> embed.addInlineField("Color", "#" + Integer.toHexString(color.getRGB())));
