@@ -9,6 +9,7 @@ import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -38,6 +39,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class GuildUtilities {
     static public final long AN = 367648314184826880L;
@@ -125,6 +127,13 @@ public class GuildUtilities {
                 .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
                 .addField("Name:", event.getUser().getDiscriminatedName())
                 , event.getApi());
+
+        event.getApi().getThreadPool().getScheduler().schedule(() -> {
+            event.getApi().getServerById(event.getServer().getId()).ifPresent(server -> {
+                if (server.getMembers().stream().anyMatch(u -> u.getId() == event.getUser().getId()))
+                    sendCaptcha(event.getUser(), server, event.getApi().getServerTextChannelById(681651055771385863L).orElse(null));
+            });
+        }, 1, TimeUnit.MINUTES);
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
@@ -238,30 +247,45 @@ public class GuildUtilities {
                     func.handle(e);
                 }
             } else {
-                EmbedBuilder embed = func.getNormalEmbed(event)
-                        .setTitle("Captcha")
-                        .setDescription(user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:");
+                long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
 
-                int solution = calculateCaptchaNumber(user, server);
-                int random = func.getRandom(500, 1500);
-                int add = solution - random;
-
-                try {
-                    Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
-                    embed.setImage(image.getFinalMeme().orElse(null));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (joinedAgo > 10 * 60 * 1000) {
+                    event.getChannel().getMessages(4).thenApply(messages -> {
+                        if (messages.stream().noneMatch(message -> message.getAuthor().getId() != user.getId())) {
+                            sendCaptcha(user, server, event.getChannel());
+                        }
+                        return null;
+                    });
                 }
-                event.getChannel().sendMessage(embed).exceptionally(ExceptionLogger.get());
             }
         }
+    }
+
+    private static void sendCaptcha(User user, Server server, TextChannel channel) {
+        if (channel == null) return;
+
+        EmbedBuilder embed = func.getNormalEmbed(user, null)
+                .setTitle("Captcha")
+                .setDescription(user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:");
+
+        int solution = calculateCaptchaNumber(user, server);
+        int random = func.getRandom(500, 1500);
+        int add = solution - random;
+
+        try {
+            Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
+            embed.setImage(image.getFinalMeme().orElse(null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
     }
 
     private static int calculateCaptchaNumber(User user, Server server) {
         int hash = user.getIdAsString().hashCode()
                 * server.getIdAsString().hashCode()
                 * user.getJoinedAtTimestamp(server).orElse(Instant.EPOCH).hashCode();
-        return hash % 700 + 300;
+        return (Math.abs(hash) % 800) + 200;
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
