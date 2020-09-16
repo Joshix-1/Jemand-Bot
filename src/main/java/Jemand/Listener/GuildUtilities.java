@@ -1,5 +1,6 @@
 package Jemand.Listener;
 
+import Jemand.Memes;
 import Jemand.func;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
@@ -32,6 +33,7 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,6 +55,7 @@ public class GuildUtilities {
     public GuildUtilities(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
             server.addUserRoleAddListener(this::userAddedRole);
+            server.addUserRoleRemoveListener(this::userRemovedRole);
             server.addMessageCreateListener(this::messageCreated);
             server.addServerMemberBanListener(this::memberBanned);
             server.addServerChannelDeleteListener(this::channelDeleted);
@@ -70,6 +73,14 @@ public class GuildUtilities {
             server.addUserRoleAddListener(event -> updatedRolesUser(event, true));
             server.addUserRoleRemoveListener(event -> updatedRolesUser(event, false));
         });
+    }
+
+    private void userRemovedRole(UserRoleRemoveEvent event) {
+        if (event.getRole().getId() == 755058629299667107L //Vote-Rolle top.gg
+                && event.getServer().getMembers().contains(event.getUser())) {
+
+            event.getUser().sendMessage("Du kannst hier erneut voten: https://top.gg/servers/367648314184826880/vote");
+        }
     }
 
     private void updatedRolesUser(UserRoleEvent event, boolean added) {
@@ -219,17 +230,38 @@ public class GuildUtilities {
         User user = event.getMessageAuthor().asUser().orElse(null);
         Server server = event.getServer().orElse(null);
         if (user != null && server != null && user.getRoles(server).size() == 1 /*@everyone role*/) {
-            user.getJoinedAtTimestamp(server).ifPresent(joinStamp -> {
-                if (joinStamp.isBefore(Instant.ofEpochMilli(System.currentTimeMillis() - (10 * 60 * 1000)))) { //is at least 10min on server
-                    try {
-                        user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                        user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                    } catch (Exception e) {
-                        func.handle(e);
-                    }
+            if (event.getMessageContent().equals(Integer.toString(calculateCaptchaNumber(user, server)))) {
+                try {
+                    user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+                    user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+                } catch (Exception e) {
+                    func.handle(e);
                 }
-            });
+            } else {
+                EmbedBuilder embed = func.getNormalEmbed(event)
+                        .setTitle("Captcha")
+                        .setDescription(user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:");
+
+                int solution = calculateCaptchaNumber(user, server);
+                int random = func.getRandom(500, 1500);
+                int add = solution - random;
+
+                try {
+                    Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
+                    embed.setImage(image.getFinalMeme().orElse(null));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                event.getChannel().sendMessage(embed).exceptionally(ExceptionLogger.get());
+            }
         }
+    }
+
+    private static int calculateCaptchaNumber(User user, Server server) {
+        int hash = user.getIdAsString().hashCode()
+                * server.getIdAsString().hashCode()
+                * user.getJoinedAtTimestamp(server).orElse(Instant.EPOCH).hashCode();
+        return hash % 700 + 300;
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {

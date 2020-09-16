@@ -40,7 +40,7 @@ public class Memes {
         this(template, convertURLs(image));
     }
 
-    Memes(String template, String... text) throws IOException {
+    public Memes(String template, String... text) throws IOException {
         this(template, convertStrings(text, getCoordinates(template)));
     }
 
