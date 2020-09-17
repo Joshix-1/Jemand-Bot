@@ -11,15 +11,13 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.message.embed.EmbedField;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
@@ -30,13 +28,13 @@ import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.server.role.UserRoleEvent;
 import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.*;
+import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -129,11 +127,10 @@ public class GuildUtilities {
                 , event.getApi());
 
         event.getApi().getThreadPool().getScheduler().schedule(() -> {
-            event.getApi().getServerById(event.getServer().getId()).ifPresent(server -> {
-                if (server.getMembers().stream().anyMatch(u -> u.getId() == event.getUser().getId()))
-                    sendCaptcha(event.getUser(), server, event.getApi().getServerTextChannelById(681651055771385863L).orElse(null));
+            event.getServer().getLatestInstance().thenAccept(server -> {
+                sendCaptcha(event.getUser(), server, event.getApi().getServerTextChannelById(681651055771385863L).orElse(null));
             });
-        }, 1, TimeUnit.MINUTES);
+        }, 6, TimeUnit.MINUTES);
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
@@ -246,45 +243,56 @@ public class GuildUtilities {
                 } catch (Exception e) {
                     func.handle(e);
                 }
-            } else {
-                long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
-
-                if (joinedAgo > 10 * 60 * 1000) {
-                    event.getChannel().getMessages(4).thenApply(messages -> {
-                        if (messages.stream().noneMatch(message -> message.getAuthor().getId() != user.getId())) {
-                            sendCaptcha(user, server, event.getChannel());
-                        }
-                        return null;
-                    });
-                }
+            } else if (!DiscordRegexPattern.ROLE_MENTION.matcher(event.getMessageContent()).find()
+                    && !event.getMessageContent().contains("@everyone")
+                    && !event.getMessageContent().contains("@here")
+                    && event.getMessage().getMentionedUsers().size() < 2) {
+                sendCaptcha(user, server, event.getChannel());
             }
         }
     }
 
+    private static String getCaptchaDescription(User user) {
+        return user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:";
+    }
+
     private static void sendCaptcha(User user, Server server, TextChannel channel) {
-        if (channel == null) return;
+        if (channel == null || user.getRoles(server).size() > 1) return;
 
-        EmbedBuilder embed = func.getNormalEmbed(user, null)
-                .setTitle("Captcha")
-                .setDescription(user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:");
+        long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
+        if (joinedAgo > 4 * 60 * 1000) { //atleast 7 min ago
+            channel.getMessages(10).thenApply(messages -> {
+                if (messages.stream().noneMatch(message -> message.getEmbeds().size() > 0
+                        && message.getEmbeds().get(0).getDescription().map(desc -> desc.equals(getCaptchaDescription(user))).orElse(false))) {
 
-        int solution = calculateCaptchaNumber(user, server);
-        int random = func.getRandom(500, 1500);
-        int add = solution - random;
+                    EmbedBuilder embed = func.getNormalEmbed(user, null)
+                            .setTitle("Captcha")
+                            .setDescription(getCaptchaDescription(user));
 
-        try {
-            Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
-            embed.setImage(image.getFinalMeme().orElse(null));
-        } catch (IOException e) {
-            e.printStackTrace();
+                    int solution = calculateCaptchaNumber(user, server);
+                    int random;
+                    do {
+                        random = func.getRandom(222, 1444);
+                    } while (Math.abs(random - solution) < 20);
+                    int add = solution - random;
+
+                    try {
+                        Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
+                        embed.setImage(image.getFinalMeme().orElse(null));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
+                }
+                return null;
+            });
         }
-        channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
     }
 
     private static int calculateCaptchaNumber(User user, Server server) {
-        int hash = user.getIdAsString().hashCode()
+        int hash = (user.getIdAsString() + func.KEY).hashCode()
                 * server.getIdAsString().hashCode()
-                * user.getJoinedAtTimestamp(server).orElse(Instant.EPOCH).hashCode();
+                * (user.getJoinedAtTimestamp(server).map(Instant::toString).orElse("69") + func.SALT).hashCode();
         return (Math.abs(hash) % 800) + 200;
     }
 
