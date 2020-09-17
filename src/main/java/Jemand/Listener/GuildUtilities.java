@@ -125,12 +125,6 @@ public class GuildUtilities {
                 .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
                 .addField("Name:", event.getUser().getDiscriminatedName())
                 , event.getApi());
-
-        event.getApi().getThreadPool().getScheduler().schedule(() -> {
-            event.getServer().getLatestInstance().thenAccept(server -> {
-                sendCaptcha(event.getUser(), server, event.getApi().getServerTextChannelById(681651055771385863L).orElse(null));
-            });
-        }, 6, TimeUnit.MINUTES);
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
@@ -240,6 +234,8 @@ public class GuildUtilities {
                 try {
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+
+
                 } catch (Exception e) {
                     func.handle(e);
                 }
@@ -260,8 +256,8 @@ public class GuildUtilities {
         if (channel == null || user.getRoles(server).size() > 1) return;
 
         long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
-        if (joinedAgo > 4 * 60 * 1000) { //atleast 7 min ago
-            channel.getMessages(10).thenApply(messages -> {
+        if (joinedAgo > 5 * 60 * 1000) { //at least 5 min ago
+            channel.getMessages(20).thenApplyAsync(messages -> {
                 if (messages.stream().noneMatch(message -> message.getEmbeds().size() > 0
                         && message.getEmbeds().get(0).getDescription().map(desc -> desc.equals(getCaptchaDescription(user))).orElse(false))) {
 
