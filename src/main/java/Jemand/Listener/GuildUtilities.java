@@ -216,7 +216,7 @@ public class GuildUtilities {
             return;
         }
 
-        if (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty()) return;
+        if (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty() && event.getMessageAttachments().isEmpty()) return;
 
         func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null))).ifPresent(webhook -> event.getMessage()
                             .toWebhookMessageBuilder()
