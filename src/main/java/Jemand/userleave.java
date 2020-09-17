@@ -9,6 +9,7 @@ import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.json.simple.JSONObject;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class userleave {
@@ -65,7 +66,7 @@ public class userleave {
             standardmessage = new Texte(user).get("LeaveMessage");
         }
 
-        js  = f.JsonFromFile(filename);
+        js  = func.JsonFromFile(filename);
 
         if(!js.containsKey(server.getIdAsString())) {
             updateJs(false, standardmessage, 0);
@@ -73,8 +74,8 @@ public class userleave {
         activated = js.get(server.getIdAsString()).toString().startsWith("t");
         if(activated) {
             message = js.get(server.getIdAsString()).toString().split("\u200B")[1];
-            channel = f.getApi().getServerTextChannelById(js.get(server.getIdAsString()).toString().substring(1).split("\u200B")[0]).orElse(channel);
-            uses = f.IntFromString(js.get(server.getIdAsString()).toString().substring(1).split("\u200B")[2], 0);
+            channel = func.getApi().getServerTextChannelById(js.get(server.getIdAsString()).toString().substring(1).split("\u200B")[0]).orElse(channel);
+            uses = func.IntFromString(js.get(server.getIdAsString()).toString().substring(1).split("\u200B")[2], 0);
         }
     }
 
@@ -83,7 +84,7 @@ public class userleave {
             addUse();
             String s = SERVER.matcher(USES.matcher(MEMBERS.matcher(message).replaceAll(Integer.toString(server.getMemberCount()))).replaceAll(js.get(server.getIdAsString()).toString().split("\u200B")[2])).replaceAll(server.getName());
             if(join) s = USER.matcher(s).replaceAll(user.getMentionTag());
-            else s=USER.matcher(s).replaceAll(user.getDiscriminatedName());
+            else s=USER.matcher(s).replaceAll(Matcher.quoteReplacement(user.getDiscriminatedName()));
             AtomicReference<Integer> online = new AtomicReference<>(server.getMemberCount());
             AtomicReference<Integer> bots = new AtomicReference<>(0);
 
