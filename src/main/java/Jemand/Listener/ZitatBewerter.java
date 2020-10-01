@@ -20,7 +20,7 @@ public class ZitatBewerter {
     public static class Add implements ReactionAddListener {
         @Override
         public void onReactionAdd(ReactionAddEvent event) {
-            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null  || event.getReaction().isEmpty()) return;
+            if(event.getUser().isEmpty() || event.getUser().get().isBot() || Zitat.UPVOTE_EMOJI == null  || event.getReaction().isEmpty()) return;
             try {
                 Message message = event.getMessage()
                         .orElse(event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join());
@@ -31,7 +31,7 @@ public class ZitatBewerter {
                             EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
 
                             if (event.getReaction().get().getEmoji().equalsEmoji(Zitat.REPORT_EMOJI)) {
-                                func.sendOwner("Reportet: \n\nZitat-Id: " + zid + "Von: " + event.getUser().getDiscriminatedName() + "\n\n" + message.getEmbeds().get(0).getImage().map(EmbedImage::getUrl).map(URL::toString).orElse(message.getEmbeds().get(0).getDescription().orElse("")), null);
+                                func.sendOwner("Reportet: \n\nZitat-Id: " + zid + "Von: " + event.getUser().get().getDiscriminatedName() + "\n\n" + message.getEmbeds().get(0).getImage().map(EmbedImage::getUrl).map(URL::toString).orElse(message.getEmbeds().get(0).getDescription().orElse("")), null);
                                 message.edit(embed.addField("\u200B", Zitat.REPORT_EMOJI + "  Zitat wurde reportet."));
                             } else {
                                 String rating = Zitat.getRating(zid);
@@ -59,7 +59,7 @@ public class ZitatBewerter {
 
         @Override
         public void onReactionRemove(ReactionRemoveEvent event) {
-            if(event.getUser().isBot() || Zitat.UPVOTE_EMOJI == null || event.getReaction().isEmpty()) return;
+            if(event.getUser().isEmpty() || event.getUser().get().isBot() || Zitat.UPVOTE_EMOJI == null || event.getReaction().isEmpty()) return;
             try {
                 Message message = event.getMessage()
                         .orElse(event.getApi().getMessageById(event.getMessageId(), event.getChannel()).exceptionally(t -> null).join());
@@ -92,7 +92,7 @@ public class ZitatBewerter {
         if(message == null) return "";
         String zid = "";
 
-        if(!e.getUser().isBot() && message.getAuthor().isYourself() && message.getEmbeds().size() > 0) {
+        if(e.getUser().isPresent() && e.getUser().get().isBot() && message.getAuthor().isYourself() && message.getEmbeds().size() > 0) {
             String title = message.getEmbeds().get(0).getTitle().orElse("");
 
             if(title.startsWith("Zitat-Id: ")) {

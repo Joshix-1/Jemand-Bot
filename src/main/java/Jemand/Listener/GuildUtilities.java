@@ -234,7 +234,7 @@ public class GuildUtilities {
                 try {
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-
+                    //event.getChannel().sendMessage(user.getMentionTag() + " cool, es könnte sein, da");
 
                 } catch (Exception e) {
                     func.handle(e);
@@ -333,8 +333,9 @@ public class GuildUtilities {
         try {
             event.getServer().getAuditLog(1, AuditLogActionType.CHANNEL_DELETE).join().getInvolvedUsers().forEach(user1 -> {
                 user1.removeRole(func.getApi().getRoleById(MITGLIED).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Channel got deleted").join();
-                event.getServer().getOwner()
-                        .sendMessage(user1.getDisplayName(event.getServer()) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").join();
+                event.getServer().getOwner().ifPresent(owner ->
+                        owner.sendMessage(user1.getDisplayName(event.getServer()) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").join()
+                );
 
             });
         } catch (Exception e) {
@@ -344,7 +345,8 @@ public class GuildUtilities {
 
     //Fortnite-Detektor
     private void activityChanged(UserChangeActivityEvent event) {
-        if (event.getUser().isBot()) return;
+        if (event.getUser().isEmpty() || event.getUser().get().isBot()) return;
+        User user = event.getUser().get();
 
         event.getApi().getServerTextChannelById(623940807619248148L).ifPresent(textchannel -> {
     		event.getNewActivity().ifPresent(activity -> {
@@ -356,18 +358,18 @@ public class GuildUtilities {
     					EmbedBuilder embed = new EmbedBuilder()
     							.setColor(Color.RED)
     							.setTimestampToNow()
-    							.setFooter(event.getUser().getDiscriminatedName(), event.getUser().getAvatar());
+    							.setFooter(user.getDiscriminatedName(), user.getAvatar());
     					activity.getDetails().ifPresent(string -> {
     						embed.addField("\u200B", "\nDetails: (" + string + ")");
     					});
-    					textchannel.sendMessage(embed.setDescription(event.getUser().getMentionTag() + " spielt " + activity.getName() + "."));
-    					func.getApi().getRoleById(623193804551487488L).ifPresent(event.getUser()::addRole);
+    					textchannel.sendMessage(embed.setDescription(user.getMentionTag() + " spielt " + activity.getName() + "."));
+    					func.getApi().getRoleById(623193804551487488L).ifPresent(user::addRole);
     				}
     			});
     		});
     	});
 
-        EmbedBuilder embed = getUserUpdatedEmbedBuilder(event.getUser());
+        EmbedBuilder embed = getUserUpdatedEmbedBuilder(user);
         if (event.getNewActivity().isPresent()) {
             String n = getActivity(event.getNewActivity().get());
             String o = getActivity(event.getOldActivity().orElse(null));

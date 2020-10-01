@@ -2,6 +2,7 @@ package Jemand;
 
 import Jemand.Listener.CommandCleanupListener;
 import Jemand.Listener.GuildUtilities;
+import Jemand.Listener.MusicPlayer;
 import Jemand.Listener.ReactionRole;
 import com.vdurmont.emoji.EmojiParser;
 import me.bramhaag.owo.OwO;
@@ -21,7 +22,6 @@ import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.imageio.ImageIO;
@@ -82,7 +82,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {/*"tw",*/ "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {"play", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -139,8 +139,8 @@ public class Befehl {
             message.addReaction(repeat);
         }
         message.addReactionAddListener(event2 -> {
-            if(event2.getEmoji().equalsEmoji(repeat) && !event2.getUser().isYourself()) {
-                if(user == event2.getUser()) {
+            if(event2.getEmoji().equalsEmoji(repeat) && event2.getUserId() != event2.getApi().getYourself().getId()) {
+                if(user.getId() == event2.getUserId()) {
                     event2.removeReactionsByEmojiFromMessage(repeat);
                     Delete.set(false);
                     try {
@@ -282,6 +282,14 @@ public class Befehl {
                 });
             });
             return true;
+        }
+
+        if (befehl.get().equalsIgnoreCase("play")) {
+            return MusicPlayer.play(server, user, event.getServerTextChannel().get(), subtext1.get());
+        }
+
+        if (befehl.get().equalsIgnoreCase("skip")) {
+            return MusicPlayer.skip(server, user);
         }
 
         //allQuotes //zitat
@@ -935,7 +943,7 @@ public class Befehl {
                         }
                     }
                 } else {
-                    if (!event2.getUser().isYourself()) {
+                    if (event2.getUserId() != event2.getApi().getYourself().getId()) {
                         event2.removeReaction();
                     }
                 }
@@ -1704,7 +1712,7 @@ public class Befehl {
                 if(haspermission) {
                     m.addReactions(str).join();
                     m.addReactionAddListener(event2 -> {
-                        if (event2.getUser().getId() == user.getId()) {
+                        if (event2.getUserId() == user.getId()) {
                             int index = -1;
                             for (int j = 0; j < str.length; j++) {
                                 if (event2.getEmoji().equalsEmoji(str[j])) {
@@ -1838,7 +1846,7 @@ public class Befehl {
                                     site = -1;
                                 if (event2.getEmoji().isUnicodeEmoji() && event2.getEmoji().equalsEmoji(forward))
                                     site = 1;
-                                if (site != 0 && event2.getUser() == user) {
+                                if (site != 0 && event2.getUserId() == user.getId()) {
                                     int fix2 = 0;
                                     String str = event2.getMessage().orElse(m).getEmbeds().get(0).getTitle().orElse("");
                                     int asite = str.length() - str.replace("\u200B", "").length() + site;
@@ -2097,7 +2105,7 @@ public class Befehl {
                         AtomicReference<Boolean> B = new AtomicReference<>(true);
 
                         messageUser1.addReactionAddListener(event2 -> {
-                            if (!event2.getUser().isYourself()) {
+                            if (event2.getUserId() != event2.getApi().getYourself().getId()) {
                                 if (event2.getEmoji().asKnownCustomEmoji().orElse(brunnen).equals(ohne_brunnen)) {
                                     if (sspb.get() == -1 && sspbG.get() == -1) {
                                         B.set(false);
@@ -2125,7 +2133,7 @@ public class Befehl {
                         }).removeAfter(30L, TimeUnit.MINUTES);
 
                         messageUser2.addReactionAddListener(event2 -> {
-                            if (!event2.getUser().isYourself()) {
+                            if (event2.getUserId() != event2.getApi().getYourself().getId()) {
                                 if (event2.getEmoji().asKnownCustomEmoji().orElse(brunnen).equals(ohne_brunnen)) {
                                     if (sspb.get() == -1 && sspbG.get() == -1) {
                                         B.set(false);
@@ -2175,7 +2183,7 @@ public class Befehl {
                             messages.get()[i].addReactions(schere, stein, papier, brunnen, ohne_brunnen); //, brunnen, ohne_brunnen
                             final int i2 = i;
                             messages.get()[i].addReactionAddListener(event2 -> {
-                                if (!event2.getUser().isYourself()) {
+                                if (event2.getUserId() != event2.getApi().getYourself().getId()) {
                                     if (event2.getEmoji().asKnownCustomEmoji().orElse(brunnen).equals(ohne_brunnen)) {
                                         if (func.allSame(sspbA, -1)) {
                                             B.set(false);
@@ -2291,7 +2299,7 @@ public class Befehl {
                         message4g.addReactions(reactions).join();
                         message4g.edit(embed.setDescription(vg.setMessage(message4g)));
                         message4g.addReactionAddListener(event2 -> {
-                            if (!event2.getUser().isYourself() && !vg.isEnded()) {
+                            if (event2.getUserId() != event2.getApi().getYourself().getId() && !vg.isEnded()) {
                                 vg.doMove(event2);
                                 if(!vg.isEnded()) message4g.edit(embed.setDescription(vg.getDisplayField()));
                             }
@@ -2373,7 +2381,7 @@ public class Befehl {
                         tttmessage.addReactions(EmojiParser.parseToUnicode(":one:"), EmojiParser.parseToUnicode(":two:"), EmojiParser.parseToUnicode(":three:"), EmojiParser.parseToUnicode(":four:"), EmojiParser.parseToUnicode(":five:"), EmojiParser.parseToUnicode(":six:"), EmojiParser.parseToUnicode(":seven:"), EmojiParser.parseToUnicode(":eight:"), EmojiParser.parseToUnicode(":nine:")).join();
                         tttmessage.edit(embed.setDescription(ttt.setMessage(tttmessage)));
                         tttmessage.addReactionAddListener(event2 -> {
-                            if (!event2.getUser().isYourself() && !ttt.isEnded()) {
+                            if (event2.getUserId() != event2.getApi().getYourself().getId() && !ttt.isEnded()) {
                                 ttt.doRound(event2);
                                 if (!ttt.isEnded()) tttmessage.edit(embed.setDescription(ttt.getMessage()));
                             }
@@ -2436,14 +2444,14 @@ public class Befehl {
                     //}
 
                     helpmessage.addReactionAddListener((event2 -> {
-                        if (!(event2.getUser().isYourself()) && event2.getUser().equals(user)) {
+                        if (event2.getUserId() != event2.getApi().getYourself().getId() && event2.getUserId() == user.getId()) {
                             event2.removeReaction();
                             if (event2.getReaction().get().getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":arrow_backward:")) && !event2.getMessage().get().getEmbeds().get(0).getTitle().get().equals("Help")) {
                                 helpmessage.edit("", helpembed.removeAllFields().setDescription(nhelp).setTitle("Help"));
                             } else {
                                 if (event2.getMessageContent().get().isEmpty()) {
                                     for (int i = 0; i < befehle.length; i++) {
-                                        if (!(event2.getUser().isYourself()) && event2.getReaction().get().getEmoji().equalsEmoji(helpabc[i].replaceAll("\u200B", ""))) {
+                                        if (event2.getUserId() != event2.getApi().getYourself().getId() && event2.getReaction().get().getEmoji().equalsEmoji(helpabc[i].replaceAll("\u200B", ""))) {
                                             EmbedBuilder helpembed2 = helpembed;
                                             String[] befehle2 = befehle[i].split(" ");
                                             String helpstr2 = "";
@@ -2464,7 +2472,7 @@ public class Befehl {
                                     }
                                     String[] befehle2 = befehle[site.get()].split(" ");
                                     for (int i = 0; i < befehle2.length; i++) {
-                                        if (!(event2.getUser().isYourself()) && event2.getReaction().get().getEmoji().equalsEmoji(helpabc[i].replaceAll("\u200B", ""))) {
+                                        if (event2.getUserId() != event2.getApi().getYourself().getId() && event2.getReaction().get().getEmoji().equalsEmoji(helpabc[i].replaceAll("\u200B", ""))) {
                                             if (!helpmessage.getEmbeds().isEmpty() && helpmessage.getEmbeds().get(0).getFields().size() > i && (helpmessage.getEmbeds().get(0).getFields().get(i).getValue().toLowerCase().contains("e.g.:") || helpmessage.getEmbeds().get(0).getFields().get(i).getValue().toLowerCase().contains("z.b.:"))) {
                                                 String text = helpmessage.getEmbeds().get(0).getFields().get(i).getValue().substring(helpmessage.getEmbeds().get(0).getFields().get(i).getValue().lastIndexOf(prefix.get()));
                                                 if (text.toLowerCase().contains("report"))

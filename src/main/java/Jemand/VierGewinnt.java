@@ -85,7 +85,7 @@ public class VierGewinnt {
     VierGewinnt doMove(ReactionAddEvent event2) {
         if(state == 0) {
             if (m == null  && event2.getMessage().isPresent()) m = event2.getMessage().orElse(m);
-            if (event2.getUser().getId() == users[rounds % 2]) {
+            if (event2.getUserId() == users[rounds % 2]) {
                 for (int i = 0; i < zahl.length; i++) {
                     if (event2.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(zahl[i]))) {
                         for (int j = 0; j < rows.length; j++) {

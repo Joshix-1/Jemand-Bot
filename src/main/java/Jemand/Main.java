@@ -207,7 +207,7 @@ public class Main {
 					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 9999), "UTF-8");
 //
 				func.getApi().addServerJoinListener(event -> {
-					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getServer().getOwner().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));
+					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getApi().getUserById(event.getServer().getOwnerId()).join().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));
 					func.getApi().getYourself().updateNickname(event.getServer(), "Jemand [J!]");
 					try {
 						func.sendOwner("https://joshix-1.github.io/invite?id=" + event.getServer().getIdAsString() + "\n", null);
@@ -238,6 +238,22 @@ public class Main {
 			}
 
 			func.getApi().addMessageCreateListener(event -> {
+				if (event.getMessageContent().equalsIgnoreCase("J!restart") && func.userIsTrusted(event.getMessageAuthor())) {
+					if (func.getFileSeparator().equals("/")) {
+						try {
+							if (Runtime.getRuntime().exec("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
+								func.shutdown();
+								System.exit(69);
+							} else {
+								event.getChannel().sendMessage(func.getRotEmbed(event).setDescription("lol, geht nicht"));
+							}
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 
 				if ((func.getFileSeparator().equals("/") || func.OWNER.map(User::getId).orElse(0L) == event.getMessageAuthor().getId()) && event.getMessageAuthor().isUser() && !event.getMessageAuthor().isBotUser() && !event.getMessageAuthor().isWebhook() && !event.getMessageAuthor().isYourself()) {
 					//id

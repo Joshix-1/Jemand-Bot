@@ -32,8 +32,10 @@ public class ReactionRole {
         @Override
         public void onReactionAdd(ReactionAddEvent event) {
             try {
-                getRole(event).ifPresent(role -> {
-                    if(botCanManageRole(event, role)) role.addUser(event.getUser()).join();
+                event.getUser().ifPresent(user -> {
+                    getRole(event).ifPresent(role -> {
+                        if (botCanManageRole(event, role)) role.addUser(user).join();
+                    });
                 });
             } catch (Exception e) {func.handle(e);}
         }
@@ -44,8 +46,10 @@ public class ReactionRole {
         @Override
         public void onReactionRemove(ReactionRemoveEvent event) {
             try {
-                getRole(event).ifPresent(role -> {
-                    if(botCanManageRole(event, role)) role.removeUser(event.getUser()).join();
+                event.getUser().ifPresent(user -> {
+                    getRole(event).ifPresent(role -> {
+                        if (botCanManageRole(event, role)) role.removeUser(user).join();
+                    });
                 });
             } catch (Exception e) {func.handle(e);}
         }
@@ -54,8 +58,8 @@ public class ReactionRole {
     private static boolean botCanManageRole(SingleReactionEvent e, Role r) {
         if(e.getApi().getYourself().canManageRole(r)) return true;
         try {
-            Texte texte = new Texte(e.getUser());
-            EmbedBuilder embed = func.setColorRed(func.getNormalEmbed(e.getUser(), null));
+            Texte texte = new Texte(e.getUser().orElse(null));
+            EmbedBuilder embed = func.setColorRed(func.getNormalEmbed(e.getUser().orElse(null), null));
             embed.setTitle(texte.get("Fehler2Title"));
             embed.setDescription(texte.get("CannotMangeRoles"));
             e.getChannel().sendMessage(embed).join();
@@ -67,7 +71,7 @@ public class ReactionRole {
 
     private static Optional<Role> getRole(SingleReactionEvent e) {
         String emoji = e.getEmoji().asUnicodeEmoji().orElse("");
-        if(e.getUser().isBot()
+        if(e.getUser().isEmpty() || e.getUser().get().isBot()
             || emoji.isEmpty()
             || e.getServerTextChannel().isEmpty()) return Optional.empty();
 
