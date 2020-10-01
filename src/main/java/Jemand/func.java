@@ -9,6 +9,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -67,7 +68,7 @@ public class func {
 
 
     private static String token = pws[6];
-    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
+    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING).login().join();
     public static final int PERMISSIONS = 604892353;
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);

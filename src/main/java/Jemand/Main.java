@@ -226,16 +226,15 @@ public class Main {
 		//erkennt wenn Nachricht ankommt
 		try {
 			//Listeners:
-			if(func.getFileSeparator().equals("/")) {
-				func.getApi().addMessageDeleteListener(new CommandCleanupListener());
-				func.getApi().addMessageCreateListener(new Channelportal());
-				func.getApi().addReactionAddListener(new Channelportal());
-				func.getApi().addReactionAddListener(new ZitatBewerter.Add());
-				func.getApi().addReactionRemoveListener(new ZitatBewerter.Remove());
-				func.getApi().addReactionAddListener(new ReactionRole.Add());
-				func.getApi().addReactionRemoveListener(new ReactionRole.Remove());
-				new GuildUtilities(func.getApi());
-			}
+			func.getApi().addMessageDeleteListener(new CommandCleanupListener());
+			func.getApi().addMessageCreateListener(new Channelportal());
+			func.getApi().addReactionAddListener(new Channelportal());
+			func.getApi().addReactionAddListener(new ZitatBewerter.Add());
+			func.getApi().addReactionRemoveListener(new ZitatBewerter.Remove());
+			func.getApi().addReactionAddListener(new ReactionRole.Add());
+			func.getApi().addReactionRemoveListener(new ReactionRole.Remove());
+			new GuildUtilities(func.getApi());
+
 
 			func.getApi().addMessageCreateListener(event -> {
 				if (event.getMessageContent().equalsIgnoreCase("J!restart") && func.userIsTrusted(event.getMessageAuthor())) {
