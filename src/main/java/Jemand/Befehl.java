@@ -833,7 +833,7 @@ public class Befehl {
             message.addReactions(EmojiParser.parseToUnicode(":repeat:"), helpabc[0], helpabc[1], helpabc[2], helpabc[3], helpabc[4], helpabc[5]);
 
             message.addReactionAddListener(event2 -> {
-                if (event2.getUser().equals(user)) {
+                if (event2.getUserId() == user.getId()) {
                     if (iz.get() == -1) {
                         if (event2.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":repeat:"))) {
                             event2.removeReaction();
@@ -1456,14 +1456,14 @@ public class Befehl {
                 do {
                     key = func.randomstr(func.getRandom(4, 5)) + "_" + func.randomstr(func.getRandom(4, 5)) + "_" + func.randomstr(func.getRandom(4, 5)) + "_" + func.randomstr(func.getRandom(4, 5)) + "_" + func.randomstr(func.getRandom(4, 5));
                 }  while (saved.containsKey(key));
-                String attach = "";
+                StringBuilder attach = new StringBuilder();
                 if (!event.getMessageAttachments().isEmpty()) {
-                    attach = "";
+                    attach = new StringBuilder();
                     for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                         try {
-                            attach += owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
+                            attach.append(owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
                         } catch (Throwable e) {
-                            attach += event.getMessageAttachments().get(i).getUrl() + "\u200B";
+                            attach.append(event.getMessageAttachments().get(i).getUrl()).append("\u200B");
                         }
                     }
                 }
@@ -1471,7 +1471,7 @@ public class Befehl {
                 try {
                     String k = func.createCryptKey2(subbefehl1.get());
                     String salt = "ss" + user.getId() + "u" + subbefehl1.get();
-                    attach = func.encrypt(attach, k, salt + "3");
+                    attach = new StringBuilder(func.encrypt(attach.toString(), k, salt + "3"));
                     text = func.encrypt(text, k, salt + "0");
                 } catch (Exception e) {
                     func.handle(e);
@@ -1539,16 +1539,16 @@ public class Befehl {
                     String text = saves[0];
                     if (!subbefehl2.get().contains("raw")) {
                         text = text.replaceAll("(?i)<text>", subtext2.get());
-                        String randuser = "";
+                        StringBuilder randuser = new StringBuilder();
 
 
                         if (text.toLowerCase().contains("<randuser>")) {
                             try {
                                 for (Iterator<User> iterator = server.getMembers().iterator(); iterator.hasNext(); ) {
-                                    randuser += iterator.next().getMentionTag() + " ";
+                                    randuser.append(iterator.next().getMentionTag()).append(" ");
                                 }
 
-                                randuser = randuser.split(" ")[func.getRandom(0, randuser.split(" ").length)];
+                                randuser = new StringBuilder(randuser.toString().split(" ")[func.getRandom(0, randuser.toString().split(" ").length)]);
                             } catch (Exception e) {
                                 func.handle(e);
                             }
@@ -1556,7 +1556,7 @@ public class Befehl {
                         text = func.replaceRandom(text);
                         DateFormat df = new SimpleDateFormat(texte.get("ZeitFormat"));
                         DateFormat df2 = new SimpleDateFormat("HH:mm:ss");
-                        text = text.replaceAll("(?i)<user>", user.getMentionTag()).replaceAll("(?i)<server>", server.getName()).replaceAll("(?i)<randuser>", randuser).replaceAll("(?i)<channel>", event.getServerTextChannel().get().getMentionTag()).replaceAll("(?i)<datum>", df.format((new Date(System.currentTimeMillis())))).replaceAll("(?i)<uhrzeit>", df2.format((new Date(System.currentTimeMillis()))));
+                        text = text.replaceAll("(?i)<user>", user.getMentionTag()).replaceAll("(?i)<server>", server.getName()).replaceAll("(?i)<randuser>", randuser.toString()).replaceAll("(?i)<channel>", event.getServerTextChannel().get().getMentionTag()).replaceAll("(?i)<datum>", df.format((new Date(System.currentTimeMillis())))).replaceAll("(?i)<uhrzeit>", df2.format((new Date(System.currentTimeMillis()))));
                         text = text.replaceAll("(?i)<rawtext>", subtext2.get());
                     }
                     mb.setEmbed(CommandCleanupListener.insertResponseTracker(embed.setDescription(text), event.getMessageId(), texte.getString("SaveEmbedFooter", discName).toString(), avatar).setTimestamp(Instant.ofEpochMilli(Long.parseLong(saves[2]))));
@@ -1657,14 +1657,14 @@ public class Befehl {
                     if (author.equals(user) || user.isBotOwner()) { //&& func.ispro(user))
                         String text = "\u200B" + func.removeSpaceAtStart(subtext1.get().substring(subtext1.get().indexOf(subtext[0]) + subtext[0].length()));
                         String key = subtext[0];
-                        String attach = "";
+                        StringBuilder attach = new StringBuilder();
                         if (!event.getMessageAttachments().isEmpty()) {
-                            attach = "\u200B\u200B";
+                            attach = new StringBuilder("\u200B\u200B");
                             for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                                 try {
-                                    attach += owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
+                                    attach.append(owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
                                 } catch (Throwable e) {
-                                    attach += event.getMessageAttachments().get(i).getUrl() + "\u200B";
+                                    attach.append(event.getMessageAttachments().get(i).getUrl()).append("\u200B");
                                 }
                             }
                         }
@@ -1750,8 +1750,8 @@ public class Befehl {
                 Map<String, Long> top = func.sortByValue(top_unsorted, false);
                 String[] keys1 = top.keySet().toArray(new String[top.size()]);
                 int newlength = keys1.length;
-                for (int i = 0; i < keys1.length; i++) {
-                    if (server.getMemberById(keys1[i]).isEmpty()) {
+                for (String s : keys1) {
+                    if (server.getMemberById(s).isEmpty()) {
                         newlength--;
                     }
                 }
@@ -2420,13 +2420,14 @@ public class Befehl {
                 String befehlestr = Bot + " \u200B " + Bilder + " \u200B "+ Memes + " \u200B " + Spaß + " \u200B " + Spiele + " \u200B "+ Server + " \u200B " + Anderes;
                 String[] befehle = (befehlestr.replace("J!", func.WHITE_SPACE.matcher(prefix.get()).replaceAll(""))).split(" \u200B ");
 
-                befehlestr = " " + texte.get("Kategorien") + " " + befehlestr.replace("J!", "") + " ";
+                //IDK WHAT THIS LINE WANTS TO DO:
+                //befehlestr = " " + texte.get("Kategorien") + " " + befehlestr.replace("J!", "") + " ";
 
                 StringBuilder helpstr = new StringBuilder();
                 //static final String[] helpstrings = {"Die W�rfel werden gefallen sein. Nutze \"+**roll** (Zahl)\", um einen W�rfel mit so vielen Seiten zu werfen. Wenn du kein Argument nutzt sind es 6 Seiten.", "Pong - Ping.", "Zwinge mich etwas zusagen.", "Wenn du jemandem anonym deinen Hass gestehen willst.", "Nutze +**4g {User}** oder +**4-gewinnt {User}**, um gegen den makierten User dieses hervorangende Spiel spielen zu k�nnen, ohne Discord verlassen zu m�ssen.", "Nutze +**sspb** oder +**sss**, um gegen den Bot **Schnick-Schnack-Schnuck** zu spielen.", "Wenn du diesen tollen Bot verbreiten willst.", "Sende Joshix#6613 anonym Hate-Kommentare.", "Erstelle einen Server-Invite mit: \"+**Serverinvite** [Dauer in h] [Anzahl Aufrufe]\". Wenn die Dauer �ber 24h ist, dann l�uft er nie ab. Wennn die Anzahl der Aufrufe h�her als 100 ist, gibt es kein Maximum.", "Wie der Say-Befehl nur in cool.", "Reagiere auf eine Nachricht mit einem Text, nutze \"+react [Text] (MessageId)\". Wenn keine MessageId angegeben ist, dann reagiert der Bot auf die Nachricht mit dem Befehl. Wenn ein Buchstabe doppelt enthalten ist, dann wird nur der Erste beachtet.", "Spiele gegen einen Freund Tic Tac Toe, nutze \"+ttt {Mitspieler}\". \nDas TicTacToe-Feld ist so aufgebaut: \n:one: :two: :three:\n:four: :five: :six:\n:seven: :eight: :nine:\n\n**Tipp:** Wenn du am Pc bist kannst du einfach mit deiner Maus �ber ein leeres Feld fahren und so sehen, um welche Nummer es sich handelt.", "Nutze \"**+Fake-Person**\"/\"**+Fp**\", um dir ein Bild einer nicht realen, von einer k�nstlichen Intelligenz erstellten Person anzusehen.", "Nutze \"**+Fake-Cat**\"/\"**+Fc**\", um dir ein Bild einer nicht realen, von einer k�nstlichen Intelligenz erstellten Katze anzusehen.", "Wenn du mal nicht wei�t, ob du etwas tun willst, nutze einfach \"**+8-Ball**\"/\"**+8ball**\", um eine einfache Antwort auf deine Frage zu bekommen. Das funktioniert ||fast|| immer.", "Lasse den Bot zuf�llige Bilder von [robohash.org](https://robohash.org/) senden. \n**+Random-Picture**/**RP**, um ein zuf�lliges Bild, der unten beschriebenden zu bekommen.\n**+Random-Robot**/**RR**, um ein Bild eines Roboters zu bekommen.\n**+Random-Face**/**RF**, um ein Bild eines Roboter-Kopfes zu erhalten.\n**+Random-Alien**/**RA**, um ein Bild eines Aliens zu kriegen.\n**+Random-Cat**/**RC**, um ein Bild einer Katze zu erhalten.\n**+Random-Robot**/**RR**, um ein Bild eines Roboters zu bekommen.", "Nutze \"**+Prefix** [neues Prefix]\", um f�r dich ein anderes Prefix f�r die Bot-Befehle zu setzen."};
 
                 for (int i = 0; i < kategorien.length; i++) {
-                    helpstr.append(helpabc[i] + " -> " + kategorien[i] + "\n");
+                    helpstr.append(helpabc[i]).append(" -> ").append(kategorien[i]).append("\n");
                 }
                 final String nhelp = helpstr.toString();
                 EmbedBuilder helpembed = embed;
