@@ -290,7 +290,7 @@ public class GuildUtilities {
         int hash = (user.getIdAsString() + func.KEY).hashCode()
                 * server.getIdAsString().hashCode()
                 * (user.getJoinedAtTimestamp(server).map(Instant::toString).orElse("69") + func.SALT).hashCode();
-        return (Math.abs(hash) % 8000) + 1200;
+        return (Math.abs(hash) % 90000) + 10000;
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
