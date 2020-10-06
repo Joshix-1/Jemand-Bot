@@ -13,7 +13,7 @@ compileTestJava.options.encoding = "UTF-8"
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    System.out.println("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand\nsudo supervisorctl restart Jemand")
+    System.out.println("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand\nsudo supervisorctl restart Jemand\n/home/josh/Programming/Jemand-Bot/build/distributions")
 }
 
 repositories {
