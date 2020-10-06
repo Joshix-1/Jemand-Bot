@@ -1,6 +1,8 @@
 package Jemand.Listener;
 
+import Jemand.ImageResizer;
 import Jemand.Memes;
+import Jemand.NumberToText;
 import Jemand.func;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
@@ -234,8 +236,7 @@ public class GuildUtilities {
                 try {
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                    //event.getChannel().sendMessage(user.getMentionTag() + " cool, es könnte sein, da");
-
+                    event.getChannel().sendMessage(user.getMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
                 } catch (Exception e) {
                     func.handle(e);
                 }
@@ -248,8 +249,8 @@ public class GuildUtilities {
         }
     }
 
-    private static String getCaptchaDescription(User user) {
-        return user.getMentionTag() + " schreibe die Lösung folgender Aufgabe in diesen Kanal:";
+    private static String getCaptchaDescription(User user, Server server) {
+        return user.getMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" als Zahl in diesen Kanal.";
     }
 
     private static void sendCaptcha(User user, Server server, TextChannel channel) {
@@ -257,27 +258,27 @@ public class GuildUtilities {
 
         long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
         if (joinedAgo > 5 * 60 * 1000) { //at least 5 min ago
-            channel.getMessages(20).thenApplyAsync(messages -> {
+            channel.getMessages(10).thenApplyAsync(messages -> {
                 if (messages.stream().noneMatch(message -> message.getEmbeds().size() > 0
-                        && message.getEmbeds().get(0).getDescription().map(desc -> desc.equals(getCaptchaDescription(user))).orElse(false))) {
+                        && message.getEmbeds().get(0).getDescription().map(desc -> desc.equals(getCaptchaDescription(user, server))).orElse(false))) {
 
                     EmbedBuilder embed = func.getNormalEmbed(user, null)
                             .setTitle("Captcha")
-                            .setDescription(getCaptchaDescription(user));
+                            .setDescription(getCaptchaDescription(user, server));
 
-                    int solution = calculateCaptchaNumber(user, server);
-                    int random;
-                    do {
-                        random = func.getRandom(222, 1444);
-                    } while (Math.abs(random - solution) < 20);
-                    int add = solution - random;
-
-                    try {
-                        Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
-                        embed.setImage(image.getFinalMeme().orElse(null));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    //int solution = calculateCaptchaNumber(user, server);
+                    //int random;
+                    //do {
+                    //    random = func.getRandom(222, 1444);
+                    //} while (Math.abs(random - solution) < 20);
+                    //int add = solution - random;
+//
+                    //try {
+                    //    Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
+                    //    embed.setImage(image.getFinalMeme().orElse(null));
+                    //} catch (IOException e) {
+                    //    e.printStackTrace();
+                    //}
                     channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
                 }
                 return null;
@@ -285,11 +286,11 @@ public class GuildUtilities {
         }
     }
 
-    private static int calculateCaptchaNumber(User user, Server server) {
+    public static int calculateCaptchaNumber(User user, Server server) {
         int hash = (user.getIdAsString() + func.KEY).hashCode()
                 * server.getIdAsString().hashCode()
                 * (user.getJoinedAtTimestamp(server).map(Instant::toString).orElse("69") + func.SALT).hashCode();
-        return (Math.abs(hash) % 800) + 200;
+        return (Math.abs(hash) % 8000) + 1200;
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
