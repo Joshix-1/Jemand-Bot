@@ -1,7 +1,5 @@
 package Jemand.Listener;
 
-import Jemand.ImageResizer;
-import Jemand.Memes;
 import Jemand.NumberToText;
 import Jemand.func;
 import org.javacord.api.DiscordApi;
@@ -13,7 +11,6 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
@@ -35,12 +32,11 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GuildUtilities {
     static public final long AN = 367648314184826880L;
@@ -54,6 +50,8 @@ public class GuildUtilities {
     static private final long WITZIG_EMOJI = 609012744578007071L;
 
     static private final long BOT_MITGLIED = 559440621815857174L;
+
+    private final ConcurrentHashMap<Long, Long> newUsersLastMessage = new ConcurrentHashMap<>();
 
     public GuildUtilities(DiscordApi api) {
         api.getServerById(AN).ifPresent(server -> {
@@ -235,6 +233,7 @@ public class GuildUtilities {
         if (user != null && server != null && user.getRoles(server).size() == 1 /*@everyone role*/) {
             if (event.getMessageContent().equals(Integer.toString(calculateCaptchaNumber(user, server)))) {
                 try {
+                    newUsersLastMessage.remove(user.getId());
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     event.getChannel().sendMessage(user.getMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
@@ -254,36 +253,22 @@ public class GuildUtilities {
         return user.getMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" als Zahl in diesen Kanal.";
     }
 
-    private static void sendCaptcha(User user, Server server, TextChannel channel) {
+    private void sendCaptcha(User user, Server server, TextChannel channel) {
         if (channel == null || user.getRoles(server).size() > 1) return;
 
-        long joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
+        long joinedAgo;
+        if (newUsersLastMessage.containsKey(user.getId())) {
+            joinedAgo = System.currentTimeMillis() - newUsersLastMessage.get(user.getId());
+        } else {
+            joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
+        }
         if (joinedAgo > 5 * 60 * 1000) { //at least 5 min ago
-            channel.getMessages(10).thenApplyAsync(messages -> {
-                if (messages.stream().noneMatch(message -> message.getEmbeds().size() > 0
-                        && message.getEmbeds().get(0).getDescription().map(desc -> desc.equals(getCaptchaDescription(user, server))).orElse(false))) {
+            newUsersLastMessage.put(user.getId(), System.currentTimeMillis() + 5 * 60 * 1000); //5 extra minutes
+            EmbedBuilder embed = func.getNormalEmbed(user, null)
+                    .setTitle("Captcha")
+                    .setDescription(getCaptchaDescription(user, server));
 
-                    EmbedBuilder embed = func.getNormalEmbed(user, null)
-                            .setTitle("Captcha")
-                            .setDescription(getCaptchaDescription(user, server));
-
-                    //int solution = calculateCaptchaNumber(user, server);
-                    //int random;
-                    //do {
-                    //    random = func.getRandom(222, 1444);
-                    //} while (Math.abs(random - solution) < 20);
-                    //int add = solution - random;
-//
-                    //try {
-                    //    Memes image = new Memes(Memes.LISA_PRESENTATION, add + "+" + random);
-                    //    embed.setImage(image.getFinalMeme().orElse(null));
-                    //} catch (IOException e) {
-                    //    e.printStackTrace();
-                    //}
-                    channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
-                }
-                return null;
-            });
+            channel.sendMessage(embed).exceptionally(ExceptionLogger.get());
         }
     }
 
