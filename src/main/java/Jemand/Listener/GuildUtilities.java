@@ -37,6 +37,7 @@ import org.javacord.core.entity.user.UserImpl;
 import java.awt.*;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -287,10 +288,8 @@ public class GuildUtilities {
     }
 
     public static int calculateCaptchaNumber(User user, Server server) {
-        int hash = (user.getIdAsString() + func.KEY).hashCode()
-                * server.getIdAsString().hashCode()
-                * (user.getJoinedAtTimestamp(server).map(Instant::toString).orElse("69") + func.SALT).hashCode();
-        return (Math.abs(hash) % 90000) + 10000;
+        int hash = Objects.hash(user, server, user.getJoinedAtTimestamp(server), func.SALT);
+        return (Math.abs(hash) % 900000) + 100000;
     }
 
     private static ServerTextChannel cloneTextchannel(ServerTextChannel channel) {
