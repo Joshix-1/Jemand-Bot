@@ -221,7 +221,8 @@ public class NumberToText {
         }
         /* -- alle anderen ganzen Zahlen -- */
         digits=0;
-        result="";
+        result=x<0?"minus ": "";
+        x = Math.abs(x);
         while(x>0) {
             result=(x%1000>0?(intToText1000(x%1000,digits)+intToTextDigits(digits,x%1000>1)):"")+result;
             x/=1000;
