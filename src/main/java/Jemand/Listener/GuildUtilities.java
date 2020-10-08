@@ -231,7 +231,8 @@ public class GuildUtilities {
         User user = event.getMessageAuthor().asUser().orElse(null);
         Server server = event.getServer().orElse(null);
         if (user != null && server != null && user.getRoles(server).size() == 1 /*@everyone role*/) {
-            if (event.getMessageContent().equals(Integer.toString(calculateCaptchaNumber(user, server)))) {
+            String replacedContent = event.getMessageContent().replaceAll("[,.]", "");
+            if (replacedContent.equals(Integer.toString(calculateCaptchaNumber(user, server)))) {
                 try {
                     newUsersLastMessage.remove(user.getId());
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
@@ -240,11 +241,16 @@ public class GuildUtilities {
                 } catch (Exception e) {
                     func.handle(e);
                 }
+            } else if (newUsersLastMessage.containsKey(user.getId())) { //got captcha
+                if (replacedContent.contains(Integer.toString(calculateCaptchaNumber(user, server)))) {
+                    event.getChannel().sendMessage(user.getDisplayName(server) + " du musst die Zahl alleine schreiben. :)");
+                }
+                event.getMessage().addReaction("❌").exceptionally(ExceptionLogger.get());
             } else if (!DiscordRegexPattern.ROLE_MENTION.matcher(event.getMessageContent()).find()
-                    && !event.getMessageContent().contains("@everyone")
-                    && !event.getMessageContent().contains("@here")
-                    && event.getMessage().getMentionedUsers().size() < 2) {
-                sendCaptcha(user, server, event.getChannel());
+                        && !event.getMessageContent().contains("@everyone")
+                        && !event.getMessageContent().contains("@here")
+                        && event.getMessage().getMentionedUsers().size() < 2) {
+                    sendCaptcha(user, server, event.getChannel());
             }
         }
     }
