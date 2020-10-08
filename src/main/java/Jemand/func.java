@@ -68,7 +68,7 @@ public class func {
 
 
     private static String token = pws[6];
-    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING).login().join();
+    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_REACTIONS).login().join();
     public static final int PERMISSIONS = 604892353;
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);
