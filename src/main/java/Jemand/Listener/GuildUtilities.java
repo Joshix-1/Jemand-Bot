@@ -46,10 +46,13 @@ public class GuildUtilities {
     static private final long LOGS = 559451873015234560L;
     static private final long ACTIVITY_LOGS = 740337061524930671L;
 
+    static private final long PETITIONEN_KANAL = 681650819002662946L;
+
     static private final long WITZIG_KANAL = 740498116171792395L;
     static private final long WITZIG_EMOJI = 609012744578007071L;
 
     static private final long BOT_MITGLIED = 559440621815857174L;
+    static private final long LAWLIET_ID = 368521195940741122L;
 
     private final ConcurrentHashMap<Long, Long> newUsersLastMessage = new ConcurrentHashMap<>();
 
@@ -226,6 +229,17 @@ public class GuildUtilities {
                             .send(webhook).exceptionally(ExceptionLogger.get())
         );
 
+        if (event.getChannel().getId() == PETITIONEN_KANAL
+                && event.getMessageAuthor().getId() != LAWLIET_ID
+                && !func.WHITE_SPACE.matcher(event.getMessageContent()).replaceAll("").toLowerCase().startsWith("l.vote")) {
+            func.getIncomingWebhook(event.getApi().getServerTextChannelById(681650503351795766L).orElse(null)).ifPresent(webhook -> event.getMessage()
+                    .toWebhookMessageBuilder()
+                    .send(webhook).exceptionally(ExceptionLogger.get())
+            );
+            event.getMessage().delete().exceptionally(ExceptionLogger.get());
+            return;
+        }
+
         if(!event.getMessageAuthor().isRegularUser()) return;
 
         User user = event.getMessageAuthor().asUser().orElse(null);
@@ -262,14 +276,10 @@ public class GuildUtilities {
     private void sendCaptcha(User user, Server server, TextChannel channel) {
         if (channel == null || user.getRoles(server).size() > 1) return;
 
-        long joinedAgo;
-        if (newUsersLastMessage.containsKey(user.getId())) {
-            joinedAgo = System.currentTimeMillis() - newUsersLastMessage.get(user.getId());
-        } else {
-            joinedAgo = user.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).map(time -> System.currentTimeMillis() - time).orElse(0L);
-        }
-        if (joinedAgo > 5 * 60 * 1000) { //at least 5 min ago
-            newUsersLastMessage.put(user.getId(), System.currentTimeMillis() + 5 * 60 * 1000); //5 extra minutes
+        if (!newUsersLastMessage.containsKey(user.getId())
+                || (System.currentTimeMillis() - newUsersLastMessage.get(user.getId())) > 10 * 60 * 1000) { //is 10 min ago last message
+
+            newUsersLastMessage.put(user.getId(), System.currentTimeMillis());
             EmbedBuilder embed = func.getNormalEmbed(user, null)
                     .setTitle("Captcha")
                     .setDescription(getCaptchaDescription(user, server));
@@ -279,7 +289,7 @@ public class GuildUtilities {
     }
 
     public static int calculateCaptchaNumber(User user, Server server) {
-        int hash = Objects.hash(user, server, user.getJoinedAtTimestamp(server), func.SALT);
+        int hash = Objects.hash(user.getIdAsString(), user.getJoinedAtTimestamp(server).orElse(null));
         return (Math.abs(hash) % 900000) + 100000;
     }
 
