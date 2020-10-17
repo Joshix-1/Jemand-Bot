@@ -300,14 +300,14 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             for (MessageAttachment attachment : message.getAttachments()){
                 text.append('\n').append(attachment.getUrl());
 
-                if (attachment.isImage()) { //<img src="pic_trulli.jpg" alt="Italian Trulli">
+                if (false && attachment.isImage()) { //<img src="pic_trulli.jpg" alt="Italian Trulli">
                     formattedText.append("<br><img src='")
                             .append(attachment.getUrl())
                             .append("' alt='")
                             .append(attachment.getUrl())
                             .append("'>");
                 } else { //<a href="url">link text</a>
-                    formattedText.append("<br><a href=\"")
+                    formattedText.append("<br><a href='")
                             .append(attachment.getUrl())
                             .append("'>")
                             .append(attachment.getFileName())
@@ -336,7 +336,6 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
 
     //https://matrix.org/docs/spec/client_server/r0.6.1#m-room-message-msgtypes
     //only: font, del, h1, h2, h3, h4, h5, h6, blockquote, p, a, ul, ol, sup, sub, li, b, i, u, strong, em, strike, code, hr, br, div, table, thead, tbody, tr, th, td, caption, pre, span, img.
-    static final private Pattern CODE_BLOCK = Pattern.compile("(?i)```(?<code>.++)```", Pattern.MULTILINE | Pattern.UNIX_LINES);
     static private String makeToHtml(String content) {
         //content = Jsoup.clean(content, Whitelist.none());
 
@@ -348,7 +347,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             CustomEmoji emoji = ((DiscordApiImpl) func.getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
             //content = content.replace(emoji.getMentionTag(), String.format(HTML_EMOJI, emoji.getImage().getUrl().toExternalForm(), ":" + emoji.getName() + ":"));
             // <a href="https://www.w3schools.com">Visit W3Schools.com!</a>
-            content = customEmoji.replaceFirst(Matcher.quoteReplacement("<a href=\"" + emoji.getImage().getUrl().toExternalForm() + "\">:" + emoji.getName() + ":"));
+            content = customEmoji.replaceFirst(Matcher.quoteReplacement("<a href=\"" + emoji.getImage().getUrl().toExternalForm() + "\">:" + emoji.getName() + ":</a>"));
             customEmoji.reset(content);
         }
 
@@ -384,13 +383,32 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
             channelMention.reset(content);
         }
 
-        Matcher codeBlock = CODE_BLOCK.matcher(content);
-        while (codeBlock.find()) {
-            String code = codeBlock.group("code");
-            content = codeBlock.replaceFirst(Matcher.quoteReplacement("<code>" + code + "</code>"));
-            codeBlock.reset(content);
-        }
+        content = content.replace("\n", "<br>");
 
+        content = replaceMarkdown(content, CODE_BLOCK_WITH_BREAK, "code");
+        content = replaceMarkdown(content, CODE_BLOCK, "code"); //3
+        content = replaceMarkdown(content, WRONG_CODE_BLOCK, "code"); //2
+        content = replaceMarkdown(content, SMALL_CODE_BLOCK, "code"); //1
+        content = replaceMarkdown(content, BOLD, "b");
+        content = replaceMarkdown(content, ITALIC, "i");
+
+        return content;
+    }
+
+    static final private Pattern CODE_BLOCK_WITH_BREAK = Pattern.compile("```(?:<br>)?(?<text>.+)<br>```");
+    static final private Pattern CODE_BLOCK = Pattern.compile("```(?:<br>)?(?<text>.+)```");
+    static final private Pattern WRONG_CODE_BLOCK = Pattern.compile("``(?<text>.+)``");
+    static final private Pattern SMALL_CODE_BLOCK = Pattern.compile("`(?<text>.+)`");
+    static final private Pattern BOLD = Pattern.compile("\\*\\*(?<text>.+)\\*\\*");
+    static final private Pattern ITALIC = Pattern.compile("\\*(?<text>.+)\\*");
+
+    private static String replaceMarkdown(String content, Pattern p, String htmlTag) {
+        Matcher markDown = p.matcher(content);
+        while (markDown.find()) {
+            String text = markDown.group("text");
+            content = markDown.replaceFirst(Matcher.quoteReplacement("<" + htmlTag + ">" + text + "</" + htmlTag + ">"));
+            markDown.reset(content);
+        }
         return content;
     }
 }
