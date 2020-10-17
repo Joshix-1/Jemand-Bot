@@ -225,6 +225,7 @@ public class Main {
 
 		//erkennt wenn Nachricht ankommt
 		try {
+			func.getApi().addReconnectListener(event -> event.getApi().getActivity().ifPresent(activity -> event.getApi().updateActivity(activity.getType(), activity.getName())));
 			//Listeners:
 			func.getApi().addMessageDeleteListener(new CommandCleanupListener());
 			func.getApi().addMessageCreateListener(new Channelportal());
@@ -246,9 +247,7 @@ public class Main {
 							} else {
 								event.getChannel().sendMessage(func.getRotEmbed(event).setDescription("lol, geht nicht"));
 							}
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
+						} catch (InterruptedException | IOException e) {
 							e.printStackTrace();
 						}
 					}
