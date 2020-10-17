@@ -1,8 +1,5 @@
 package Jemand;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 
 /**
  * Aufgabe: In Verträgen und Schecks muß man immer auch den Betrag in Worten schreiben. Für eine
