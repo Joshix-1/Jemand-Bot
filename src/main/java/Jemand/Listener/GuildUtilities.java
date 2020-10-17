@@ -2,6 +2,7 @@ package Jemand.Listener;
 
 import Jemand.NumberToText;
 import Jemand.func;
+import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
@@ -11,6 +12,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
@@ -114,7 +116,7 @@ public class GuildUtilities {
                 }
             });
         }
-        //else if (event.getChannel().getId() == WITZIG_KANAL && event.getEmoji().getMentionTag().equals(QUESTION_MARK)) {
+        //else if (event.getChannel().getId() == WITZIG_KANAL && event.getEmoji().getNicknameMentionTag().equals(QUESTION_MARK)) {
         //    event.requestMessage().thenAccept(message -> {
         //       if (message.getAuthor().isWebhook() && message.getContent().contains(Channelportal.SEPARATOR)) {
         //            long id = func.binaryBlankStringToLong(message.getContent().split(Channelportal.SEPARATOR, 2)[0]);
@@ -251,13 +253,46 @@ public class GuildUtilities {
                     newUsersLastMessage.remove(user.getId());
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                    event.getChannel().sendMessage(user.getMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
+                    event.getChannel().sendMessage(user.getNicknameMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
                 } catch (Exception e) {
                     func.handle(e);
                 }
             } else if (newUsersLastMessage.containsKey(user.getId())) { //got captcha
                 if (replacedContent.contains(Integer.toString(calculateCaptchaNumber(user, server)))) {
                     event.getChannel().sendMessage(user.getDisplayName(server) + " du musst die Zahl alleine schreiben. :)");
+                } else {
+                    try {
+                        int sent = Integer.parseInt(replacedContent);
+                        int answer = calculateCaptchaNumber(user, server);
+                        if (sent > answer) {
+                            event.getMessage().addReaction("⬇️").exceptionally(ExceptionLogger.get());
+                        } else {
+                            event.getMessage().addReaction("⬆️").exceptionally(ExceptionLogger.get());
+                        }
+                        String sentStr = NumberToText.intToText(sent);
+                        String answerStr = NumberToText.intToText(answer);
+
+                        String difference = StringUtils.difference(sentStr, answerStr);
+
+                        if (difference.equals(answerStr)) {
+                            String reverseSentStr = StringUtils.reverse(sentStr);
+                            String reverseAnswerStr = StringUtils.reverse(answerStr);
+
+                            String reverseDifference = StringUtils.difference(reverseSentStr, reverseAnswerStr);
+
+                            if (reverseDifference.equals(reverseAnswerStr)) {
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
+                                        .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                            } else {
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " *" + StringUtils.reverse(reverseDifference.toUpperCase()) + "* *")
+                                        .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                            }
+                        } else {
+                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " * *" + difference.toUpperCase() + "*")
+                                    .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                        }
+                        return;
+                    } catch (NumberFormatException ignored) {}
                 }
                 event.getMessage().addReaction("❌").exceptionally(ExceptionLogger.get());
             } else if (!DiscordRegexPattern.ROLE_MENTION.matcher(event.getMessageContent()).find()
@@ -270,7 +305,7 @@ public class GuildUtilities {
     }
 
     private static String getCaptchaDescription(User user, Server server) {
-        return user.getMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" als Zahl in diesen Kanal.";
+        return user.getNicknameMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" mit Ziffern in diesen Kanal.";
     }
 
     private void sendCaptcha(User user, Server server, TextChannel channel) {
@@ -289,7 +324,7 @@ public class GuildUtilities {
     }
 
     public static int calculateCaptchaNumber(User user, Server server) {
-        int hash = Objects.hash(user.getIdAsString(), user.getJoinedAtTimestamp(server).orElse(null));
+        int hash = Objects.hash(user.getJoinedAtTimestamp(server).orElse(Instant.EPOCH), user.getIdAsString() + ":why_so_salty#LazyCrypto");
         return (Math.abs(hash) % 900000) + 100000;
     }
 
@@ -363,7 +398,7 @@ public class GuildUtilities {
     					activity.getDetails().ifPresent(string -> {
     						embed.addField("\u200B", "\nDetails: (" + string + ")");
     					});
-    					textchannel.sendMessage(embed.setDescription(user.getMentionTag() + " spielt " + activity.getName() + "."));
+    					textchannel.sendMessage(embed.setDescription(user.getNicknameMentionTag() + " spielt " + activity.getName() + "."));
     					func.getApi().getRoleById(623193804551487488L).ifPresent(user::addRole);
     				}
     			});
