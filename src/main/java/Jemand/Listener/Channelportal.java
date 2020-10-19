@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.jojii.matrixclientserver.Bot.Client;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -61,11 +62,12 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
                         roomEvent.forEach(event -> {
                             if (event.getType().equals("m.room.message") && !event.getSender().equals("@jemand-bot:matrix.org")) {
                                 func.getApi().getServerTextChannelById(channels[0][1]).flatMap(func::getIncomingWebhook).ifPresent(webhook -> {
-                                    WebhookMessageBuilder mb = new WebhookMessageBuilder()
-                                            .setDisplayName(event.getSender());
+                                    WebhookMessageBuilder mb = new WebhookMessageBuilder();
 
-                                    getAvatarUrl(event.getSender()).ifPresentOrElse(mb::setDisplayAvatar, () -> mb.setDisplayAvatar(func.getApi().getYourself().getAvatar()));
-                                    getDisplayName(event.getSender()).ifPresent(mb::setDisplayName);
+                                    Channelportal.MatrixUser user = MatrixUser.byId(event.getSender());
+
+                                    user.getAvatar().ifPresentOrElse(mb::setDisplayAvatar, () -> mb.setDisplayAvatar(func.getApi().getYourself().getAvatar()));
+                                    mb.setDisplayName(user.getName());
 
                                     JSONObject js = event.getContent();
 
@@ -110,29 +112,31 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
         }
     }
 
-    static private Optional<String> getDisplayName(String user) {
-        try {
-            return makeHttpGetRequest(String.format("https://matrix.org/_matrix/client/r0/profile/%s/displayname", user))
-                    .filter(json -> json.has("displayname"))
-                    .map(json -> json.getString("displayname"));
-        } catch (JSONException e) {
-            //e.printStackTrace();
-            return Optional.empty();
+    static class MatrixUser {
+        URL avatar;
+        String name;
+
+        private MatrixUser(URL avatar, String name) {
+            this.avatar = avatar;
+            this.name = name;
         }
-    }
 
-    static private Optional<URL> getAvatarUrl(String user) {
-        try {
-            JSONObject response = makeHttpGetRequest(String.format("https://matrix.org/_matrix/client/r0/profile/%s/avatar_url", user)).orElse(null);
+        static MatrixUser byId(String id) {
+            JSONObject response = makeHttpGetRequest("https://matrix.org/_matrix/client/r0/profile/" + id).orElse(null);
 
-            if (response == null) return Optional.empty();
-            //mxc://<server-name>/<media-id>
-            //https://matrix.org/docs/spec/client_server/r0.6.1#matrix-content-mxc-uris
+            if (response == null) return new MatrixUser(null, id);
 
-            return convertMatrixFileURls(response.getString("avatar_url"));
-        } catch (JSONException e) {
-            System.out.println(e);
-            return Optional.empty();
+            URL avatar = response.has("avatar_url") ? convertMatrixFileURls(response.getString("avatar_url")).orElse(null) : null;
+            return new MatrixUser(avatar,
+                    response.has("displayname") ? response.getString("displayname") : id);
+        }
+
+        Optional<URL> getAvatar() {
+            return Optional.ofNullable(avatar);
+        }
+
+        String getName() {
+            return name;
         }
     }
 
@@ -282,7 +286,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
                 ? message.getAuthor().getDiscriminatedName()
                 : message.getAuthor().getDisplayName() + " (" + message.getAuthor().getDiscriminatedName() + ")";
         text.append(name).append(":\n");
-        formattedText.append(name).append(":<br>");
+        formattedText.append("<h2>").append(name).append(":</h2><br>");
 
         if (!message.getContent().isEmpty()) {
             text.append(message.getReadableContent());
