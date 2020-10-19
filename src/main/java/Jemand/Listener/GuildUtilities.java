@@ -8,6 +8,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
@@ -111,6 +112,9 @@ public class GuildUtilities {
                     sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
                         messageCompletableFuture.thenAccept(message -> {
                             message.addReaction(reaction.getEmoji()).exceptionally(ExceptionLogger.get());
+                            if (message.getChannel().getType() == ChannelType.SERVER_NEWS_CHANNEL) {
+                                message.crossPost().exceptionally(ExceptionLogger.get());
+                            }
                         });
                     });
                 }
