@@ -11,6 +11,7 @@ import org.apfloat.Apfloat;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -20,7 +21,10 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.util.DiscordRegexPattern;
+import org.javacord.api.util.logging.ExceptionLogger;
 import org.json.simple.JSONObject;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -44,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -82,7 +87,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {"play", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {"play", "excecute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -357,9 +362,34 @@ public class Befehl {
             return true;
         }
 
+        if (befehl.get().equalsIgnoreCase("excecute") && func.userIsTrusted(user)) {
+            Matcher m = DiscordRegexPattern.WEBHOOK_URL.matcher(subtext1.get());
+            if (m.find()) {
+                IncomingWebhook w = api.getIncomingWebhookByIdAndToken(m.group("id"), m.group("token")).join();
+                String content = m.replaceFirst("");
+                event.getMessage().toMessageBuilder().setContent(content).send(w);
+                event.getMessage().delete();
+                return true;
+            }
+        }
+
         //reaction-role //role-
-        if(befehl.get().equals("reaction-role")) {
+        if(befehl.get().equalsIgnoreCase("reaction-role")) {
             String[] role_id = WHITE_SPACES.split(subtext1.get());
+            Matcher m = DiscordRegexPattern.MESSAGE_LINK.matcher(subtext1.get());
+            if (m.find()) {
+                //return getTextChannelById(matcher.group("channel"))
+                //                .map(textChannel -> textChannel.getMessageById(matcher.group("message")));
+                Optional<TextChannel> channel = api.getTextChannelById(m.group("channel"));
+
+                if (channel.isPresent()) {
+                    Message message = channel.get().getMessageById(m.group("message")).exceptionally(ExceptionLogger.get()).join();
+                    if (message != null && message.getAuthor().isYourself()) {
+                        return ReactionRole.addRolesToMessage(message, user, role_id);
+                    }
+                }
+            }
+
             try {
                 ReactionRole.sendReactionRoleMessage(event, role_id);
                 return true;
@@ -367,6 +397,7 @@ public class Befehl {
                 func.handle(e);
                 return false;
             }
+
         }
 
         JSONObject saved = func.JsonFromFile("save.json");

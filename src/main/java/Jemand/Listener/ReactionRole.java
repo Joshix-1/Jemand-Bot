@@ -115,12 +115,12 @@ public class ReactionRole {
         }).exceptionally(ExceptionLogger.get());
     }
 
-    public static void addRolesToMessage(Message m, User user, String... role_ids) {
-        if(m.getServer().isEmpty() || !m.getAuthor().isYourself() || m.getEmbeds().isEmpty()) return;
+    public static boolean addRolesToMessage(Message m, User user, String... role_ids) {
+        if(m.getServer().isEmpty() || !m.getAuthor().isYourself() || m.getEmbeds().isEmpty()) return false;
         Embed e = m.getEmbeds().get(0);
         EmbedBuilder eb = e.toBuilder();
         int size = e.getFields().size();
-        if(size >= 20) return;
+        if(size >= 20) return false;
 
         int count = size;
         for (int i = 0; i < role_ids.length && count < 20; i++) {
@@ -131,7 +131,7 @@ public class ReactionRole {
                 count ++;
             }
         }
-        m.edit(m.getContent(), eb).join();
+        return null != m.edit(m.getContent(), eb).exceptionally(ExceptionLogger.get()).join();
     }
 
 
