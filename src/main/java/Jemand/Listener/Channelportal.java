@@ -286,7 +286,7 @@ public class Channelportal implements MessageCreateListener, ReactionAddListener
                 ? message.getAuthor().getDiscriminatedName()
                 : message.getAuthor().getDisplayName() + " (" + message.getAuthor().getDiscriminatedName() + ")";
         text.append(name).append(":\n");
-        formattedText.append("<h2>").append(name).append(":</h2><br>");
+        formattedText.append("<h3>").append(name).append(":</h3>");
 
         if (!message.getContent().isEmpty()) {
             text.append(message.getReadableContent());
