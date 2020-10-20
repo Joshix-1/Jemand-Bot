@@ -1,11 +1,8 @@
 package Jemand;
 
-import Jemand.Listener.Channelportal;
-import Jemand.Listener.CommandCleanupListener;
-import Jemand.Listener.ReactionRole;
-import Jemand.Listener.GuildUtilities;
-import Jemand.Listener.ZitatBewerter;
+import Jemand.Listener.*;
 import com.vdurmont.emoji.EmojiParser;
+import de.jojii.matrixclientserver.Bot.Client;
 import org.apache.commons.io.FileUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
@@ -236,6 +233,15 @@ public class Main {
 			func.getApi().addReactionRemoveListener(new ReactionRole.Remove());
 			new GuildUtilities(func.getApi());
 
+			//MatrixBridge
+			Client client = new Client("http://matrix.org");
+			client.login("jemand-bot", func.pws[8], loginData -> {
+				if (loginData.isSuccess()) {
+					new MatrixDiscordBridge(func.getApi(), client, MatrixDiscordBridge.MATRIX_ROOM, Channelportal.channels[0]);
+				} else {
+					System.err.println("error logging in");
+				}
+			});
 
 			func.getApi().addMessageCreateListener(event -> {
 				if (event.getMessageContent().equalsIgnoreCase("J!restart") && func.userIsTrusted(event.getMessageAuthor())) {
