@@ -114,7 +114,7 @@ public class MatrixDiscordBridge {
                 ? message.getAuthor().getDiscriminatedName()
                 : message.getAuthor().getDisplayName() + " (" + message.getAuthor().getDiscriminatedName() + ")";
         text.append(name).append(":\n");
-        formattedText.append("<h6>").append(name).append(":</h6>");
+        formattedText.append("<h5>").append(name).append(":</h5>");
 
         if (!message.getContent().isEmpty()) {
             text.append(message.getReadableContent());
