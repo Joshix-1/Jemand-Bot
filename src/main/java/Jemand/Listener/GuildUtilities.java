@@ -112,9 +112,9 @@ public class GuildUtilities {
                     sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), WITZIG_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
                         messageCompletableFuture.thenAccept(message -> {
                             message.addReaction(reaction.getEmoji()).exceptionally(ExceptionLogger.get());
-                            if (message.getChannel().getType() == ChannelType.SERVER_NEWS_CHANNEL) {
-                                message.crossPost().exceptionally(ExceptionLogger.get());
-                            }
+
+                            message.crossPost().exceptionally(ExceptionLogger.get());
+
                         });
                     });
                 }
@@ -288,11 +288,11 @@ public class GuildUtilities {
                                 new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             } else {
-                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " *" + StringUtils.reverse(reverseDifference.toUpperCase()) + "* *")
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(reverseDifference, "***" + difference.toUpperCase() + "***")))
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             }
                         } else {
-                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " * *" + difference.toUpperCase() + "*")
+                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + answerStr.replaceFirst(difference, "***" + difference.toUpperCase() + "***"))
                                     .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                         }
                         return;
