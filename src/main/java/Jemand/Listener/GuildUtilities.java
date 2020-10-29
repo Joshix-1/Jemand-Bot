@@ -14,6 +14,7 @@ import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.UncachedMessageUtil;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
@@ -251,6 +252,12 @@ public class GuildUtilities {
         User user = event.getMessageAuthor().asUser().orElse(null);
         Server server = event.getServer().orElse(null);
         if (user != null && server != null && user.getRoles(server).size() == 1 /*@everyone role*/) {
+            if (newUsersLastMessage.containsKey(user.getId()) && isMoreThan10minAgo(newUsersLastMessage.get(user.getId()))) {
+                    newUsersLastMessage.remove(user.getId());
+            }
+            if (newUsersLastMessage.containsKey(user.getId()) && user.getJoinedAtTimestamp(server).map(ts -> ts.toEpochMilli() > newUsersLastMessage.get(user.getId())).orElse(false)) {
+                newUsersLastMessage.remove(user.getId());
+            }
             String replacedContent = event.getMessageContent().replaceAll("[,.]", "");
             if (replacedContent.equals(Integer.toString(calculateCaptchaNumber(user, server)))) {
                 try {
@@ -288,7 +295,7 @@ public class GuildUtilities {
                                 new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             } else {
-                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(reverseDifference, "***" + difference.toUpperCase() + "***")))
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(reverseDifference, "***" + reverseDifference.toUpperCase() + "***")))
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             }
                         } else {
@@ -312,11 +319,15 @@ public class GuildUtilities {
         return user.getNicknameMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" mit Ziffern in diesen Kanal.";
     }
 
+    private boolean isMoreThan10minAgo(long timeMs) {
+        return (System.currentTimeMillis() - timeMs) > 10 * 60 * 1000;
+    }
+
     private void sendCaptcha(User user, Server server, TextChannel channel) {
         if (channel == null || user.getRoles(server).size() > 1) return;
 
         if (!newUsersLastMessage.containsKey(user.getId())
-                || (System.currentTimeMillis() - newUsersLastMessage.get(user.getId())) > 10 * 60 * 1000) { //is 10 min ago last message
+                || isMoreThan10minAgo(newUsersLastMessage.get(user.getId()))) { //is 10 min ago last message
 
             newUsersLastMessage.put(user.getId(), System.currentTimeMillis());
             EmbedBuilder embed = func.getNormalEmbed(user, null)
