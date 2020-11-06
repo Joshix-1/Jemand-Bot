@@ -61,7 +61,7 @@ public class RPS {
 
     public RPS(Message m, User user) {
         this.api = m.getApi();
-        this.user = new long[] {user.getId(), -1};
+        this.user = new long[] {user.getId(), api.getYourself().getId()};
         this.texte = new Texte(user);
         this.texte2 = texte;
 
@@ -144,13 +144,13 @@ public class RPS {
                             .map(Texte::new).orElse(texte).getString(
                                     "SSSEndMessage",
                                     Long.toUnsignedString(user[winnerId]),
-                                    EMOTES[userInput[loserId]].getMentionTag(),
+                                    EMOTES[userInput[winnerId]].getMentionTag(),
                                     Long.toUnsignedString(user[loserId]),
                                     EMOTES[userInput[loserId]].getMentionTag()
                             ).toString())
             ).exceptionally(ExceptionLogger.get());
         });
-        if(!onlyOnePlayer()) func.addGame("rps", user[winnerId], user[loserId]);
+        if(!onlyOnePlayer()) func.addGame("sss", user[winnerId], user[loserId]);
     }
 
     private void tie() {
@@ -161,7 +161,7 @@ public class RPS {
                     .addField("\u200B", texte.getString("SSSUnentschieden", EMOTES[userInput[0]].getMentionTag()).toString())
             ).exceptionally(ExceptionLogger.get());
         });
-        if(!onlyOnePlayer()) func.addGame0("rps", user[0], user[1]);
+        if(!onlyOnePlayer()) func.addGame0("sss", user[0], user[1]);
     }
 
     private void addOhneBrunnenListener(Message m, long user) {
@@ -194,11 +194,11 @@ public class RPS {
     }
 
     private boolean alreadyBothChosen() {
-        return userInput[0] != -1 && (user[1] == -1 || userInput[1] != -1);
+        return userInput[0] != -1 && (onlyOnePlayer() || userInput[1] != -1);
     }
 
     private boolean onlyOnePlayer() {
-        return user[1] == -1;
+        return user[1] == api.getYourself().getId();
     }
 
     private boolean firstPlayerWins() {

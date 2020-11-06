@@ -2067,7 +2067,7 @@ public class Befehl {
             if (befehl.get().equalsIgnoreCase("sspb") || befehl.get().equalsIgnoreCase("SSS") || befehl.get().equalsIgnoreCase("RPS")) {
                 if (!idmentioneduser.get().isEmpty()) {
                     Optional<User> user2 = api.getCachedUserById(idmentioneduser.get());
-                    if (user2.isPresent()) {
+                    if (user2.isPresent() && !user2.get().isYourself()) {
                         new RPS(user, user2.get(), event.getMessage());
                         return true;
                     }
