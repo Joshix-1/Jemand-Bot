@@ -225,8 +225,11 @@ public class Main {
 			func.getApi().addReconnectListener(event -> event.getApi().getActivity().ifPresent(activity -> event.getApi().updateActivity(activity.getType(), activity.getName())));
 			//Listeners:
 			func.getApi().addMessageDeleteListener(new CommandCleanupListener());
+
 			func.getApi().addMessageCreateListener(new Channelportal());
 			func.getApi().addReactionAddListener(new Channelportal());
+			func.getApi().addMessageEditListener(new Channelportal());
+
 			func.getApi().addReactionAddListener(new ZitatBewerter.Add());
 			func.getApi().addReactionRemoveListener(new ZitatBewerter.Remove());
 			func.getApi().addReactionAddListener(new ReactionRole.Add());

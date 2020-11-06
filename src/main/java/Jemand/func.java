@@ -68,7 +68,7 @@ public class func {
 
 
     private static String token = pws[6];
-    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_REACTIONS).login().join();
+    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING).login().join();
     public static final int PERMISSIONS = 604892353;
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);
@@ -300,87 +300,6 @@ public class func {
         } else {
             return i2 - i1;
         }
-    }
-
-    //rps2
-    static EmbedBuilder rps(MessageCreateEvent event, User[] users, AtomicIntegerArray ints, String[] NameSSPB) {
-        Long[] points = new Long[users.length];
-        Arrays.fill(points, 0);
-        Texte t = new Texte(event.getMessageAuthor().asUser().orElse(users[0]));
-        for(int i = 0; i < users.length; i++){
-            for (int j = 0; j < users.length; j++){
-                if (ints.get(i) != ints.get(j) && rps(ints.get(i), ints.get(j))) points[i] = points[i] + 1;
-                if (ints.get(i) != ints.get(j) && rps(ints.get(j), ints.get(i))) points[i] = points[i] - 1;
-            }
-        }
-        EmbedBuilder e = getNormalEmbed(event).setTitle(t.get("SSSTitle"));
-        int best = 0;
-        Map<String, Long> map = new HashMap<>(users.length);
-        for (int i = 0; i < users.length; i++) map.put(Long.toString(i), points[i]);
-        map = sortByValue(map, false);
-        String[] s = map.keySet().toArray(new String[map.size()]);
-        for (int j = 0; j < s.length; j++) {
-            int i = Integer.parseInt(s[j]);
-            if(j == 0) best = i;
-            String s1 = users[i].getName();
-            if(event.getServer().isPresent()) s1 = users[i].getDisplayName(event.getServer().get());
-            e.addField(s1 + ":", t.get("SSSPlatzField", Long.toString(points[i]), NameSSPB[ints.get(i)]));
-        }
-        if(allSame(points, points[0])) {
-            return e.setDescription(t.get("4GUnentschieden"));
-        } else {
-            return e.setDescription(users[best].getMentionTag() + " " + t.get("4GGewonnen"));
-        }
-    }
-    static Boolean rps(int user, int geg) {
-        if (user == 3 && geg != 2) return true; //               0                             1                   2                      3
-        if (geg == 3 && user == 2) return true; //NameSSPB = {schere.getMentionTag(), stein.getMentionTag(), papier.getMentionTag(), brunnen.getMentionTag()};
-        if (geg == 3 && user != 2) return false;
-        if (user == 0 && geg != 1) return true;
-        if (user == 1 && geg != 2) return true;
-        if (user == 2 && geg != 0) return true;
-        return false;
-    }
-    //rps
-    static EmbedBuilder rps(MessageCreateEvent event2, AtomicReference<Integer> sspb, AtomicReference<Integer> sspbG, String[] NameSSPB, User geg) {
-        User user = event2.getMessageAuthor().asUser().get();
-        if(sspb.get() == -1 || sspbG.get() == -1) {
-            Texte t = new Texte(user);
-            EmbedBuilder e2 = getRotEmbed(event2).setTitle(t.get("ZeitAbgelaufen"));
-            if(sspb.get() == -1 && sspbG.get() == -1) return e2.setDescription(new Texte(user, null).get("SSSLangsam2"));
-            else if (sspb.get() == -1) return e2.setDescription(t.get("SSSLangsam", user.getDisplayName(event2.getServer().get())));
-            else if (sspbG.get() == -1) return e2.setDescription(t.get("SSSLangsam", geg.getDisplayName(event2.getServer().get())));
-        } else if (sspb.get().equals(sspbG.get())) {
-            addGame0("sss", user, geg);
-            return (getNormalEmbed(event2).setDescription(new Texte(user).getString("SSSUnentschieden", NameSSPB[sspb.get()]).toString()));
-        } else {
-            if (rps(sspb.get(), sspbG.get())) {
-                return (win(NameSSPB[sspbG.get()], NameSSPB[sspb.get()], user, geg, event2));
-            }else {
-                return (lose(NameSSPB[sspbG.get()], NameSSPB[sspb.get()], user, geg, event2));
-            }
-        }
-        return null;
-    }
-    static public EmbedBuilder lose (String g1, String o1, User user, User geg, MessageCreateEvent event) {
-        String id = user.getIdAsString();
-        String gegId = geg.getIdAsString();
-        addGame("sss", geg, user);
-        EmbedBuilder e = getNormalEmbed(event);
-        if(geg.isYourself()) e = getRotEmbed(event);
-        return e.setTitle(new Texte(user).getString("SSSTitle").toString())
-                .setDescription(new Texte(user).getString("SSSEndMessage", gegId, g1, id, o1).toString());
-    }
-
-    static public EmbedBuilder win (String g1, String o1, User user, User geg, MessageCreateEvent event) {
-        String id = user.getIdAsString();
-        String gegId = geg.getIdAsString();
-        EmbedBuilder e = getNormalEmbed(event);
-        addGame("sss", user, geg);
-        if(geg.isYourself()) e = getGruenEmbed(event);
-        return e.setTitle(new Texte(user, null).getString("SSSTitle").toString())
-                .setDescription(new Texte(user, null).getString("SSSEndMessage",id, o1, gegId, g1).toString());
-
     }
 
 
