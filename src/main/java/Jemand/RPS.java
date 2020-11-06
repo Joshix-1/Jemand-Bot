@@ -100,7 +100,9 @@ public class RPS {
 
                     int userIndex = this.user[0] == user ? 0 : 1;
                     userInput[userIndex] = emoji;
-                    m.edit(event.getMessage().orElse(m).getEmbeds().get(0).toBuilder().removeAllFields().addField("\u200B", EMOTES[emoji].getMentionTag())).exceptionally(ExceptionLogger.get());
+                    if (m.getAuthor().isYourself()) {
+                        m.edit(event.getMessage().orElse(m).getEmbeds().get(0).toBuilder().removeAllFields().addField("\u200B", EMOTES[emoji].getMentionTag())).exceptionally(ExceptionLogger.get());
+                    }
                     handleEnding();
                 }
             }
