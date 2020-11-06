@@ -4,9 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.util.logging.ExceptionLogger;
 
@@ -129,15 +127,15 @@ public class RPS {
         if (userInput[0] == userInput[1]) {
             tie();
         } else if (firstPlayerWins()) {
-            winsAgainst(0);
+            wins(0);
         } else {
-            winsAgainst(1);
+            wins(1);
         }
 
         messages.forEach(Message::removeAllReactions);
     }
 
-    private void winsAgainst(int winnerId) {
+    private void wins(int winnerId) {
         int loserId = winnerId == 0 ? 1 : 0;
         api.getTextChannelById(channel).ifPresent(channel -> {
             channel.sendMessage(
@@ -152,7 +150,11 @@ public class RPS {
                             ).toString())
             ).exceptionally(ExceptionLogger.get());
         });
-        if(!onlyOnePlayer()) func.addGame("sss", user[winnerId], user[loserId]);
+        if(gameGivesPoints()) func.addGame("sss", user[winnerId], user[loserId]);
+    }
+
+    private boolean gameGivesPoints() {
+        return !onlyOnePlayer() && user[0] != user[1];
     }
 
     private void tie() {
@@ -163,7 +165,7 @@ public class RPS {
                     .addField("\u200B", texte.getString("SSSUnentschieden", EMOTES[userInput[0]].getMentionTag()).toString())
             ).exceptionally(ExceptionLogger.get());
         });
-        if(!onlyOnePlayer()) func.addGame0("sss", user[0], user[1]);
+        if(gameGivesPoints()) func.addGame0("sss", user[0], user[1]);
     }
 
     private void addOhneBrunnenListener(Message m, long user) {
