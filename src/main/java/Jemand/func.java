@@ -8,6 +8,7 @@ import org.apfloat.ApfloatMath;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
@@ -262,10 +263,12 @@ public class func {
         return "";
     };
     //"\t#\t*\t+\t-\t?\t!\t&" " :hash: :asterisk: <:plus:576765085582622740> <:minus:576765084492365838> <:fragezeichen:576765084995420180> <:ausrufezeichen:576765084626321410> <:und:576765085565845504>"
-    static public void react (Message message, String[] helpabc, Integer i2) {
-        for (int i = 0; i < i2; i++) {
-            message.addReaction(EmojiParser.parseToUnicode(helpabc[i])).join();
+    static public void react (Message message, String[] helpabc, int i2) {
+        String[] toReact = new String[i2];
+        for (int i = 0; i < toReact.length; i++) {
+            toReact[i] = EmojiParser.parseToUnicode(helpabc[i]);
         }
+        message.addReactions(toReact).exceptionally(ExceptionLogger.get());
     }
 
     static <k> k[] reverseArr(k[] a) {
