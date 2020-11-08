@@ -200,8 +200,8 @@ public class Main {
 			if (func.getFileSeparator().equals("/")) { //only Linux
 
 				String logs = FileUtils.readFileToString(new File("/usr/home/admin/Jemand.log"));
-				if (logs.length() > 10001)
-					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 9999), "UTF-8");
+				if (logs.length() > 100001)
+					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 99999), "UTF-8");
 //
 				func.getApi().addServerJoinListener(event -> {
 					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getApi().getUserById(event.getServer().getOwnerId()).join().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));
