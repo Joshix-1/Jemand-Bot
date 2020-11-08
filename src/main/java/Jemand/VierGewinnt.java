@@ -12,19 +12,19 @@ public class VierGewinnt {
     private static final String[] emojis = {func.parseLetterToEmote("x"), ":o2:"};
     private static final String blank_row = "<:01:703321359744499813> <:02:703322946650898443> <:03:703322960420667392> <:04:703322984101838881> <:05:703323000560418927> <:06:703323015030636545> <:07:703323031732486405>".replace(' ', '\u200B');
     private static final String[] leer = blank_row.split("\u200B");
-    private static String vierX = emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0];
-    private static String vierO = emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1];
-    private static String dreiX = emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0];
-    private static String dreiO = emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1];
-    private long[] users;
-    private String[] rows = new String[6];
+    private static final String vierX = emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0];
+    private static final String vierO = emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1];
+    private static final String dreiX = emojis[0] + "\u200B" + emojis[0] + "\u200B" + emojis[0];
+    private static final String dreiO = emojis[1] + "\u200B" + emojis[1] + "\u200B" + emojis[1];
+    private final long[] users;
+    private final String[] rows = new String[6];
     private int rounds;
     private Message m;
-    private boolean[] ai = new boolean[2];
+    private final boolean[] ai = new boolean[2];
     private int state; //0 = game is running; 1 = user1 won; 2 = user2 won; 3 = draw
-    private Texte texte;
-    private Befehl befehl;
-    private boolean vier;
+    private final Texte texte;
+    private final Befehl befehl;
+    private final boolean vier;
 
     VierGewinnt(Befehl b, User user1, long user2, boolean vier) {
         long jemand_id = func.getApi().getYourself().getId();
@@ -198,7 +198,7 @@ public class VierGewinnt {
 
     void check() {
         if(!getField().contains("0")) state = 3;
-        if(state == 0) {
+        else if(state == 0) {
             state = checkState(getField(), vier);
         }
         if(state != 0) {
@@ -227,16 +227,16 @@ public class VierGewinnt {
        int s = getStateOf(field, vier);
        if(s != 0) return s;
        //vertikal
-       String[][] str = new String[6][7];
+       String[][] fieldArray = new String[6][7];
        String[] row = func.reverseArr(field.split("\n"));
-       for (int i = 0; i < str.length; i++) {
-           str[i] = row[i].split("\u200B");
+       for (int i = 0; i < fieldArray.length; i++) {
+           fieldArray[i] = row[i].split("\u200B");
        }
 
        //vertikal:
        StringBuilder vertikal = new StringBuilder();
-       for (int i = 0; i < str[0].length; i++) {
-           for (String[] strings : str) {
+       for (int i = 0; i < fieldArray[0].length; i++) {
+           for (String[] strings : fieldArray) {
                vertikal.append(strings[i]).append("\u200B");
            }
            vertikal.append("\n");
@@ -244,35 +244,48 @@ public class VierGewinnt {
        s = getStateOf(vertikal.toString(), vier);
        if(s != 0) return s;
 
+       /*
+     Connect four:
+                 :54::55::56::57:
+             :43::44::45::46::47:
+         :32::33::34::35::36::37:
+     :21::22::23::24::25::26:
+     :11::12::13::14::15:
+     :01::02::03::04:
+
+        */
        //diagonal /
        StringBuilder diagonal = new StringBuilder();
-       for (int i = 0; i < 3; i++) {
-           for (int j = i; j < 6; j++) {
-               diagonal.append(str[j][j-i]).append("\u200B");
-           }
-           diagonal.append("\n");
-       }
-       for (int i = 1; i < 4; i++) {
-           for (int j = 0; j < 7-i; j++) {
-                   diagonal.append(str[j][j + i]).append("\u200B");
-           }
-           diagonal.append("\n");
-       }
+       diagonal.append(fieldArray[2][1]).append(fieldArray[3][2]).append(fieldArray[4][3]).append(fieldArray[5][4]).append("\n");
+       diagonal.append(fieldArray[1][1]).append(fieldArray[2][2]).append(fieldArray[3][3]).append(fieldArray[4][4]).append(fieldArray[5][5]).append("\n");
+       diagonal.append(fieldArray[0][1]).append(fieldArray[1][2]).append(fieldArray[2][3]).append(fieldArray[3][4]).append(fieldArray[4][5]).append(fieldArray[5][6]).append("\n");
+       diagonal.append(fieldArray[0][2]).append(fieldArray[1][3]).append(fieldArray[2][4]).append(fieldArray[3][5]).append(fieldArray[4][6]).append(fieldArray[5][7]).append("\n");
+       diagonal.append(fieldArray[0][3]).append(fieldArray[1][4]).append(fieldArray[2][5]).append(fieldArray[3][6]).append(fieldArray[4][7]).append("\n");
+       diagonal.append(fieldArray[0][4]).append(fieldArray[1][5]).append(fieldArray[2][6]).append(fieldArray[3][7]);
        s = getStateOf(diagonal.toString(), vier);
        if(s != 0) return s;
 
+
+         /*
+     Connect four:
+     :51::52::53::54:
+     :41::42::43::44::45:
+     :31::32::33::34::35::36:
+         :22::23::24::25::26::27:
+             :13::14::15::16::17:
+                 :04::05::06::07:
+
+
+     :one:​:two:​:three:​:four:​:five:​:six:​:seven:
+
+        */
        //diagonal \
-       diagonal = new StringBuilder();
-       for (int i = 0; i < 3; i++) {
-           for (int j = 0; j < 6-i; j++) {
-               diagonal.append(str[j][(6 - i - 1)-j]).append("\u200B");
-           }
-       }
-       for (int i = 0; i < 3; i++) {
-           for (int j = i; j < 6; j++) {
-               diagonal.append(str[j][6 - (j - i)]).append("\u200B");
-           }
-       }
+       diagonal.append(fieldArray[3][1]).append(fieldArray[2][2]).append(fieldArray[1][3]).append(fieldArray[0][4]).append("\n");
+       diagonal.append(fieldArray[4][1]).append(fieldArray[3][2]).append(fieldArray[2][3]).append(fieldArray[1][4]).append(fieldArray[0][5]).append("\n");
+       diagonal.append(fieldArray[5][1]).append(fieldArray[4][2]).append(fieldArray[3][3]).append(fieldArray[2][4]).append(fieldArray[1][5]).append(fieldArray[0][6]).append("\n");
+       diagonal.append(fieldArray[5][2]).append(fieldArray[4][3]).append(fieldArray[3][4]).append(fieldArray[2][5]).append(fieldArray[1][6]).append(fieldArray[0][7]).append("\n");
+       diagonal.append(fieldArray[5][3]).append(fieldArray[4][4]).append(fieldArray[3][5]).append(fieldArray[2][6]).append(fieldArray[1][7]).append("\n");
+       diagonal.append(fieldArray[5][4]).append(fieldArray[4][5]).append(fieldArray[3][6]).append(fieldArray[2][7]);
        return getStateOf(diagonal.toString(), vier);
    }
 
