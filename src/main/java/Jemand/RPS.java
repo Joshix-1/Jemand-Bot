@@ -226,7 +226,7 @@ public class RPS {
                     && event.getEmoji().equalsEmoji(OHNE_BRUNNEN)) {
                 ohneBrunnen = true;
                 for (Message mess : messages) {
-                    mess.getLatestInstance().thenAccept(this::removeBrunnen).exceptionally(ExceptionLogger.get());
+                    removeBrunnen(mess);
                 }
                 m.removeListener(ReactionAddListener.class, listener[0]);
             }
