@@ -183,15 +183,18 @@ public class RPS {
             message.addReactions(Befehl.REPEAT_EMOJI);
             ReactionAddListener[] listener = new ReactionAddListener[1];
             listener[0] = event -> {
-                if (event.getEmoji().equalsEmoji(Befehl.REPEAT_EMOJI)) {
-                    try {
-                        new RPS(api.getUserById(user[0]).get(), api.getUserById(user[1]).get(), message);
-                    } catch (Exception e) {
-                        message.getChannel().sendMessage(e.toString());
+                if (event.getUserId() == api.getYourself().getId()) return;
+                if (event.getUserId() == user[0] || event.getUserId() == user[1]) {
+                    if (event.getEmoji().equalsEmoji(Befehl.REPEAT_EMOJI)) {
+                        try {
+                            new RPS(api.getUserById(user[0]).get(), api.getUserById(user[1]).get(), message);
+                        } catch (Exception e) {
+                            message.getChannel().sendMessage(e.toString());
+                        }
+                        message.removeListener(ReactionAddListener.class, listener[0]);
+                        listener[0] = null;
                     }
-                    message.removeListener(ReactionAddListener.class, listener[0]);
-                    listener[0] = null;
-                };
+                }
             };
             message.addReactionAddListener(listener[0]);
 
