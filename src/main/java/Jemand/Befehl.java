@@ -12,7 +12,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.embed.EmbedField;
@@ -47,7 +46,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +75,7 @@ public class Befehl {
 
     private final String[] helpabc = func.EMOJIABC;
 
+    final static public String REPEAT_EMOJI = EmojiParser.parseToUnicode(":repeat:");
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
@@ -129,17 +128,16 @@ public class Befehl {
     }
 
     void addRerun(Message message) {
-        final String repeat = EmojiParser.parseToUnicode(":repeat:");
         try {
-            message.addReaction(repeat).join();
+            message.addReaction(REPEAT_EMOJI).join();
         } catch (Exception e) {
             func.handle(e);
-            message.addReaction(repeat);
+            message.addReaction(REPEAT_EMOJI);
         }
         message.addReactionAddListener(event2 -> {
-            if(event2.getEmoji().equalsEmoji(repeat) && event2.getUserId() != event2.getApi().getYourself().getId()) {
+            if(event2.getEmoji().equalsEmoji(REPEAT_EMOJI) && event2.getUserId() != event2.getApi().getYourself().getId()) {
                 if(user.getId() == event2.getUserId()) {
-                    event2.removeReactionsByEmojiFromMessage(repeat);
+                    event2.removeReactionsByEmojiFromMessage(REPEAT_EMOJI);
                     Delete.set(false);
                     try {
                         fa();
@@ -152,7 +150,7 @@ public class Befehl {
             }
         }).removeAfter(30L, TimeUnit.MINUTES)
         .addRemoveHandler(()->{
-            message.removeReactionsByEmoji(repeat);
+            message.removeReactionsByEmoji(REPEAT_EMOJI);
         });
     }
 
@@ -2083,7 +2081,7 @@ public class Befehl {
             if (befehl.get().equalsIgnoreCase("sspb") || befehl.get().equalsIgnoreCase("SSS") || befehl.get().equalsIgnoreCase("RPS")) {
                 if (!idmentioneduser.get().isEmpty()) {
                     Optional<User> user2 = api.getCachedUserById(idmentioneduser.get());
-                    if (user2.isPresent() && !user2.get().isYourself()) {
+                    if (user2.isPresent() && !user2.get().isYourself() && user.getId() != user2.get().getId()) {
                         new RPS(user, user2.get(), event.getMessage());
                         return true;
                     }
