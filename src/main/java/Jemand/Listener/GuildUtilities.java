@@ -285,9 +285,9 @@ public class GuildUtilities {
 
                         String difference = StringUtils.difference(sentStr, answerStr);
 
+                        String reverseAnswerStr = StringUtils.reverse(answerStr);
                         if (difference.equals(answerStr)) {
                             String reverseSentStr = StringUtils.reverse(sentStr);
-                            String reverseAnswerStr = StringUtils.reverse(answerStr);
 
                             String reverseDifference = StringUtils.difference(reverseSentStr, reverseAnswerStr);
 
@@ -295,11 +295,13 @@ public class GuildUtilities {
                                 new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             } else {
-                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(reverseDifference, "***" + reverseDifference.toUpperCase() + "***")))
+                                String reverseDifferenceReversed = StringUtils.reverse(reverseDifference);
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + answerStr.replaceFirst(reverseDifferenceReversed, "***" + reverseDifferenceReversed.toUpperCase() + "***"))
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             }
                         } else {
-                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + answerStr.replaceFirst(difference, "***" + difference.toUpperCase() + "***"))
+                            String differenceReversed = StringUtils.reverse(difference);
+                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(differenceReversed, "***" + differenceReversed.toUpperCase() + "***")))
                                     .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                         }
                         return;
