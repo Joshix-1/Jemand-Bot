@@ -256,12 +256,12 @@ public class VierGewinnt {
         */
        //diagonal /
        StringBuilder diagonal = new StringBuilder();
-       diagonal.append(fieldArray[2][0]).append(fieldArray[3][1]).append(fieldArray[4][2]).append(fieldArray[5][3]).append("\n");
-       diagonal.append(fieldArray[1][0]).append(fieldArray[2][1]).append(fieldArray[3][2]).append(fieldArray[4][3]).append(fieldArray[5][4]).append("\n");
-       diagonal.append(fieldArray[0][0]).append(fieldArray[1][1]).append(fieldArray[2][2]).append(fieldArray[3][3]).append(fieldArray[4][4]).append(fieldArray[5][5]).append("\n");
-       diagonal.append(fieldArray[0][1]).append(fieldArray[1][2]).append(fieldArray[2][3]).append(fieldArray[3][4]).append(fieldArray[4][5]).append(fieldArray[5][6]).append("\n");
-       diagonal.append(fieldArray[0][2]).append(fieldArray[1][3]).append(fieldArray[2][4]).append(fieldArray[3][5]).append(fieldArray[4][6]).append("\n");
-       diagonal.append(fieldArray[0][3]).append(fieldArray[1][4]).append(fieldArray[2][5]).append(fieldArray[3][6]);
+       diagonal.append(fieldArray[2][0]).append("\u200B").append(fieldArray[3][1]).append("\u200B").append(fieldArray[4][2]).append("\u200B").append(fieldArray[5][3]).append("\n");
+       diagonal.append(fieldArray[1][0]).append("\u200B").append(fieldArray[2][1]).append("\u200B").append(fieldArray[3][2]).append("\u200B").append(fieldArray[4][3]).append("\u200B").append(fieldArray[5][4]).append("\n");
+       diagonal.append(fieldArray[0][0]).append("\u200B").append(fieldArray[1][1]).append("\u200B").append(fieldArray[2][2]).append("\u200B").append(fieldArray[3][3]).append("\u200B").append(fieldArray[4][4]).append("\u200B").append(fieldArray[5][5]).append("\n");
+       diagonal.append(fieldArray[0][1]).append("\u200B").append(fieldArray[1][2]).append("\u200B").append(fieldArray[2][3]).append("\u200B").append(fieldArray[3][4]).append("\u200B").append(fieldArray[4][5]).append("\u200B").append(fieldArray[5][6]).append("\n");
+       diagonal.append(fieldArray[0][2]).append("\u200B").append(fieldArray[1][3]).append("\u200B").append(fieldArray[2][4]).append("\u200B").append(fieldArray[3][5]).append("\u200B").append(fieldArray[4][6]).append("\n");
+       diagonal.append(fieldArray[0][3]).append("\u200B").append(fieldArray[1][4]).append("\u200B").append(fieldArray[2][5]).append("\u200B").append(fieldArray[3][6]);
        s = getStateOf(diagonal.toString(), vier);
        if(s != 0) return s;
 
@@ -280,12 +280,12 @@ public class VierGewinnt {
 
         */
        //diagonal \
-       diagonal.append(fieldArray[3][0]).append(fieldArray[2][1]).append(fieldArray[1][2]).append(fieldArray[0][3]).append("\n");
-       diagonal.append(fieldArray[4][0]).append(fieldArray[3][1]).append(fieldArray[2][2]).append(fieldArray[1][3]).append(fieldArray[0][4]).append("\n");
-       diagonal.append(fieldArray[5][0]).append(fieldArray[4][1]).append(fieldArray[3][2]).append(fieldArray[2][3]).append(fieldArray[1][4]).append(fieldArray[0][5]).append("\n");
-       diagonal.append(fieldArray[5][1]).append(fieldArray[4][2]).append(fieldArray[3][3]).append(fieldArray[2][4]).append(fieldArray[1][5]).append(fieldArray[0][6]).append("\n");
-       diagonal.append(fieldArray[5][2]).append(fieldArray[4][3]).append(fieldArray[3][4]).append(fieldArray[2][5]).append(fieldArray[1][6]).append("\n");
-       diagonal.append(fieldArray[5][3]).append(fieldArray[4][4]).append(fieldArray[3][5]).append(fieldArray[2][6]);
+       diagonal.append(fieldArray[3][0]).append("\u200B").append(fieldArray[2][1]).append("\u200B").append(fieldArray[1][2]).append("\u200B").append(fieldArray[0][3]).append("\n");
+       diagonal.append(fieldArray[4][0]).append("\u200B").append(fieldArray[3][1]).append("\u200B").append(fieldArray[2][2]).append("\u200B").append(fieldArray[1][3]).append("\u200B").append(fieldArray[0][4]).append("\n");
+       diagonal.append(fieldArray[5][0]).append("\u200B").append(fieldArray[4][1]).append("\u200B").append(fieldArray[3][2]).append("\u200B").append(fieldArray[2][3]).append("\u200B").append(fieldArray[1][4]).append("\u200B").append(fieldArray[0][5]).append("\n");
+       diagonal.append(fieldArray[5][1]).append("\u200B").append(fieldArray[4][2]).append("\u200B").append(fieldArray[3][3]).append("\u200B").append(fieldArray[2][4]).append("\u200B").append(fieldArray[1][5]).append("\u200B").append(fieldArray[0][6]).append("\n");
+       diagonal.append(fieldArray[5][2]).append("\u200B").append(fieldArray[4][3]).append("\u200B").append(fieldArray[3][4]).append("\u200B").append(fieldArray[2][5]).append("\u200B").append(fieldArray[1][6]).append("\n");
+       diagonal.append(fieldArray[5][3]).append("\u200B").append(fieldArray[4][4]).append("\u200B").append(fieldArray[3][5]).append("\u200B").append(fieldArray[2][6]);
        return getStateOf(diagonal.toString(), vier);
    }
 
