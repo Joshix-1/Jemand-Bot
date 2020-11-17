@@ -2,20 +2,20 @@ package Jemand.Listener;
 
 import Jemand.NumberToText;
 import Jemand.func;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
-import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.UncachedMessageUtil;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
@@ -36,11 +36,15 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class GuildUtilities {
     static public final long AN = 367648314184826880L;
@@ -60,7 +64,10 @@ public class GuildUtilities {
 
     private final ConcurrentHashMap<Long, Long> newUsersLastMessage = new ConcurrentHashMap<>();
 
+    private final DiscordApi api;
+
     public GuildUtilities(DiscordApi api) {
+        this.api = api;
         api.getServerById(AN).ifPresent(server -> {
             server.addUserRoleAddListener(this::userAddedRole);
             server.addUserRoleRemoveListener(this::userRemovedRole);
@@ -229,6 +236,23 @@ public class GuildUtilities {
 
         if (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty() && event.getMessageAttachments().isEmpty()) return;
 
+        checkNoRoleUsers();
+
+        //reminds to bump
+        if (event.getMessageAuthor().getId() == 302050872383242240L //is disboard bot
+            && event.getMessage().getEmbeds().size() == 1) { //message has embed
+            Embed embed = event.getMessage().getEmbeds().get(0);
+            embed.getDescription().ifPresent(description -> {
+                if (description.contains("Bump erfolgreich")) {
+                    event.getApi().getThreadPool().getScheduler().schedule(() -> {
+                        event.getChannel().getCurrentCachedInstance().ifPresent(channel -> {
+                            channel.sendMessage("<@&763147436825772042>!").exceptionally(ExceptionLogger.get());
+                        });
+                    }, 2, TimeUnit.HOURS);
+                }
+            });
+        }
+
         func.getIncomingWebhook(cloneTextchannel(event.getServerTextChannel().orElse(null))).ifPresent(webhook -> event.getMessage()
                             .toWebhookMessageBuilder()
                             .setDisplayName(event.getMessageAuthor().getDisplayName() + " (" + event.getMessageAuthor().getId() + ")")
@@ -263,7 +287,7 @@ public class GuildUtilities {
                 try {
                     newUsersLastMessage.remove(user.getId());
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
-                    user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
+                    //user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     event.getChannel().sendMessage(user.getNicknameMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
                 } catch (Exception e) {
                     func.handle(e);
@@ -455,5 +479,63 @@ public class GuildUtilities {
                 type = "`Spielt %s`";
         }
         return String.format(type, activity.getName());
+    }
+
+    private long lastChecked = 0L;
+    private void checkNoRoleUsers() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastChecked > 69 * 60 * 1000) { //69 minutes
+            lastChecked = currentTime;
+            api.getServerById(AN).ifPresent(server -> {
+                LinkedList<User> users = new LinkedList<>();
+                for (User u : server.getMembers()) {
+                    if (u.getRoles(server).size() == 1) {
+                        long joinedAt = u.getJoinedAtTimestamp(server).map(Instant::toEpochMilli).orElse(-1L);
+                        if (joinedAt != -1L && currentTime - joinedAt > 14 * 24 * 60 * 60 * 1000) { //two weeks
+                            users.add(u);
+                        }
+                    }
+                }
+                System.out.println(Instant.ofEpochMilli(currentTime).toString()
+                        + " checked no roles. There are "
+                        + users.size() + " without role longer than two weeks."); //DEBUG
+
+                if (users.size() == 0) {
+                    return;
+                }
+
+                WebhookMessageBuilder wmb = new WebhookMessageBuilder();
+                wmb.setDisplayAvatar(api.getYourself().getAvatar());
+                wmb.setDisplayName(api.getYourself().getName());
+                StringBuilder sb = new StringBuilder();
+                for (User user : users) {
+                    String toAppend = user.getDiscriminatedName() + " (id: " + user.getId() + ")\n";
+                    String sbStr = sb.toString();
+                    if (sbStr.length() + toAppend.length() > 2048) {
+                        wmb.addEmbed(new EmbedBuilder().setDescription(sbStr));
+                        sb = new StringBuilder();
+                    }
+
+                    sb.append(toAppend);
+
+                    user.sendMessage("Du wurdest vom Discord-Server des Asozialen Netzwerkes gekickt,"
+                            + " da du es in zwei Wochen nicht geschafft hast "
+                            + calculateCaptchaNumber(user, server)
+                            + " zu schreiben. Nutze folgenden Link um erneut beizutreten:"
+                            + " https://asozialesnetzwerk.github.io/discord")
+                            .exceptionally(ExceptionLogger.get())
+                            .thenCompose(nothing -> {
+                                System.out.println("Kicked " + user + (nothing == null ? ", but couldn't send a message" : " and send them a message"));
+                                return server.kickUser(user, "Ist zwei Wochen hier und hat keine Rolle.");
+                            }).exceptionally(ExceptionLogger.get());
+                }
+                String sbStr = sb.toString();
+                if (!sbStr.isEmpty()) {
+                    wmb.addEmbed(new EmbedBuilder().setDescription(sbStr));
+                }
+                wmb.setContent("kicked " + users.size() + " users.");
+                sendWebhookMessageBuilderToId(wmb, LOGS, api);
+            });
+        }
     }
 }
