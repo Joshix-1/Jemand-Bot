@@ -200,8 +200,8 @@ public class Main {
 			if (func.getFileSeparator().equals("/")) { //only Linux
 
 				String logs = FileUtils.readFileToString(new File("/usr/home/admin/Jemand.log"));
-				if (logs.length() > 100001)
-					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 99999), "UTF-8");
+				if (logs.length() > 1000001)
+					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 999999), "UTF-8");
 //
 				func.getApi().addServerJoinListener(event -> {
 					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getApi().getUserById(event.getServer().getOwnerId()).join().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));
@@ -395,7 +395,7 @@ public class Main {
 
 		System.out.println("System started succesfully: " + func.createBotInvite());
 		if(func.getFileSeparator().equals("/")) func.sendOwner("System started succesfully: <" + func.createBotInvite() + ">  " + func.getFileSeparator(), null);
-		func.getApi().updateActivity(ActivityType.getActivityTypeById(4), "trying to sleep.");
+		func.getApi().updateActivity(ActivityType.LISTENING, "allem");
 	}
 
     static private boolean TriggerReactText(MessageCreateEvent event, String ReactTo, String ReactWith) {
