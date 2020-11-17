@@ -9,6 +9,7 @@ import me.bramhaag.owo.OwO;
 import org.apache.commons.io.FileUtils;
 import org.apfloat.Apfloat;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -23,7 +24,9 @@ import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.util.DiscordRegexPattern;
+import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.json.simple.JSONObject;
 import org.zeroturnaround.zip.ZipUtil;
@@ -79,7 +82,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {"play", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {"play", "mind", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -367,6 +370,8 @@ public class Befehl {
                     }
                 }
             }
+
+
 
             if (!sb.toString().isEmpty()) {
                 strings.add(sb.toString());
@@ -1722,6 +1727,81 @@ public class Befehl {
                 }
                 return true;
             }
+            //master //mind
+        if (befehl.get().equalsIgnoreCase("mind")) {
+            List<User> userList = event.getMessage().getMentionedUsers();
+            Long[] userIds = new Long[userList.size() + 1];
+            for (int i = 0; i < userList.size(); i++) {
+                userIds[i] = userList.get(i).getId();
+            }
+            userIds[userIds.length - 1] = user.getId();
+
+            /**
+             * Entry point for the game
+             * @param args Optional list of settings to configure the game:
+             *             Arg  -   Type    -   Description
+             *             0    -   boolean -   Sets whether duplicate values should be allowed in the secret code
+             *             1    -   int     -   Sets number of guesses give to the user
+             *             2    -   int     -   Sets the length of the generated secret code
+             *             3    -   int     -   Sets the lower bound (inclusive) for each code value (0-9)
+             *             4    -   int     -   Sets the upper bound (inclusive) for each code value (0-9)
+             */
+            event.getChannel().sendMessage("**Write 'start' to start.**\nOptional list of settings to configure the game (write them in one message):\n" +
+                    "Arg  -   Type    -   Description\n" +
+                    "0    -   boolean -   Sets whether duplicate values should be allowed in the secret code\n" +
+                    "1    -   int     -   Sets number of guesses give to the user\n" +
+                    "2    -   int     -   Sets the length of the generated secret code\n" +
+                    "3    -   int     -   Sets the upperbound bound (inclusive) for each code value (0-9)\n").exceptionally(ExceptionLogger.get());;
+            Mastermind game = new Mastermind();
+
+            long channelId = event.getChannel().getId();
+
+            MessageCreateListener[] listener = new MessageCreateListener[1];
+            listener[0] = event -> {
+                if (event.getChannel().getId() != channelId || !event.getMessageAuthor().isRegularUser() || game.hasStarted()) return;
+                boolean userIsOk = false;
+                for (int i = 0; i < userIds.length; i++) {
+                    if (userIds[i] == event.getMessageAuthor().getId()) userIsOk = true;
+                }
+
+                if (!userIsOk) return;
+
+                if (event.getMessageContent().toLowerCase().equals("start")) {
+                    // Let's play!
+                    game.play(event.getChannel(), userIds);
+                    api.removeListener(listener[0]);
+                    return;
+                }
+
+                String[] args = func.WHITE_SPACE.split(event.getMessageContent());
+                boolean updated = false;
+                // Parse values from any existing arguments
+                if (args.length >= 1) {
+                    if (args[0].toLowerCase().startsWith("t") && !game.get_duplicatesAllowed()) {
+                        game.set_duplicatesAllowed(true);
+                        updated = true;
+                    } else if (game.get_duplicatesAllowed()) {
+                        game.set_duplicatesAllowed(false);
+                        updated = true;
+                    }
+                }
+                if (args.length >= 2) {
+                    updated = game.set_numberOfGuesses(func.IntFromString(args[1], game.get_numberOfGuesses()));
+                }
+                if (args.length >= 3) {
+                    updated = game.set_codeLength(func.IntFromString(args[2], game.get_codeLength()));
+                }
+                if (args.length >= 4) {
+                    updated = game.set_maxCodeValue(func.IntFromString(args[3], game.get_maxCodeValue()));
+                }
+                if (updated) {
+                    event.getChannel().sendMessage("Updated settings").exceptionally(ExceptionLogger.get());
+                }
+            };
+            api.addMessageCreateListener(listener[0]);
+
+            return true;
+        }
             //edit
             if (befehl.get().equalsIgnoreCase("Edit") || befehl.get().equalsIgnoreCase("e")) {
                 if (subtext1.get().isEmpty() || !subtext1.get().contains(" ")) {
