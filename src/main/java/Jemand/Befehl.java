@@ -82,7 +82,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {"play", "mind", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "clear", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {"play", "mind", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -701,26 +701,6 @@ public class Befehl {
             return false;
         }
 
-        //clear
-        if(befehl.get().equalsIgnoreCase("clear")) {
-            if (server.hasAnyPermission(user, PermissionType.ADMINISTRATOR)) {
-                int i = func.IntFromString(subtext1.get(), 0);
-                if(i>100 && !server.getOwner().equals(user)) i = 100;
-                if(i == 0) {
-                    event.getChannel().sendMessage(func.getRotEmbed(event).setTitle(texte.get("FehlerTitle")).setDescription(texte.get("FehlerDesc", "Clear")));
-                    return false;
-                } else {
-                    event.getChannel().getMessages(i).thenAccept(MessageSet::deleteAll);
-                    event.getChannel().sendMessage(embed.setTitle(texte.get("Erfolgreich")).setDescription(texte.get("Cleared", Integer.toString(i)))).thenAccept(message -> {
-                        api.getThreadPool().getScheduler().schedule((Runnable) message::delete, 10, TimeUnit.SECONDS);
-                    });
-                    return true;
-                }
-            } else {
-                event.getChannel().sendMessage(func.getRotEmbed(event).setTitle(texte.get("Fehler2Title")).setDescription(texte.get("MisssingPermission", PermissionType.ADMINISTRATOR.name())));
-                return false;
-            }
-        }
 
         //language
         if(befehl.get().equalsIgnoreCase("language")) {
@@ -2365,7 +2345,7 @@ public class Befehl {
                 String Spaß = "8-Ball Emote React Roll Say Ping Pong";
                 if (server.getId() == GuildUtilities.AN || server.getId() == 563387219620921347L) Spaß += " Zitat GOQ";
                 String Spiele = "4-Gewinnt SSS TTT Stats Dice-Game";
-                String Server = "Rank Top Prefix GuildInvite Clear Welcome-Message Leave-Message Backup Reaction-Role";
+                String Server = "Rank Top Prefix GuildInvite Welcome-Message Leave-Message Backup Reaction-Role";
                 String Anderes = "Save SaveAs Save-Private Load Delete Rename Edit Calculate";
 
 

@@ -2,7 +2,6 @@ package Jemand.Listener;
 
 import Jemand.NumberToText;
 import Jemand.func;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
@@ -36,8 +35,6 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -52,7 +49,7 @@ public class GuildUtilities {
     static public final long MITGLIED = 367649615484551179L;
     static private final long ROLLENMEISTER = 493572898577973249L;
     static private final long LOGS = 559451873015234560L;
-    static private final long ACTIVITY_LOGS = 740337061524930671L;
+    static private final long ACTIVITY_LOGS = 740338145689600032L;
 
     static private final long PETITIONEN_KANAL = 681650819002662946L;
 
@@ -297,35 +294,44 @@ public class GuildUtilities {
                     event.getChannel().sendMessage(user.getDisplayName(server) + " du musst die Zahl alleine schreiben. :)");
                 } else {
                     try {
-                        int sent = Integer.parseInt(replacedContent);
                         int answer = calculateCaptchaNumber(user, server);
+                        int sent = Integer.parseInt(replacedContent);
                         if (sent > answer) {
                             event.getMessage().addReaction("⬇️").exceptionally(ExceptionLogger.get());
                         } else {
                             event.getMessage().addReaction("⬆️").exceptionally(ExceptionLogger.get());
                         }
-                        String sentStr = NumberToText.intToText(sent);
-                        String answerStr = NumberToText.intToText(answer);
 
-                        String difference = StringUtils.difference(sentStr, answerStr);
+                        int answerLength = Integer.toString(answer).length();
 
-                        String reverseAnswerStr = StringUtils.reverse(answerStr);
-                        if (difference.equals(answerStr)) {
-                            String reverseSentStr = StringUtils.reverse(sentStr);
+                        if (answerLength == replacedContent.length()) {
 
-                            String reverseDifference = StringUtils.difference(reverseSentStr, reverseAnswerStr);
+                            String sentStr = NumberToText.intToText(sent);
+                            String answerStr = NumberToText.intToText(answer);
 
-                            if (reverseDifference.equals(reverseAnswerStr)) {
-                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
-                                        .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                            String difference = StringUtils.difference(sentStr, answerStr);
+
+                            String reverseAnswerStr = StringUtils.reverse(answerStr);
+                            if (difference.equals(answerStr)) {
+                                String reverseSentStr = StringUtils.reverse(sentStr);
+
+                                String reverseDifference = StringUtils.difference(reverseSentStr, reverseAnswerStr);
+
+                                if (reverseDifference.equals(reverseAnswerStr)) {
+                                    new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl lautet: " + answerStr)
+                                            .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                                } else {
+                                    String reverseDifferenceReversed = StringUtils.reverse(reverseDifference);
+                                    new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + answerStr.replaceFirst(reverseDifferenceReversed, "***" + reverseDifferenceReversed.toUpperCase() + "***"))
+                                            .send(event.getChannel()).exceptionally(ExceptionLogger.get());
+                                }
                             } else {
-                                String reverseDifferenceReversed = StringUtils.reverse(reverseDifference);
-                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + answerStr.replaceFirst(reverseDifferenceReversed, "***" + reverseDifferenceReversed.toUpperCase() + "***"))
+                                String differenceReversed = StringUtils.reverse(difference);
+                                new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(differenceReversed, "***" + differenceReversed.toUpperCase() + "***")))
                                         .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                             }
-                        } else {
-                            String differenceReversed = StringUtils.reverse(difference);
-                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " " + StringUtils.reverse(reverseAnswerStr.replaceFirst(differenceReversed, "***" + differenceReversed.toUpperCase() + "***")))
+                        } else { //length differs
+                            new MessageBuilder().setContent(user.getNicknameMentionTag() + " die Zahl ist " + answerLength + " Ziffern lang.")
                                     .send(event.getChannel()).exceptionally(ExceptionLogger.get());
                         }
                         return;
@@ -342,7 +348,7 @@ public class GuildUtilities {
     }
 
     private static String getCaptchaDescription(User user, Server server) {
-        return user.getNicknameMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" mit Ziffern in diesen Kanal.";
+        return user.getNicknameMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" mit Ziffern (0-9) in diesen Kanal.";
     }
 
     private boolean isMoreThan10minAgo(long timeMs) {
@@ -523,9 +529,9 @@ public class GuildUtilities {
                             + calculateCaptchaNumber(user, server)
                             + " zu schreiben. Nutze folgenden Link um erneut beizutreten:"
                             + " https://asozialesnetzwerk.github.io/discord")
-                            .exceptionally(ExceptionLogger.get())
-                            .thenCompose(nothing -> {
-                                System.out.println("Kicked " + user + (nothing == null ? ", but couldn't send a message" : " and send them a message"));
+                            .exceptionally(ExceptionLogger.get()) //on error sets message to null
+                            .thenCompose(message -> {
+                                System.out.println("Kicked " + user + (message == null ? ", but couldn't send a message" : " and send them a message"));
                                 return server.kickUser(user, "Ist zwei Wochen hier und hat keine Rolle.");
                             }).exceptionally(ExceptionLogger.get());
                 }

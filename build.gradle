@@ -32,6 +32,9 @@ repositories {
 }
 
 dependencies {
+    //telegram
+    implementation "org.telegram:telegrambots:4.9.1"
+
     implementation 'com.github.Joshix-1:Javacord:Jemand-SNAPSHOT'
     implementation 'com.github.JojiiOfficial:Matrix-ClientServer-API-java:master-SNAPSHOT'
     implementation 'org.jsoup:jsoup:1.13.1'

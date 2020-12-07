@@ -139,12 +139,12 @@ public class Mastermind {
      * @return The result of the guess evaluation
      */
     private GuessResult submitGuess(String guess) {
-        _currentGuess++;
-
         if (guess.length() != _codeLength) {
             String errorMessage = String.format("Guess must be %d numbers long!", _codeLength);
             return new GuessResult(errorMessage);
         }
+
+        _currentGuess++;
 
         try {
             return getScore(guess);
