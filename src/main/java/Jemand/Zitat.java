@@ -1,191 +1,307 @@
 package Jemand;
 
+import com.goebl.david.Webb;
 import com.vdurmont.emoji.EmojiParser;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Objects;
 
 public class Zitat {
+    static final String WRONGQUOTES_API = "https://zitate.prapsschnalinen.de/api/wrongquotes";
+    static final String AUTHORS = "https://zitate.prapsschnalinen.de/api/authors";
+    static private final List<Author> authorList = new LinkedList<>();
+    static private final List<Quote> quotesList = new LinkedList<>();
+    static Map<String, Integer> rating = new HashMap<>();
+    static private final Map<String, Integer> quoteIds = new HashMap<>();
+
+    static public void main(String[] args) {
+        quoteIds.forEach((str, i) -> {
+            System.out.println(str + ": " + i);
+        });
+    }
+
+    static {
+       updateQuotes();
+
+        System.out.println(Arrays.toString(authorList.toArray()));
+        System.out.println(Arrays.toString(quotesList.toArray()));
+        System.out.println(Arrays.toString(rating.keySet().toArray()));
+    }
+
+    static void updateQuotes() {
+        Webb webb = Webb.create();
+
+        JSONArray jsonArray = webb
+                .get(WRONGQUOTES_API)
+                .asJsonArray()
+                .getBody();
+
+        System.out.println(jsonArray);
+
+        jsonArray.forEach(o -> {
+            handleWrongQuote((JSONObject) o);
+        });
+    }
+
+    static void handleWrongQuote(JSONObject data) {
+        JSONObject quote = data.getJSONObject("quote");
+        addQuote(quote);
+        JSONObject author = data.getJSONObject("author");
+        addAuthor(author);
+
+        String id = quote.get("id") + "-" + author.get("id");
+        rating.put(id, data.getInt("rating"));
+        quoteIds.put(id, data.getInt("id"));
+    }
+
+    static void addQuote(JSONObject data) {
+        if (data.has("id")) {
+            int id = data.getInt("id");
+            for (Quote q : quotesList) {
+                if (q.id == id) return; //TODO: Binary Search?
+            }
+            quotesList.add(new Quote(data));
+        }
+    }
+
+    static void addAuthor(JSONObject data) {
+        if (data != null && data.has("id")) {
+            int id = data.getInt("id");
+            for (Author a : authorList) {
+                if (a.id == id) return; //TODO: Binary Search?
+            }
+            authorList.add(new Author(data));
+        }
+    }
+
+    static int getQuoteIdForGoq(String qStr) {
+        for (Quote q : quotesList) {
+            if (q.text.equals(qStr) || func.goq_replace(q.text).equals(func.goq_replace(qStr))) {
+                return q.id;
+            }
+        }
+        return -1;
+    }
+
+    static int createAuthor(String author, User user) {
+        if (Character.isLowerCase(author.charAt(0))) {
+            author = Character.toUpperCase(author.charAt(0)) + author.substring(1);
+        }
+
+        Webb webb = Webb.create();
+
+        JSONObject result = webb
+                .post(AUTHORS)
+                .param("author", author)
+                .param("contributed_by", user.getName() + " (discord_id: " + user.getId() + ")")
+                .asJsonObject()
+                .getBody();
+        addAuthor(result);
+        return result.getInt("id");
+    }
+
+    static int getAuthorIdForGoq(String aStr) {
+        for (Author a : authorList) {
+            if (a.name.equals(aStr) || func.goq_replace(a.name).equals(func.goq_replace(aStr))) {
+                return a.id;
+            }
+        }
+        return -1;
+    }
+
+    static Optional<Quote> getQuoteById(int id) {
+        for (Quote q : quotesList) {
+            if (q.id == id) {
+                return Optional.of(q);
+            }
+        }
+        return Optional.empty();
+    }
+
+    static String getQuotesTextById(int id) {
+        return getQuoteById(id).map(q -> q.text).orElse("null");
+    }
+
+    static int getQuoteCount() {
+        return quotesList.size();
+    }
+
+    static Optional<Author> getAuthorById(int id) {
+        for (Author a : authorList) {
+            if (a.id == id) {
+                return Optional.of(a);
+            }
+        }
+        return Optional.empty();
+    }
+
+    static String getAuthorsNameById(int id) {
+        return getAuthorById(id).map(a -> a.name).orElse("null");
+    }
+
+    static int getAuthorCount() {
+        return authorList.size();
+    }
+
+    public static void rateQuote(String zid, int rate, User user) {
+        rate /= Math.abs(rate);
+        Webb webb = Webb.create();
+
+        if (quoteIds.containsKey(zid)) {
+            JSONObject result = webb
+                    .post(WRONGQUOTES_API + "/" + quoteIds.get(zid))
+                    .param("vote", rate)
+                    .asJsonObject()
+                    .getBody();
+            handleWrongQuote(result);
+        } else {
+            String[] ids = zid.split("-");
+            JSONObject result = webb
+                    .post(WRONGQUOTES_API)
+                    .param("contributed_by", user.getDiscriminatedName())
+                    .param("quote", ids[0])
+                    .param("author", ids[1])
+                    .asJsonObject()
+                    .getBody();
+
+            handleWrongQuote(result);
+
+            if (quoteIds.containsKey(zid)) rateQuote(zid, rate, user);
+        }
+    }
+
+    public static int getRating(String id) {
+        return rating.getOrDefault(id, 0);
+    }
+
+    static class Quote {
+        public final int id;
+        public final String text;
+        public final Author origAuthor;
+
+        private Quote(JSONObject data) {
+            id = data.getInt("id");
+            text = data.getString("quote");
+            JSONObject author = data.getJSONObject("author");
+            addAuthor(author);
+            origAuthor = new Author(author);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Quote quote = (Quote) o;
+            return id == quote.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
+
+        @Override
+        public String toString() {
+            return "Quote{" +
+                    "id=" + id +
+                    ", text='" + text + '\'' +
+                    ", origAuthor=" + origAuthor +
+                    '}';
+        }
+    }
+
+    static class Author {
+        public final int id;
+        public final String name;
+
+        private Author(JSONObject data) {
+            id = data.getInt("id");
+            name = data.getString("author");
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Author a = (Author) o;
+            return id == a.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
+
+        @Override
+        public String toString() {
+            return "Author{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+
     static public final long WITZIG_ID = 703173500139208734L;
     static public final CustomEmoji UPVOTE_EMOJI = func.getApi().getCustomEmojiById(Zitat.WITZIG_ID).orElse(null);
     static public final String upvote = UPVOTE_EMOJI == null ? "" : UPVOTE_EMOJI.getMentionTag();
     static public final String DOWNVOTE_EMOJI = EmojiParser.parseToUnicode(":thumbsdown:");
     static public final String REPORT_EMOJI = EmojiParser.parseToUnicode(":warning:");
 
-    static public String[] NAMEN;
-    static public String[] ZITATE;
-    static public JSONObject BEWERTUNGEN;
+    private Quote quote;
+    private Author author;
+    private String typ;
 
+    public  Zitat(int zitatId, int nameId, String typ) {
+        Zitat.updateQuotes();
 
-    static {
-        try {
-            BEWERTUNGEN = func.readJsonFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/bewertung_zitate.json");
-        } catch (Exception e) {
-            BEWERTUNGEN = func.JsonFromFile("bewertung_zitate.json");
-        }
-        updateQuotes();
-        updateNames();
-    }
-    static {
-        if(UPVOTE_EMOJI == null) {
-            func.handle(new Exception("Witzig-Emoji not found"));
-        }
-    }
-    private int zitat, name;
-    private String typ = "";
-
-    public  Zitat(int zitatId, int nameId, String Typ) {
-        zitat = zitatId;
-        name = nameId;
-        typ = Typ.toLowerCase();
-    }
-
-    static void updateNames() {
-        try {
-            NAMEN = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/namen.txt").split("\n");
-        } catch (IOException e) {
-            NAMEN = func.readtextoffile("namen.txt").split("\n");
-            func.handle(e);
-        }
-    }
-
-    static void addName(String name, User user) {
-        String names = getNameString();
-        if(!names.endsWith("\n")) names += "\n";
-        try {
-            if(user == null) {
-                func.setGithub("zitate", "namen.txt", names + name, "Neuer Autor: '" + name + "'");
-            } else {
-                func.setGithub("zitate", "namen.txt",  names + name, name + "\" zur Autorensliste hinzugefügt. Danke an " + user.getDiscriminatedName() + " (" + user.getIdAsString() + ")");
-            }
-            NAMEN = (names + name).split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //static void addQuote(String quote) {
-    //    try {
-    //        String quotes = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt");
-    //        if(!quotes.endsWith("\n")) quotes += "\n";
-    //        func.setGithub("zitate", "zitate.txt", quotes + quote);
-    //        updateQuotes();
-    //    } catch (IOException e) {
-    //        e.printStackTrace();
-    //    }
-    //}
-
-    static String getNameString() {
-        try {
-            return func.getGithub("zitate", "namen.txt");
-        } catch (IOException e) {
-            func.handle(e);
-            return  func.readtextoffile("namen.txt");
-        }
-    }
-
-    static public void rateQuote(String id, int rating) {
-        if (!BEWERTUNGEN.containsKey(id)) {
-            BEWERTUNGEN.put(id, rating);
-        } else if(rating != 0) {
-            BEWERTUNGEN.put(id, getRatingAsLong(id) + rating);
-        }
-        if(rating != 0 && func.getRandom(0, 8) == 0) {
-            saveRating();
-        }
-    }
-
-    static public long getRatingAsLong(String id) {
-        try {
-            return Long.parseLong(getRating(id));
-        } catch(NumberFormatException e) {
-            return 0L;
-        }
-    }
-
-    static public String getRating(String id) {
-        if(BEWERTUNGEN.containsKey(id)) {
-            return BEWERTUNGEN.get(id).toString();
-        } else {
-            return "0";
-        }
-    }
-
-    public static void saveRating() {
-        saveRating(BEWERTUNGEN.toString());
-    }
-
-    private static void saveRating(String bewertung) {
-        try {
-            bewertung = bewertung.replace(",", ",\n");
-            if (!func.getGithub("zitate", "bewertung_zitate.json").equals(bewertung))
-                func.setGithub("zitate", "bewertung_zitate.json", bewertung, "Bewertungen hinzugefügt.");
-        } catch (IOException e) {
-            func.handle(e);
-        }
-        func.JsonToFile(BEWERTUNGEN, "bewertung_zitate.json");
-
-    }
-
-    static void updateQuotes() {
-        try {
-            ZITATE = func.readStringFromUrl("https://raw.githubusercontent.com/asozialesnetzwerk/zitate/master/zitate.txt").split("\n");
-        } catch (IOException e) {
-            ZITATE = func.readtextoffile("zitate.txt").split("\n");
-            func.handle(e);
-        }
-    }
-
-    public Zitat(int zitatId, int nameId) {
-        zitat = zitatId;
-        name = nameId;
+        this.typ = typ;
+        quote = getQuoteById(zitatId).orElseThrow(() -> new IllegalArgumentException("Quote id is wrong"));
+        author = getAuthorById(nameId).orElseThrow(() -> new IllegalArgumentException("Author id is wrong"));
     }
 
     public Zitat() {
+        Zitat.updateQuotes();
+
         typ = "";
-
-        do {
-            zitat = func.getRandom(0, ZITATE.length - 1);
-            name = func.getRandom(0, NAMEN.length - 1);
-
-            rateQuote(getZid(), 0);
-        } while (getRatingAsLong(getZid()) <= -1 || func.readtextoffile("blacklist_namen.txt").contains("+" + name+ "+"));
+        quote = quotesList.get(func.getRandom(0, quotesList.size() - 1));
+        author = authorList.get(func.getRandom(0, authorList.size() - 1));
     }
-    public void setTyp(String Typ) {typ = Typ.toLowerCase();}
-    public void setName(int Id_Name) {name = Id_Name;}
-    public void setZitat(int Id_Zitat) {zitat = Id_Zitat;}
-    public String getZid() {return zitat + "-" + name;}
+
+    public void setQuote(int quoteId) {
+        this.quote = getQuoteById(quoteId).orElseThrow(() -> new IllegalArgumentException("Quote id is wrong"));
+    }
+
+    public void setAuthor(int authorId) {
+        this.author = getAuthorById(authorId).orElseThrow(() -> new IllegalArgumentException("Author id is wrong"));
+    }
+
+    public void setTyp(String typ) {
+        this.typ = typ;
+    }
+
+    public String getZid() {
+        return (quote == null ? "-1" : quote.id) + "-" + (quote == null ? "-1" : author.id);
+    }
 
     public void sendMessage(TextChannel channel, EmbedBuilder embed) throws Exception {
-        if(upvote == null) return;
-
         embed.removeAllFields();
 
+        final String zid = getZid();
 
-        if(!(zitat< ZITATE.length)) {
-            Zitat.updateQuotes();
-            if(!(zitat< ZITATE.length)) zitat = ZITATE.length-1;
-        }
-        if(!(name < NAMEN.length)) {
-            Zitat.updateNames();
-            if(!(name < NAMEN.length)) name = NAMEN.length-1;
-        }
+        embed.setUrl("https://asozialesnetzwerk.github.io/zitate/#/" + zid);
 
-        rateQuote(getZid(), 0);
-
-        final String zid2 = getZid();
-
-        embed.setUrl("https://asozialesnetzwerk.github.io/zitate/#/" + zid2);
-
-        embed.addField("\u200B", upvote + ": " + getRating(zid2)).setTitle("Zitat-Id: "+ zid2).setDescription(func.LinkedEmbed(ZITATE[zitat]) + "\n\n- " + func.LinkedEmbed(NAMEN[name]));
+        embed.addField("\u200B", upvote + ": " + getRating(zid)).setTitle("Zitat-Id: "+ zid).setDescription(func.LinkedEmbed(quote.text) + "\n\n- " + func.LinkedEmbed(author.name));
 
         if(typ.toLowerCase().contains("bild")) {
             try {
@@ -193,15 +309,13 @@ public class Zitat {
                 api_url += "&brandLogo=https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png";
                 //api_url = "https://api.ritekit.com/v1/images/quote?quote=<ZITAT>&author=<AUTHOR>&fontSize=30&quoteFont=PassionOne&quoteFontColor=%23f7fffa&authorFont=Lato%20Black&authorFontColor=%23ffffff&enableHighlight=1&highlightColor=%23182578&bgType=gradient&backgroundColor=%23000000&gradientType=radial&gradientColor1=%230e0c1c&gradientColor2=%20%23040024&brandLogo=https%3A%2F%2Fimages.emojiterra.com%2Ftwitter%2Fv12%2F128px%2F1f998.png&animation=none";
                 api_url += "&client_id=" + func.pws[7];
-                String author = NAMEN[name];
-                if(func.StringBlank(author.substring(NAMEN[name].length()-1))) author = NAMEN[name].substring(0, NAMEN[name].length()-1);
                 embed.removeAllFields()
-                        .setImage(func.readJsonFromUrl(api_url.replace("<ZITAT>", func.replaceNonNormalChars(ZITATE[zitat]).replace("\"", ""))
-                                .replace("<AUTHOR>", func.replaceNonNormalChars(author))
+                        .setImage(func.readJsonFromUrl(api_url.replace("<ZITAT>", func.replaceNonNormalChars(quote.text).replace("\"", ""))
+                                .replace("<AUTHOR>", func.replaceNonNormalChars(author.name))
                                 .replace(" ", "%20")
                                 .replaceAll("  [\\t\\n\\x08\\x0c\\r]", ""))
                                 .get("url").toString())
-                        .addField("\u200B", upvote + ": " +getRating(zid2)).setTitle("Zitat-Id: "+ zid2).setDescription("");
+                        .addField("\u200B", upvote + ": " + getRating(zid)).setTitle("Zitat-Id: "+ zid).setDescription("");
 
             } catch (Exception e) {
                 func.handle(e);
@@ -209,19 +323,19 @@ public class Zitat {
         } else if(typ.toLowerCase().contains("ka")) {
             String str = Memes.KALENDER;
             if(func.getRandom(0, 1) == 1) str = Memes.KALENDER2;
-            BufferedImage bi = new Memes(str, "»" + ZITATE[zitat].substring(1, ZITATE[zitat].length()-1) + "«", NAMEN[name], new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime())).getFinalMeme().orElse(null);
+            BufferedImage bi = new Memes(str, "»" + quote.text + "«", author.name, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime())).getFinalMeme().orElse(null);
             if(bi != null) {
-                embed.removeAllFields().setImage(bi).addField("\u200B", upvote + ": " + getRating(zid2)).setTitle("Zitat-Id: " + zid2).setDescription("");
+                embed.removeAllFields().setImage(bi).addField("\u200B", upvote + ": " + getRating(zid)).setTitle("Zitat-Id: " + zid).setDescription("");
             }
         } else if(typ.toLowerCase().contains("ata")) {
-            new Memes(Memes.ZITAT_ATA, "»" + ZITATE[zitat].substring(1, ZITATE[zitat].lastIndexOf('"') -1) + "«", "- " + NAMEN[name]).getFinalMeme().ifPresent(img -> {
-                embed.removeAllFields().setImage(img).addField("\u200B", upvote + ": " + getRating(zid2)).setTitle("Zitat-Id: " + zid2).setDescription("");
+            new Memes(Memes.ZITAT_ATA, "»" + quote.text + "«", "- " + author.name).getFinalMeme().ifPresent(img -> {
+                embed.removeAllFields().setImage(img).addField("\u200B", upvote + ": " + getRating(zid)).setTitle("Zitat-Id: " + zid).setDescription("");
             });
         }
 
         Message message = channel.sendMessage(embed).join();
 
-        message.addReactions(UPVOTE_EMOJI.getReactionTag(), DOWNVOTE_EMOJI, REPORT_EMOJI).join();
+        message.addReactions(UPVOTE_EMOJI.getReactionTag(), DOWNVOTE_EMOJI).join();
     }
 
 }

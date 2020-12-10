@@ -93,7 +93,6 @@ public class func {
     static public final String[] EMOJIABC = "\uD83C\uDDE6 \uD83C\uDDE7 \uD83C\uDDE8 \uD83C\uDDE9 \uD83C\uDDEA \uD83C\uDDEB \uD83C\uDDEC \uD83C\uDDED \uD83C\uDDEE \uD83C\uDDEF \uD83C\uDDF0 \uD83C\uDDF1 \uD83C\uDDF2 \uD83C\uDDF3 \uD83C\uDDF4 \uD83C\uDDF5 \uD83C\uDDF6 \uD83C\uDDF7 \uD83C\uDDF8 \uD83C\uDDF9 \uD83C\uDDFA \uD83C\uDDFB \uD83C\uDDFC \uD83C\uDDFD \uD83C\uDDFE \uD83C\uDDFF :keycap_ten: :zero: :one: :two: :three: :four: :five: :six: :seven: :eight: :nine: :hash: :asterisk: ➕ ➖ <:ae:703320745782018179> <:oe:703320746188865637> <:ue:703320746134601758> <:ss:703174443148509264> ❓ ❗ <:und:invalid:> <:leerzeichen:703321360180445224>".split(" ");
 
     static public void shutdown() {
-        Zitat.saveRating();
         //redis.shutdown();
         api.disconnect();
         api.getThreadPool().getExecutorService().shutdown();
@@ -962,11 +961,11 @@ public class func {
 
     //zitat // goq
     static public String LinkedEmbed (String term) {
-        String term2 = term.replaceAll(" ", "+");
+        String term2 = URLEncoder.encode(term, StandardCharsets.UTF_8);
         if(term2.length() > 90) {
             term2 = term2.substring(0, 89) + "\"";
         }
-        return "[term1](https://ddg.gg/?q=term2)".replace("term1", term).replace("term2", term2);
+        return String.format("[%s](https://ddg.gg/?q=%s)", term, term2);
     }
 
     static public DiscordApi getApi() {

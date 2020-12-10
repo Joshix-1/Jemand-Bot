@@ -327,19 +327,18 @@ public class Befehl {
             final String temp = template;
             final String d = date;
 
-            Zitat.BEWERTUNGEN.keySet().forEach(k -> {
-                String key = k.toString();
-                int val = Integer.parseInt(Zitat.BEWERTUNGEN.get(key).toString());
+            Zitat.rating.keySet().forEach(k -> {
+                int val = Zitat.getRating(k);
                 if(val > 1) {
                     try {
-                        String[] zitat = minus.split(key);
+                        String[] zitat = minus.split(k);
                         zitat[0] = zitate[Integer.parseInt(zitat[0])];
                         zitat[1] = namen[Integer.parseInt(zitat[1])];
 
                         BufferedImage img = new Memes(temp, "»" + zitat[0].substring(1, zitat[0].lastIndexOf('"') -1) + "«", "- " + zitat[1], d).getFinalMeme().orElse(null);
 
                         if(img != null)
-                            ImageIO.write(img, "png", new File(filepath + key + ".png"));
+                            ImageIO.write(img, "png", new File(filepath + k + ".png"));
 
                     } catch(IOException | ArrayIndexOutOfBoundsException e) {
                        func.handle(e);
@@ -865,22 +864,18 @@ public class Befehl {
             }
             return true;
         }
-        //game-of-qoutes //goq
+        //game-of-qoutes ///goq
         //choose from 6 zitate
         //an only //&& (server.getId() == 367648314184826880L || server.getId() == 563387219620921347L)
         if ((befehl.get().equalsIgnoreCase("goq") || befehl.get().equalsIgnoreCase("game-of-quotes"))) {
-            Zitat.updateQuotes();
-            Zitat.updateNames();
-            final String[] zitate = Zitat.ZITATE;
-            final String[] namen = Zitat.NAMEN;
             AtomicReference<Boolean> boo = new AtomicReference<>(true);
             AtomicReference<Boolean> boo2 = new AtomicReference<>(true);
             AtomicReference<Integer> iz = new AtomicReference<>(-1);
             AtomicReference<Integer> in = new AtomicReference<>(-1);
-            AtomicReference<int[]> zid0 = new AtomicReference<>(func.differentRandomInts(0, zitate.length - 1, 6));
+            AtomicReference<int[]> zid0 = new AtomicReference<>(func.differentRandomInts(0, Zitat.getQuoteCount() - 1, 6));
 
             int subtext = func.IntFromString(subtext1.get(), -1);
-            if(subtext >= 0 && subtext < zitate.length) {
+            if(subtext >= 0 && subtext < Zitat.getQuoteCount()) {
                 int[] copy = zid0.get();
                 copy[0] = subtext;
                 zid0.set(copy);
@@ -888,8 +883,7 @@ public class Befehl {
 
             embed.setTitle("Wähle ein Zitat:").removeAllFields();
             for (int j = 0; j < zid0.get().length; j++) {
-                embed.addField(helpabc[j]  + " (" + zid0.get()[j] + ")", func.LinkedEmbed(zitate[zid0.get()[j]]));
-
+                embed.addField(helpabc[j]  + " (" + zid0.get()[j] + ")", func.LinkedEmbed(Zitat.getQuotesTextById(zid0.get()[j])));
             }
             Message message = event.getChannel().sendMessage(embed).join();
             message.addReactions(EmojiParser.parseToUnicode(":repeat:"), helpabc[0], helpabc[1], helpabc[2], helpabc[3], helpabc[4], helpabc[5]);
@@ -899,10 +893,10 @@ public class Befehl {
                     if (iz.get() == -1) {
                         if (event2.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":repeat:"))) {
                             event2.removeReaction();
-                            zid0.set(func.differentRandomInts(0, zitate.length, 6));
+                            zid0.set(func.differentRandomInts(0, Zitat.getQuoteCount(), 6));
                             embed.setTitle("Wähle ein Zitat:").removeAllFields();
                             for (int j = 0; j < zid0.get().length; j++) {
-                                embed.addField(helpabc[j]  + " (" + zid0.get()[j] + ")", func.LinkedEmbed(zitate[zid0.get()[j]]));
+                                embed.addField(helpabc[j]  + " (" + zid0.get()[j] + ")", func.LinkedEmbed(Zitat.getQuotesTextById(zid0.get()[j])));
                             }
                             message.edit(embed);
                             //message.edit(embed.setTitle("Wähle ein Zitat:").removeAllFields().addField(helpabc[0], zitate[zid0.get()[0]]).addField(helpabc[1], zitate[zid0.get()[1]]).addField(helpabc[2], zitate[zid0.get()[2]]).addField(helpabc[3], zitate[zid0.get()[3]]).addField(helpabc[4], zitate[zid0.get()[4]]).addField(helpabc[5], zitate[zid0.get()[5]])).join();
@@ -914,10 +908,10 @@ public class Befehl {
                                     boo.set(false);
                                     //message.removeOwnReactionsByEmoji(EmojiParser.parseToUnicode(":repeat:"), helpabc[0], helpabc[1], helpabc[2], helpabc[3], helpabc[4], helpabc[5]);
                                     iz.set(zid[i]);
-                                    zid0.set(func.differentRandomInts(0, namen.length, 6));
-                                    embed.removeAllFields().setTitle("Zitat:").setDescription(func.LinkedEmbed(zitate[iz.get()]) +  " (" +  iz.get() + "-?)\n\n - Schreibe einen witzigen Autoren in den Chat, oder wähle einen aus den unteren.\n\u200B");
+                                    zid0.set(func.differentRandomInts(0, Zitat.getAuthorCount(), 6));
+                                    embed.removeAllFields().setTitle("Zitat:").setDescription(func.LinkedEmbed(Zitat.getQuotesTextById(iz.get())) +  " (" +  iz.get() + "-?)\n\n - Schreibe einen witzigen Autoren in den Chat, oder wähle einen aus den unteren.\n\u200B");
                                     for (int j = 0; j < zid0.get().length; j++) {
-                                        embed.addField(helpabc[j] + " (" + zid0.get()[j] + ")", func.LinkedEmbed(namen[zid0.get()[j]]));
+                                        embed.addField(helpabc[j] + " (" + zid0.get()[j] + ")", func.LinkedEmbed(Zitat.getAuthorsNameById(zid0.get()[j])));
                                     }
                                     message.edit(embed);
                                     event.getChannel().addMessageCreateListener(event3 -> {
@@ -937,20 +931,13 @@ public class Befehl {
                                                     mc = mc.substring(0, 1).toUpperCase() + mc.substring(1);
                                                     message.delete();
 
-                                                    if (func.goq_replace(Zitat.getNameString().toLowerCase()).contains(func.goq_replace(mc.toLowerCase()))) {
-                                                        for (int j = 0; j < namen.length; j++) {
-                                                            if (func.goq_replace(namen[j]).equals(func.goq_replace(mc))) {
-                                                                in.set(j);
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
+                                                    in.set(Zitat.getQuoteIdForGoq(mc));
+
                                                     if(in.get() == -1) {
                                                         if (mc.endsWith("\"") && mc.startsWith("\"")) {
                                                             mc = mc.substring(1, mc.length() - 1);
                                                         }
-                                                        in.set(namen.length);
-                                                        Zitat.addName(mc, user);
+                                                        in.set(Zitat.createAuthor(mc, user));
                                                     }
                                                     event3.getMessage().delete();
                                                     try {
@@ -965,7 +952,7 @@ public class Befehl {
                                     .addRemoveHandler(() -> {
                                         if (boo2.get()) {
                                             try {
-                                                message.edit(embed.setDescription(zitate[iz.get()] + "\n\n - Niemand (Du warst zu langsam)"));
+                                                message.edit(embed.setDescription(Zitat.getQuotesTextById(iz.get()) + "\n\n - Niemand (Du warst zu langsam)"));
                                             } catch (Exception e) {
                                                 func.handle(e);
                                             }
@@ -978,10 +965,10 @@ public class Befehl {
                     } else {
                         if (in.get() == -1) {
                             if (event2.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":repeat:"))) {
-                                zid0.set(func.differentRandomInts(0, namen.length, 6));
-                                embed.removeAllFields().setTitle("Zitat:").setDescription(func.LinkedEmbed(zitate[iz.get()]) + " (" +  iz.get() + "-?)\n\n - Schreibe einen witzigen Autoren in den Chat, oder wähle einen aus den unteren.\n\u200B");
+                                zid0.set(func.differentRandomInts(0, Zitat.getQuoteCount(), 6));
+                                embed.removeAllFields().setTitle("Zitat:").setDescription(func.LinkedEmbed(Zitat.getQuotesTextById(iz.get())) + " (" +  iz.get() + "-?)\n\n - Schreibe einen witzigen Autoren in den Chat, oder wähle einen aus den unteren.\n\u200B");
                                 for (int i = 0; i < zid0.get().length; i++) {
-                                    embed.addField(helpabc[i] + " (" + zid0.get()[i] + ")", func.LinkedEmbed(namen[zid0.get()[i]]));
+                                    embed.addField(helpabc[i] + " (" + zid0.get()[i] + ")", func.LinkedEmbed(Zitat.getAuthorsNameById(zid0.get()[i])));
                                 }
                                 message.edit(embed);
                                 event2.removeReaction();
@@ -1031,29 +1018,29 @@ public class Befehl {
             if (befehl.get().equalsIgnoreCase("zitat")) {
                 Zitat zitat = new Zitat();
 
-                zitat.setTyp(subtext1.get());
-
                 if (!func.StringBlank(subtext1.get()) && !subtext1.get().contains("-")) {
                     subtext1.set(subtext1.get().toLowerCase().replace("kalender", "")
                                                .replace("ka", "")
                                                .replace("bild", ""));
 
+                    zitat.setTyp(subtext1.get());
+
                     if (subtext1.get().toLowerCase().contains("w")) {
-                        Boolean b1 = subtext1.get().toLowerCase().contains("n");
+                        boolean b1 = subtext1.get().toLowerCase().contains("n");
                         if (b1) {
                             b1 = subtext1.get().indexOf('n') < subtext1.get().indexOf('w');
                         }
-                        StringBuilder keys = new StringBuilder();
-                        for (Object o : Zitat.BEWERTUNGEN.keySet()) {
-                            keys.append(o).append("\n");
-                        }
-                        String[] keylist = keys.toString().split("\n");
+
+                        List<String> keyList = new ArrayList<>(Zitat.rating.keySet());
                         while (true) {
-                            int i = func.getRandom(0, keylist.length - 1);
-                            long rating = Zitat.getRatingAsLong(keylist[i]);
+                            int i = func.getRandom(0, keyList.size() - 1);
+                            long rating = Zitat.getRating(keyList.get(i));
                             if (rating > 0 && !b1 || rating < 0 && b1) {
-                                subtext1.set(subtext1.get().replace("-", "") + " " + keylist[i]);
-                                break;
+                                String[] zid = keyList.get(i).split("-");
+                                zitat.setQuote(Integer.parseInt(zid[0]));
+                                zitat.setAuthor(Integer.parseInt(zid[1]));
+                                zitat.sendMessage(event.getChannel(), embed);
+                                return true;
                             }
                         }
                     }
@@ -1062,8 +1049,8 @@ public class Befehl {
                     String[] str1 = subtext1.get().split("-");
                     if (str1[0].contains(" ")) str1[0] = str1[0].split(" ")[str1[0].split(" ").length - 1];
                     if (str1[1].contains(" ")) str1[1] = str1[1].split(" ")[0];
-                    zitat.setZitat(Integer.parseInt(str1[0]));
-                    zitat.setName(Integer.parseInt(str1[1]));
+                    zitat.setQuote(Integer.parseInt(str1[0]));
+                    zitat.setAuthor(Integer.parseInt(str1[1]));
                 }
                 zitat.sendMessage(event.getChannel(), embed);
                 return true;

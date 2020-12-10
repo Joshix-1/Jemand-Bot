@@ -30,22 +30,18 @@ public class ZitatBewerter {
                         try {
                             EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
 
-                            if (reaction.getEmoji().equalsEmoji(Zitat.REPORT_EMOJI)) {
-                                func.sendOwner("Reportet: \n\nZitat-Id: " + zid + "Von: " + event.getUser().get().getDiscriminatedName() + "\n\n" + message.getEmbeds().get(0).getImage().map(EmbedImage::getUrl).map(URL::toString).orElse(message.getEmbeds().get(0).getDescription().orElse("")), null);
-                                message.edit(embed.addField("\u200B", Zitat.REPORT_EMOJI + "  Zitat wurde reportet."));
-                            } else {
-                                String rating = Zitat.getRating(zid);
-                                if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
-                                    Zitat.rateQuote(zid, 1);
-                                }
-                                if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
-                                    Zitat.rateQuote(zid, -1);
-                                }
-
-                                if(!rating.equals(Zitat.getRating(zid))) {
-                                    message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
-                                }
+                            int rating = Zitat.getRating(zid);
+                            if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
+                                Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
                             }
+                            if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
+                                Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
+                            }
+
+                            if(rating != Zitat.getRating(zid)) {
+                                message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
+                            }
+
                         } catch (NullPointerException e) {
                             func.handle(e);
                         }
@@ -67,16 +63,16 @@ public class ZitatBewerter {
                     try {
                         Reaction reaction = event.requestReaction().join().orElse(null);
                         if (reaction != null) {
-                            String rating = Zitat.getRating(zid);
+                            int rating = Zitat.getRating(zid);
 
                             if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
-                                Zitat.rateQuote(zid, -1);
+                                Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
                             }
                             if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
-                                Zitat.rateQuote(zid, 1);
+                                Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
                             }
 
-                            if (!rating.equals(Zitat.getRating(zid))) {
+                            if (rating != Zitat.getRating(zid)) {
                                 EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
                                 //message.getEmbeds().get(0).getImage().ifPresent(image -> embed.setImage(image.downloadAsBufferedImage(message.getApi()).join()));
                                 message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
