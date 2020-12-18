@@ -205,7 +205,7 @@ public class GuildUtilities {
             updatePermissions(event, 804773313); //https://discordapi.com/permissions.html#804773313
         } else if (role != MITGLIED && role != ROLLENMEISTER) {
             if (event.getRole().getName().toLowerCase().contains("mitglied")) { //vorläufiges Mitglied, rest braucht die Rechte nicht
-                updatePermissions(event, 267902401); //https://discordapi.com/permissions.html#267902401
+                updatePermissions(event, 267771329); //https://discordapi.com/permissions.html#267771329
             } else {
                 updatePermissions(event, 0);
             }
