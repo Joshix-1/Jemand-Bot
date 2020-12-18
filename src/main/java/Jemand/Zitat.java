@@ -20,6 +20,7 @@ import java.util.Objects;
 public class Zitat {
     static final String WRONGQUOTES_API = "https://zitate.prapsschnalinen.de/api/wrongquotes";
     static final String AUTHORS = "https://zitate.prapsschnalinen.de/api/authors";
+    static final String QUOTES = "https://zitate.prapsschnalinen.de/api/quotes";
     static private final List<Author> authorList = new LinkedList<>();
     static private final List<Quote> quotesList = new LinkedList<>();
     static Map<String, Integer> rating = new HashMap<>();
@@ -33,13 +34,10 @@ public class Zitat {
 
     static {
        updateQuotes();
-
-        System.out.println(Arrays.toString(authorList.toArray()));
-        System.out.println(Arrays.toString(quotesList.toArray()));
-        System.out.println(Arrays.toString(rating.keySet().toArray()));
     }
 
-    static void updateQuotes() {
+    public static void updateQuotes() {
+        //TODO: GET ALL AUTHORS TOO IF THERE IS ONE WITHOUT QUOTE
         Webb webb = Webb.create();
 
         JSONArray jsonArray = webb
@@ -47,10 +45,26 @@ public class Zitat {
                 .asJsonArray()
                 .getBody();
 
-        System.out.println(jsonArray);
-
         jsonArray.forEach(o -> {
             handleWrongQuote((JSONObject) o);
+        });
+
+        jsonArray = webb
+                .get(AUTHORS)
+                .asJsonArray()
+                .getBody();
+
+        jsonArray.forEach(o -> {
+            addAuthor((JSONObject) o);
+        });
+
+        jsonArray = webb
+                .get(QUOTES)
+                .asJsonArray()
+                .getBody();
+
+        jsonArray.forEach(o -> {
+            addQuote((JSONObject) o);
         });
     }
 
@@ -263,16 +277,12 @@ public class Zitat {
     private String typ;
 
     public  Zitat(int zitatId, int nameId, String typ) {
-        Zitat.updateQuotes();
-
         this.typ = typ;
         quote = getQuoteById(zitatId).orElseThrow(() -> new IllegalArgumentException("Quote id is wrong"));
         author = getAuthorById(nameId).orElseThrow(() -> new IllegalArgumentException("Author id is wrong"));
     }
 
     public Zitat() {
-        Zitat.updateQuotes();
-
         typ = "";
         quote = quotesList.get(func.getRandom(0, quotesList.size() - 1));
         author = authorList.get(func.getRandom(0, authorList.size() - 1));

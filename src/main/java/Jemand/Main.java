@@ -8,6 +8,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.embed.EmbedImage;
 import org.javacord.api.entity.permission.Permissions;

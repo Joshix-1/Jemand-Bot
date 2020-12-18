@@ -1,6 +1,7 @@
 package Jemand.Listener;
 
 import Jemand.NumberToText;
+import Jemand.Zitat;
 import Jemand.func;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.DiscordApi;
@@ -492,6 +493,9 @@ public class GuildUtilities {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastChecked > 69 * 60 * 1000) { //69 minutes
             lastChecked = currentTime;
+
+            Zitat.updateQuotes();
+
             api.getServerById(AN).ifPresent(server -> {
                 LinkedList<User> users = new LinkedList<>();
                 for (User u : server.getMembers()) {
