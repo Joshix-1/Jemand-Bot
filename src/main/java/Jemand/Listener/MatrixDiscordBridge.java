@@ -1,5 +1,6 @@
 package Jemand.Listener;
 
+import Jemand.func;
 import de.jojii.matrixclientserver.Bot.Client;
 import de.jojii.matrixclientserver.Bot.Events.RoomEvent;
 import org.javacord.api.DiscordApi;
@@ -158,7 +159,7 @@ public class MatrixDiscordBridge {
          */
 
         try {
-            client.sendText(matrixRoom, text.toString(), /*null);//*/ true, formattedText.toString(), null);
+            client.sendText(matrixRoom, func.replaceUmlaute(text.toString()), /*null);//*/ true, func.replaceUmlaute(formattedText.toString()), null);
         } catch (IOException e) {
             e.printStackTrace();
         }
