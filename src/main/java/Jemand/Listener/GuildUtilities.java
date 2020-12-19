@@ -14,6 +14,7 @@ import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -27,10 +28,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
-import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
-import org.javacord.api.event.server.role.UserRoleAddEvent;
-import org.javacord.api.event.server.role.UserRoleEvent;
-import org.javacord.api.event.server.role.UserRoleRemoveEvent;
+import org.javacord.api.event.server.role.*;
 import org.javacord.api.event.user.*;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.logging.ExceptionLogger;
@@ -87,6 +85,8 @@ public class GuildUtilities {
 
             server.addUserRoleAddListener(event -> updatedRolesUser(event, true));
             server.addUserRoleRemoveListener(event -> updatedRolesUser(event, false));
+
+            server.addRoleDeleteListener(this::roleDeleted);
         });
     }
 
@@ -232,25 +232,28 @@ public class GuildUtilities {
             api.getRoleById(MITGLIED).ifPresent(mitglied -> {
                 if (mitglied.hasUser(u)) {
                     if (m.mentionsEveryone()) {
-                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle markiert: " + m.getLink());
+                        removeMitglied(u, m.getChannel(), "Hat alle markiert: " + m.getLink());
                     } else if (m.getContent().contains(mitglied.getMentionTag())) {
-                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle Mitglieder markiert: " + m.getLink());
+                        removeMitglied(u, m.getChannel(), "Hat alle Mitglieder markiert: " + m.getLink());
                     } else if (m.getContent().contains("<@" + VORLÄUFIG + ">")) {
-                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle Vorläufigen markiert: " + m.getLink());
+                        removeMitglied(u, m.getChannel(), "Hat alle Vorläufigen markiert: " + m.getLink());
                     }
                 }
             });
         });
     }
 
-    private void removeMitglied(Role mitglied, User u, TextChannel c, String reason) {
-        u.removeRole(mitglied, reason).exceptionally(ExceptionLogger.get()).thenAccept((v) -> {
-            c.sendMessage(u.getMentionTag() + ", dir wurde die Mitgliedsrolle entzogen, wenn du glaubst, dass es ein Fehler war, beschwere dich bitte ohne Leute zu markieren.").exceptionally(ExceptionLogger.get());
-            api.getTextChannelById(LOGS).ifPresent(channel -> channel.sendMessage(u.getIdAsString() + " ist nun kein Mitglied mehr. Grund: " + reason).exceptionally(ExceptionLogger.get()));
-        });
+    private void removeMitglied(User u, TextChannel c, String reason) {
+        api.getRoleById(MITGLIED).ifPresent(mitglied -> {
+            Messageable mess = c == null ? u : c;
+            u.removeRole(mitglied, reason).exceptionally(ExceptionLogger.get()).thenAccept((v) -> {
+                mess.sendMessage(u.getMentionTag() + ", dir wurde die Mitgliedsrolle entzogen, wenn du glaubst, dass es ein Fehler war, beschwere dich bitte (ohne Leute zu markieren).").exceptionally(ExceptionLogger.get());
+                api.getTextChannelById(LOGS).ifPresent(channel -> channel.sendMessage(u.getIdAsString() + " ist nun kein Mitglied mehr. Grund: " + reason).exceptionally(ExceptionLogger.get()));
+            });
 
-        api.getRoleById(VORLÄUFIG).ifPresent(r -> {
-            if (!r.hasUser(u)) u.addRole(r, "Mitglied weg.").exceptionally(ExceptionLogger.get());
+            api.getRoleById(VORLÄUFIG).ifPresent(r -> {
+                if (!r.hasUser(u)) u.addRole(r, "Mitglied weg.").exceptionally(ExceptionLogger.get());
+            });
         });
     }
 
@@ -450,13 +453,21 @@ public class GuildUtilities {
             event.getServer().getAuditLog(1, AuditLogActionType.CHANNEL_DELETE).join().getInvolvedUsers().forEach(user1 -> {
                 user1.removeRole(func.getApi().getRoleById(MITGLIED).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Channel got deleted").join();
                 event.getServer().getOwner().ifPresent(owner ->
-                        owner.sendMessage(user1.getDisplayName(event.getServer()) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").join()
+                        owner.sendMessage(user1.getDisplayName(event.getServer()) + " (name: " + user1.getDiscriminatedName() + "; id: " + user1.getIdAsString() + ") hat #" + event.getChannel().getName() + " gelöscht.").exceptionally(ExceptionLogger.get())
                 );
 
             });
         } catch (Exception e) {
             func.handle(e);
         }
+    }
+
+    private void roleDeleted(RoleDeleteEvent event) {
+        event.getServer().getAuditLog(1, AuditLogActionType.ROLE_DELETE).join().getInvolvedUsers().forEach(user1 -> {
+            user1.removeRole(func.getApi().getRoleById(MITGLIED).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Role got deleted").join();
+
+            removeMitglied(user1, null, event.getRole().getName() + "-Rolle gelöscht.");
+        });
     }
 
     //Fortnite-Detektor
