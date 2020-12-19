@@ -19,6 +19,7 @@ import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
@@ -48,6 +49,7 @@ public class GuildUtilities {
     static public final long AN = 367648314184826880L;
     static private final long COPY = 740214894036779009L;
     static public final long MITGLIED = 367649615484551179L;
+    static private final long VORLÄUFIG = 559141475812769793L;
     static private final long ROLLENMEISTER = 493572898577973249L;
     static private final long LOGS = 559451873015234560L;
     static private final long ACTIVITY_LOGS = 740338145689600032L;
@@ -220,9 +222,36 @@ public class GuildUtilities {
 
     private void userAddedRole(UserRoleAddEvent event) {
         if (event.getRole().getId() == MITGLIED) {
-            event.getUser().sendMessage("Herzlichen Glückwunsch. Du bist nun Mitglied auf der Gilde des Asozialen Netzwerkes.").exceptionally(ExceptionLogger.get());
+            event.getUser().sendMessage("Herzlichen Glückwunsch. Du bist nun Mitglied auf der Gilde des Asozialen Netzwerkes.\nFolgende Sachen sind verboten:\n - @everyone, @here, @Mitglied oder @Vorläufiges Mitglied markieren\n - Ein Arschloch sein.\n - Kanäle löschen\n - Scheiße bauen.").exceptionally(ExceptionLogger.get());
             event.getServer().getTextChannelById(LOGS).ifPresent(channel -> channel.sendMessage(event.getUser().getIdAsString() + " ist nun Mitglied.").exceptionally(ExceptionLogger.get()));
         }
+    }
+
+    private void checkMessageBadStuff(Message m) {
+        m.getAuthor().asUser().ifPresent(u -> {
+            api.getRoleById(MITGLIED).ifPresent(mitglied -> {
+                if (mitglied.hasUser(u)) {
+                    if (m.mentionsEveryone()) {
+                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle markiert: " + m.getLink());
+                    } else if (m.getContent().contains(mitglied.getMentionTag())) {
+                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle Mitglieder markiert: " + m.getLink());
+                    } else if (m.getContent().contains("<@" + VORLÄUFIG + ">")) {
+                        removeMitglied(mitglied, u, m.getChannel(), "Hat alle Vorläufigen markiert: " + m.getLink());
+                    }
+                }
+            });
+        });
+    }
+
+    private void removeMitglied(Role mitglied, User u, TextChannel c, String reason) {
+        u.removeRole(mitglied, reason).exceptionally(ExceptionLogger.get()).thenAccept((v) -> {
+            c.sendMessage(u.getMentionTag() + ", dir wurde die Mitgliedsrolle entzogen, wenn du glaubst, dass es ein Fehler war, beschwere dich bitte ohne Leute zu markieren.").exceptionally(ExceptionLogger.get());
+            api.getTextChannelById(LOGS).ifPresent(channel -> channel.sendMessage(u.getIdAsString() + " ist nun kein Mitglied mehr. Grund: " + reason).exceptionally(ExceptionLogger.get()));
+        });
+
+        api.getRoleById(VORLÄUFIG).ifPresent(r -> {
+            if (!r.hasUser(u)) u.addRole(r, "Mitglied weg.").exceptionally(ExceptionLogger.get());
+        });
     }
 
     private void messageCreated(MessageCreateEvent event) {
@@ -235,6 +264,8 @@ public class GuildUtilities {
         if (event.getMessageContent().isEmpty() && event.getMessage().getEmbeds().isEmpty() && event.getMessageAttachments().isEmpty()) return;
 
         checkNoRoleUsers();
+
+        checkMessageBadStuff(event.getMessage());
 
         //reminds to bump
         if (event.getMessageAuthor().getId() == 302050872383242240L //is disboard bot
@@ -263,6 +294,7 @@ public class GuildUtilities {
                 && !func.WHITE_SPACE.matcher(event.getMessageContent()).replaceAll("").toLowerCase().startsWith("l.vote")) {
             func.getIncomingWebhook(event.getApi().getServerTextChannelById(681650503351795766L).orElse(null)).ifPresent(webhook -> event.getMessage()
                     .toWebhookMessageBuilder()
+                    .setAllowedMentions(new AllowedMentionsBuilder().setMentionEveryoneAndHere(false).setMentionRoles(false).build())
                     .send(webhook).exceptionally(ExceptionLogger.get())
             );
             event.getMessage().delete().exceptionally(ExceptionLogger.get());
