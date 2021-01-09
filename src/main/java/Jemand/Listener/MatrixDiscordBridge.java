@@ -60,7 +60,11 @@ public class MatrixDiscordBridge {
                    MatrixUser user = MatrixUser.byId(event.getSender());
 
                    user.getAvatar().ifPresentOrElse(mb::setDisplayAvatar, () -> mb.setDisplayAvatar(api.getYourself().getAvatar()));
-                   mb.setDisplayName(user.getName());
+                   String name = user.getName();
+                   if (name.endsWith("[TG]")) {
+                       name = name.replace("[TG]", "[tg]");
+                   }
+                   mb.setDisplayName(name);
 
                    JSONObject js = event.getContent();
 
@@ -313,7 +317,11 @@ public class MatrixDiscordBridge {
     }
 
     public void onMessageCreate(MessageCreateEvent event) {
-        if (event.getMessageAuthor().isUser() && discordChannels.contains(event.getChannel().getIdAsString())) {
+        if (discordChannels.contains(event.getChannel().getIdAsString())
+            && (event.getMessageAuthor().isUser()
+                || (event.getChannel().getId() == 685958534277759068L
+                && event.getMessageAuthor().isWebhook()
+                && event.getMessageAuthor().getName().endsWith("[TG]")))) {
             cloneMessageToMatrix(event.getMessage());
         }
     }

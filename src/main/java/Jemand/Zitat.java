@@ -37,7 +37,6 @@ public class Zitat {
     }
 
     public static void updateQuotes() {
-        //TODO: GET ALL AUTHORS TOO IF THERE IS ONE WITHOUT QUOTE
         Webb webb = Webb.create();
 
         JSONArray jsonArray = webb

@@ -264,6 +264,7 @@ public class Main {
 				}
 
 				if ((func.getFileSeparator().equals("/") || func.OWNER.map(User::getId).orElse(0L) == event.getMessageAuthor().getId()) && event.getMessageAuthor().isUser() && !event.getMessageAuthor().isBotUser() && !event.getMessageAuthor().isWebhook() && !event.getMessageAuthor().isYourself()) {
+
 					//id
 					final String id = event.getMessageAuthor().getIdAsString();
 					Optional<User> user = event.getMessageAuthor().asUser();
@@ -289,7 +290,6 @@ public class Main {
 								e.addField(att.getFileName(), att.getUrl().toString());
 							});
 							func.OWNER.ifPresent(owner -> owner.sendMessage(e.addField("UserID:", event.getMessageAuthor().getIdAsString()).setDescription(event.getMessageContent())));
-							event.getChannel().sendMessage(func.getNormalEmbed(event).setDescription(new Texte(event.getMessageAuthor().asUser().get(), null).getString("Weiterleitung").toString()));
 						}
 					} else if(event.getServer().isPresent()) {
 						final Server server = event.getServer().get();

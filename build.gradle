@@ -47,7 +47,13 @@ dependencies {
     //implementation 'org.twitter4j:twitter4j-core:4.0.7'
 
     implementation group: 'org.kohsuke', name: 'github-api', version: '1.108'
-    
+
+
+
+    implementation "co.elastic.apm:apm-agent-api:v1.20.0"
+
+
+
 
     implementation 'org.apfloat:apfloat:1.9.1'
 

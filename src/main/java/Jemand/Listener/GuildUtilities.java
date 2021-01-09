@@ -231,7 +231,9 @@ public class GuildUtilities {
         m.getAuthor().asUser().ifPresent(u -> {
             api.getRoleById(MITGLIED).ifPresent(mitglied -> {
                 if (mitglied.hasUser(u)) {
-                    if (m.mentionsEveryone()) {
+                    if (m.getMentionedRoles().size() > 1) {
+                        removeMitglied(u, m.getChannel(), "Hat mehr als eine Rolle markiert: " + m.getLink());
+                    } else if (m.mentionsEveryone()) {
                         removeMitglied(u, m.getChannel(), "Hat alle markiert: " + m.getLink());
                     } else if (m.getContent().contains(mitglied.getMentionTag())) {
                         removeMitglied(u, m.getChannel(), "Hat alle Mitglieder markiert: " + m.getLink());
