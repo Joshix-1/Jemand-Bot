@@ -4,6 +4,7 @@ import Jemand.Listener.CommandCleanupListener;
 import Jemand.Listener.GuildUtilities;
 import Jemand.Listener.MusicPlayer;
 import Jemand.Listener.ReactionRole;
+import co.elastic.apm.api.Transaction;
 import com.vdurmont.emoji.EmojiParser;
 import me.bramhaag.owo.OwO;
 import org.apache.commons.io.FileUtils;
@@ -89,6 +90,7 @@ public class Befehl {
     private String MentionBot;
 
     private MessageCreateEvent event;
+    private Transaction transaction;
 
     EmbedBuilder embed;
 
@@ -96,7 +98,8 @@ public class Befehl {
 
 
 
-    public Befehl(MessageCreateEvent Event1) {
+    public Befehl(MessageCreateEvent Event1, Transaction transaction) {
+        this.transaction = transaction;
 
         event = Event1;
 
@@ -108,6 +111,8 @@ public class Befehl {
         server = event.getServer().orElse(null);
 
         texte = new Texte(user, server);
+
+        transaction.setLabel("language", texte.getSprache());
 
         //embedbuilder
         embed = CommandCleanupListener.insertResponseTracker(new EmbedBuilder()
@@ -242,8 +247,11 @@ public class Befehl {
 
     public boolean fuehreAus() throws Exception {
         if(!boo1.get()) {
+            transaction.setResult("Command not found.");
             return false;
         } else event.getChannel().type().join();
+
+        transaction.setLabel("command", befehl.get());
 
         //if(befehl.get().equalsIgnoreCase("tw") && func.userIsTrusted(user)) {
         //    if(subtext1.get().isEmpty()) subtext1.set("1");
@@ -434,6 +442,7 @@ public class Befehl {
                 return true;
             } catch (Exception e) {
                 func.handle(e);
+                transaction.captureException(e);
                 return false;
             }
 
@@ -447,11 +456,15 @@ public class Befehl {
             if(func.userIsTrusted(user)) {
                 event.getMessage().toMessageBuilder().setContent(subtext1.get()).send(event.getChannel());
                 event.getMessage().delete();
-            } else return false;
+            } else {
+                transaction.setResult("User not trusted.");
+                return false;
+            }
         }
 
         if(befehl.get().equalsIgnoreCase("screenshot")) {
             if(subtext1.get().isEmpty()) {
+                transaction.setResult("Missing arg.");
                 return false;
             } else {
                 File f = new WebScreenshotter(subtext1.get()).makeScreen();
@@ -485,7 +498,9 @@ public class Befehl {
                     break;
                 case "3": template = Memes.ZITAT_ATA;
                     break;
-                default: event.getChannel().sendMessage(getRotEmbed().setTitle(texte.get("FehlerTitle")).setDescription(texte.get("FehlerDesc", "Kalender")));
+                default:
+                    event.getChannel().sendMessage(getRotEmbed().setTitle(texte.get("FehlerTitle")).setDescription(texte.get("FehlerDesc", "Kalender")));
+                    transaction.setResult("Template not found.");
                     return false;
             }
 
@@ -496,6 +511,7 @@ public class Befehl {
             } catch(Exception e) {
                 func.handle(e);
                 event.getChannel().sendMessage(getRotEmbed().setTitle("Kalender").setDescription(texte.get("FehlerAufgetreten")));
+                transaction.captureException(e);
                 return false;
             }
         }
@@ -523,6 +539,7 @@ public class Befehl {
                     m = new Memes(template, subtext1.get());
                 } else {
                     event.getChannel().sendMessage(func.Fehler(name, user));
+                    transaction.setResult("Fehler");
                     return false;
                 }
                 event.getChannel().sendMessage(embed.setImage(m.getFinalMeme().orElseThrow()).setTitle(name)).join();
@@ -530,6 +547,7 @@ public class Befehl {
             } catch(Exception e) {
                 func.handle(e);
                 event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten"));
+                transaction.captureException(e);
                 return false;
             }
         }
@@ -570,6 +588,7 @@ public class Befehl {
             } catch(Exception e) {
                 func.handle(e);
                 event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten"));
+                transaction.captureException(e);
                 return false;
             }
         }
@@ -624,6 +643,7 @@ public class Befehl {
             } catch(Exception e) {
                 func.handle(e);
                 event.getChannel().sendMessage(getRotEmbed().setTitle(texte.get("FehlerAufgetreten")).setDescription(e.getMessage()));
+                transaction.captureException(e);
                 return false;
             }
         }
@@ -642,6 +662,7 @@ public class Befehl {
                         embed.addField(a.get(i).getFileName(), owo.upload(a.get(i).downloadAsByteArray().join(), a.get(i).getFileName()).executeSync().getFullUrl());
                     } catch (Throwable e) {
                         func.handle(e);
+                        transaction.captureException(e);
                         return false;
                     }
                 }
@@ -725,7 +746,10 @@ public class Befehl {
                 File f = sc.toHTML();
                 event.getChannel().sendMessage(f).join();
                 return true;
-            } catch(Exception e) {func.handle(e);}
+            } catch(Exception e) {
+                func.handle(e);
+                transaction.captureException(e);
+            }
             return false;
         }
 
@@ -796,6 +820,7 @@ public class Befehl {
                 } catch(Exception e) {
                     func.handle(e);
                     func.writetexttofile(func.readtextoffile("backups/ratelimit.txt").replace("+" + server.getId(), ""), "backups/ratelimit.txt");
+                    transaction.captureException(e);
                     return false;
                 }
             }
@@ -2190,6 +2215,7 @@ public class Befehl {
                         } catch (NullPointerException e) {
                             func.handle(e);
                             event.getChannel().sendMessage(getRotEmbed().setDescription(texte.get("FehlerAufgetreten")));
+                            transaction.captureException(e);
                             return false;
                         }
                     } else {
@@ -2231,6 +2257,7 @@ public class Befehl {
                     });
                 } catch (Exception e) {
                     func.handle(e);
+                    transaction.captureException(e);
                     return false;
                 }
                 return true;
@@ -2399,7 +2426,7 @@ public class Befehl {
                                                     event.getChannel().sendMessage(func.getNormalEmbed(event).setDescription(texte.get("ReportText")).setTimestampToNow());
                                                 else {
                                                     try {
-                                                        new Befehl(event).setAll(text.replace("\"", "")).fa();
+                                                        new Befehl(event, transaction).setAll(text.replace("\"", "")).fa();
                                                     } catch (Exception e) {func.handle(e);};
                                                     break;
                                                 }
@@ -2416,7 +2443,9 @@ public class Befehl {
                 });
                 return true;
             }
-        return false;
+
+             transaction.setResult("reached end of Befehl.java");
+            return false;
     }
 
     public final EmbedBuilder getNormalEmbed() {
