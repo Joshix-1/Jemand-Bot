@@ -50,9 +50,7 @@ dependencies {
 
 
 
-    implementation "co.elastic.apm:apm-agent-api:v1.20.0"
-
-
+    implementation 'co.elastic.apm:apm-agent-api:1.20.0'
 
 
     implementation 'org.apfloat:apfloat:1.9.1'
