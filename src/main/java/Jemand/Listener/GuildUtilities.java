@@ -1,5 +1,6 @@
 package Jemand.Listener;
 
+import Jemand.NumberToEnglischWords;
 import Jemand.NumberToText;
 import Jemand.Zitat;
 import Jemand.func;
@@ -39,6 +40,7 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -143,6 +145,18 @@ public class GuildUtilities {
                 .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
                 .addField("Name:", event.getUser().getDiscriminatedName())
                 , event.getApi());
+
+        if (event.getUser().getNickname(event.getServer()).isEmpty()) {
+            String[] titles = func.readtextoffile("titles.txt").split("\n");
+            Random random = new Random(event.getUser().getId());
+            if (titles.length > 1) {
+                String title;
+                do {
+                    title = titles[random.nextInt(titles.length)];
+                } while (event.getServer().getMembersByNicknameIgnoreCase(title).size() > 0);
+                event.getUser().updateNickname(event.getServer(), title).exceptionally(ExceptionLogger.get());
+            }
+        }
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
@@ -386,7 +400,9 @@ public class GuildUtilities {
     }
 
     private static String getCaptchaDescription(User user, Server server) {
-        return user.getNicknameMentionTag() + " schreibe \"" + NumberToText.intToText(calculateCaptchaNumber(user, server)) + "\" mit Ziffern (0-9) in diesen Kanal.";
+        int captchaNumber = calculateCaptchaNumber(user, server);
+        return user.getNicknameMentionTag() + " schreibe `" + NumberToText.intToText(captchaNumber) + "` mit Ziffern (0-9) in diesen Kanal.\n"
+                + "Write `" + NumberToEnglischWords.convertToWord(captchaNumber) + "` as number (e.g. 1234) in this channel.";
     }
 
     private boolean isMoreThan10minAgo(long timeMs) {

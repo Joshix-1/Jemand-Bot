@@ -83,7 +83,7 @@ public class Befehl {
     //roll
     private final String[] zahl = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"};
 
-    private final String[] s1 = {"play", "mind", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
+    private final String[] s1 = {"play", "tts", "tzs", "mind", "clone", "norole", "execute", "captcha", "skip", "ddg", "roleinfo", "userinfo", "lmgtfy", "mitglied", "AllQuotes", "kalender", "donald","reaction-role", "wth", "lisa", "winnie", "drake", "rnd_4g","rnd_img","encrypt", "decrypt", "ship", "dg", "dice-game", "give", "addcoins", "coins", "rnd_ttt", "lr","getlog", "restart", "levelroles", "qr", "car","ss", "save-secure", "screenshot", "pw", "password", "bf", "brainfuck", "owo", "sp", "save-private", "welcome-message", "wm", "leave-message", "lm", "c4", "stats", "speak", "Channel", "Connect-Four", "calculate", "game-of-quotes","language", "Backup", "Help", "Ping", "Roll", "Pong","RPS", "Say", "4-Gewinnt", "SSPB", "Invite", "Report", "Guildinvite", "Guild-invite", "Emote", "React", "TicTacToe", "Fake-Person", "Fake-Cat", "Fake-Art", "Fake-Horse", "resize", "8-Ball", "prefix", "SSS", "load", "SaveAs", "Save", "delete", "rename", "edit", "random-robot", "random-face", "random-alien", "random-human", "random-cat", "random-picture", "top", "rank", "calc", "goq", "rp", "rc", "rr", "rh", "ra", "rf", "8ball", "fp", "fc", "fa", "fh", "TTT", "4gewinnt", "4g", "addpro", "activity", "r", "l", "d", "e", "sa", "s", "zitat"}; //neu vor SSS einfügen, da danach doppelt
 
     private User user;
     private Server server;
@@ -301,6 +301,18 @@ public class Befehl {
         }
 
 
+
+        //tts
+        if (befehl.get().equals("tts")) {
+            TTS.play(event.getServerTextChannel().get(), user, subtext2.get(), subbefehl2.get());
+            return true;
+        }
+
+        //tzs
+        if (befehl.get().equals("tzs")) {
+            TTS.play(event.getServerTextChannel().get(), user, subtext1.get());
+            return true;
+        }
 
         if (befehl.get().equalsIgnoreCase("play")) {
             return MusicPlayer.play(server, user, event.getServerTextChannel().get(), subtext1.get());
@@ -1178,7 +1190,7 @@ public class Befehl {
 
                         event.getChannel().sendMessage(embed.setDescription(output + "```").addField("\u200B", (((System.nanoTime() - t)/100000L)/10000.0) + "ms")).join();
                     } catch (Exception e) {
-                        event.getChannel().sendMessage(embed.setTitle("Fehler:").setUrl("https://www.wolframalpha.com/input/?i=" + subtext1.get().replace(" ", "")).setColor(new Color(func.getRandom(250, 255), func.getRandom(0, 5), func.getRandom(0, 5))).setDescription(e.getMessage())).join();
+                        event.getChannel().sendMessage(embed.setTitle("Fehler:").setUrl("https://www.wolframalpha.com/input/?i=" + URLEncoder.encode(subtext1.get().replace(" ", ""), StandardCharsets.UTF_8)).setColor(new Color(func.getRandom(250, 255), func.getRandom(0, 5), func.getRandom(0, 5))).setDescription(e.getMessage())).join();
                     }
 
                 }
@@ -1333,11 +1345,16 @@ public class Befehl {
                     str = subtext1.get() + " - ";
                 }
                 if (texte.getSprache().equals("de")) {
-                    str += answer.replace("yes", "Ja").replace("maybe", "Vielleicht").replace("no", "Nein") + "!";
+                    str += answer.replace("yes", "Ja")
+                            .replace("maybe", "Vielleicht")
+                            .replace("no", "Nein") + "!";
                 } else {
                     str += answer + "!";
                 }
-                event.getChannel().sendMessage(embed.setImage(js.get("image").toString()).setThumbnail(new File(func.filepathof("8ball.png"))).setAuthor(str, "https://yesno.wtf/", "")).join();
+                event.getChannel().sendMessage(embed
+                        .setImage(js.get("image").toString())
+                        .setThumbnail(new File(func.filepathof("8ball.png")))
+                        .setAuthor(str, "https://yesno.wtf/", "")).join();
                 return true;
             }
 
@@ -2248,7 +2265,7 @@ public class Befehl {
                                 vg.doMove(event2);
                                 if(!vg.isEnded()) message4g.edit(embed.setDescription(vg.getDisplayField()));
                             }
-                        }).removeAfter(100L, TimeUnit.MINUTES).addRemoveHandler(()->{
+                        }).removeAfter(200L, TimeUnit.MINUTES).addRemoveHandler(()->{
                             if(!vg.isEnded()) {
                                 message4g.edit(embed.setDescription(vg.getDisplayField()).addField(texte.get("ZeitAbgelaufen"), texte.get("4GUnentschieden")));
                                 message4g.removeAllReactions().join();
