@@ -27,17 +27,17 @@ public class VierGewinnt {
     private final boolean vier;
 
     VierGewinnt(Befehl b, User user1, long user2, boolean vier) {
-        long jemand_id = func.getApi().getYourself().getId();
+        long botId = func.getApi().getYourself().getId();
         this.vier = vier;
         state = 0;
         befehl = b;
         texte = b.getTexte();
-        user2 = b.getServer().getMemberById(user2).map(User::getId).orElse(jemand_id);
+        user2 = b.getServer().getMemberById(user2).map(User::getId).orElse(botId);
         if(func.getRandom(0, 1) == 0)
             users = new long[]{user1.getId(), user2};
         else users = new long[]{user2, user1.getId()};
         for (int i = 0; i < 2; i++)
-            ai[i] = users[i] == jemand_id;
+            ai[i] = users[i] == botId;
         rounds = 0;
 
         Arrays.fill(rows, blank_row);

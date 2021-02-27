@@ -148,7 +148,7 @@ public class GuildUtilities {
 
         if (event.getUser().getNickname(event.getServer()).isEmpty()) {
             String[] titles = func.readtextoffile("titles.txt").split("\n");
-            Random random = new Random(event.getUser().getId());
+            Random random = new Random(event.getUser().getId()); //294508268942917633
             if (titles.length > 1) {
                 String title;
                 do {
@@ -291,7 +291,7 @@ public class GuildUtilities {
             && event.getMessage().getEmbeds().size() == 1) { //message has embed
             Embed embed = event.getMessage().getEmbeds().get(0);
             embed.getDescription().ifPresent(description -> {
-                if (description.contains("Bump erfolgreich")) {
+                if (description.contains("https://disboard.org/") && embed.getImage().isPresent()) {
                     event.getApi().getThreadPool().getScheduler().schedule(() -> {
                         event.getChannel().getCurrentCachedInstance().ifPresent(channel -> {
                             channel.sendMessage("<@&763147436825772042>!").exceptionally(ExceptionLogger.get());
@@ -481,6 +481,11 @@ public class GuildUtilities {
     }
 
     private void roleDeleted(RoleDeleteEvent event) {
+        EmbedBuilder embed = new EmbedBuilder()
+                .setTitle("Rolle gelöscht.")
+                .setDescription(String.format("%s (%s) with %d users.", event.getRole().getName(), event.getRole().getIdAsString(), event.getRole().getUsers().size()));
+        sendEmbedToLogs(embed, event.getApi());
+
         event.getServer().getAuditLog(1, AuditLogActionType.ROLE_DELETE).join().getInvolvedUsers().forEach(user1 -> {
             user1.removeRole(func.getApi().getRoleById(MITGLIED).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Role got deleted").join();
 

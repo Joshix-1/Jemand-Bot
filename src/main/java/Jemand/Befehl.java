@@ -1354,7 +1354,8 @@ public class Befehl {
                 event.getChannel().sendMessage(embed
                         .setImage(js.get("image").toString())
                         .setThumbnail(new File(func.filepathof("8ball.png")))
-                        .setAuthor(str, "https://yesno.wtf/", "")).join();
+                        .setDescription(str)
+                        .setAuthor("8-Ball", "https://yesno.wtf/", "")).join();
                 return true;
             }
 
