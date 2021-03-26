@@ -294,7 +294,7 @@ public class Befehl {
         if (befehl.get().equalsIgnoreCase("captcha")) {
             if(!func.userIsTrusted(user)) return false;
             server.getMemberById(func.LongFromString(subtext1.get(), 0L)).ifPresent(u -> {
-                int i = GuildUtilities.calculateCaptchaNumber(u, server);
+                int i = Captcha.calculate(u, server);
                 event.getChannel().sendMessage(NumberToText.intToText(i) + " → " + i + "!");
             });
             return true;

@@ -4,6 +4,7 @@ import Jemand.Listener.GuildUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -11,16 +12,20 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.logging.ExceptionLogger;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Captcha {
     private static final ConcurrentHashMap<Long, Long> newUsersLastMessage = new ConcurrentHashMap<>();
+    private static final long HQ = 561337749245001768L;
 
     public static int calculate(User user, Server server) {
         int hash = Objects.hash(user.getJoinedAtTimestamp(server).orElse(Instant.EPOCH), user.getIdAsString() + ":why_so_salty#LazyCrypto");
-        return (Math.abs(hash) % 900000) + 100000;
+        return (Math.abs(hash) % 9000) + 1000;
     }
 
     public static String getString(User user, Server server) {
@@ -48,6 +53,54 @@ public class Captcha {
                     user.addRole(server.getRoleById(559141475812769793L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     //user.addRole(server.getRoleById(559444155726823484L).orElseThrow(() -> new AssertionError("Rolle nicht da"))).join();
                     event.getChannel().sendMessage(user.getNicknameMentionTag() + " du kannst dir nun in <#686282295098736820> Rollen geben ;)").exceptionally(ExceptionLogger.get());
+                    event.getApi().getThreadPool().getScheduler().schedule(() -> {
+                        if (server.getMemberById(user.getId()).isEmpty()) { // user left server:
+                            return;
+                        }
+                        event.getApi().getServerTextChannelById(HQ).flatMap(func::getIncomingWebhook).ifPresent(webhook -> {
+                            String name;
+                            String url;
+                            String message;
+                            switch (func.getRandom(1, 4)) {
+                                case 1: {
+                                    name = "Die Amazonenkönigin";
+                                    url = "https://i.postimg.cc/YSSwwvgc/herta.png";
+                                    message = "Juten Tach %s!";
+                                    break;
+                                }
+                                case 2: {
+                                    name = "Gott";
+                                    url = "https://i.postimg.cc/htsqwLXb/gott.png";
+                                    message = "Hi %s ;)";
+                                    break;
+                                }
+                                case 3: {
+                                    name = "Commandante";
+                                    url = "https://i.postimg.cc/LXYKnGNN/k-nguru.png";
+                                    message = "Hallo %s!";
+                                    if (func.getRandom(0, 4) == 0)
+                                        message = "Hallo %s, ich wollte mir Eierkuchen backen und da ist mir aufgefallen dass ich vergessen habe Eier zu kaufen.";
+                                    break;
+                                }
+                                default: {
+                                    name = "Der Hauptmann";
+                                    url = "https://i.postimg.cc/9fNHXctD/muk.png";
+                                    message = "Hi %s o/";
+                                    break;
+                                }
+                            }
+                            try {
+                                new WebhookMessageBuilder()
+                                        .setContent(String.format(message, user.getNicknameMentionTag()))
+                                        .setDisplayName(name)
+                                        .setDisplayAvatar(new URL(url))
+                                        .send(webhook)
+                                        .exceptionally(ExceptionLogger.get());
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }, func.getRandom(6, 14), TimeUnit.SECONDS);
                 } catch (Exception e) {
                     func.handle(e);
                 }
