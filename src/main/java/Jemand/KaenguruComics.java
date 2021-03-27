@@ -9,10 +9,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class KaenguruComics {
     static final private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    static final private DateFormat readableDateFormat = new SimpleDateFormat("EEEE, dd. MMMM yyyy", Locale.GERMAN);
     static final private String fileName = "last_date.txt";
 
     private final DiscordApi api;
@@ -32,19 +34,24 @@ public class KaenguruComics {
         if (test(calendar)) {
             sendComic(calendar);
             func.writetexttofile(dateFormat.format(calendar), fileName);
+            System.out.println("Comic gefunden " + readableDateFormat.format(calendar.getTime()));
         } else {
+            System.out.println("Keinen Comic gefunden " + readableDateFormat.format(calendar.getTime()));
             calendar.add(Calendar.DAY_OF_MONTH, 1);
 
             if (test(calendar)) {
+                System.out.println("Comic gefunden " + readableDateFormat.format(calendar.getTime()));
                 sendComic(calendar);
-                func.writetexttofile(dateFormat.format(calendar), fileName);
+                func.writetexttofile(dateFormat.format(calendar.getTime()), fileName);
+            } else {
+                System.out.println("Keinen Comic gefunden " + readableDateFormat.format(calendar.getTime()));
             }
         }
     }
 
     private void sendComic(Calendar date) {
         api.getServerTextChannelById(784760963575447563L).ifPresent(channel -> {
-            channel.sendMessage(", <@&796416266696785920>:\n" +
+            channel.sendMessage(readableDateFormat.format(date.getTime()) + ", <@&796416266696785920>:\n" +
                     getComicUrl(date)).thenAccept(message -> {
                         message.crossPost().exceptionally(ExceptionLogger.get());
                         message.addReactions("wit:577887998310613032", "zig:577888095735906305").exceptionally(ExceptionLogger.get());
