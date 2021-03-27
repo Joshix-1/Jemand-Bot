@@ -41,6 +41,9 @@ public class Main {
 	public static void main(String[] args) {
 		func.getApi().updateStatus(UserStatus.DO_NOT_DISTURB);
 
+
+		new KaenguruComics(func.getApi()).start();
+
 		//func.getApi().getCachedUserById(331793234252660738L).ifPresent(user -> {
 		//	user.updateNickname(user.getApi().getServerById(367648314184826880L).get(), "Herr Oberfaschist").join();
 		//});
