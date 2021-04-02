@@ -7,7 +7,10 @@ import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.util.event.ListenerManager;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DiscordScanner {
     public static final Long ALL_USERS = -1L;

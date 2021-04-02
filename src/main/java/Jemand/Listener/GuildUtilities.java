@@ -1,11 +1,8 @@
 package Jemand.Listener;
 
 import Jemand.Captcha;
-import Jemand.NumberToEnglischWords;
-import Jemand.NumberToText;
 import Jemand.Zitat;
 import Jemand.func;
-import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
@@ -15,14 +12,12 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
@@ -30,20 +25,26 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
-import org.javacord.api.event.server.role.*;
-import org.javacord.api.event.user.*;
-import org.javacord.api.util.DiscordRegexPattern;
+import org.javacord.api.event.server.role.RoleChangePermissionsEvent;
+import org.javacord.api.event.server.role.RoleDeleteEvent;
+import org.javacord.api.event.server.role.UserRoleAddEvent;
+import org.javacord.api.event.server.role.UserRoleEvent;
+import org.javacord.api.event.server.role.UserRoleRemoveEvent;
+import org.javacord.api.event.user.UserChangeActivityEvent;
+import org.javacord.api.event.user.UserChangeAvatarEvent;
+import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
+import org.javacord.api.event.user.UserChangeNameEvent;
+import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.api.util.logging.ExceptionLogger;
-import org.javacord.core.entity.user.UserImpl;
 
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.LinkedList;
-import java.util.Objects;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class GuildUtilities {
@@ -171,7 +172,7 @@ public class GuildUtilities {
     }
 
     private static EmbedBuilder getUserUpdatedEmbedBuilder(User user) {
-        return new EmbedBuilder().setTitle(((UserImpl) user).toString() + " wurde aktualisiert.").setFooter(user.getDiscriminatedName(), user.getAvatar()).setColor(user.getRoleColor(user.getApi().getServerById(AN).orElse(null)).orElse(Color.BLACK)).setTimestampToNow();
+        return new EmbedBuilder().setTitle(user.toString() + " wurde aktualisiert.").setFooter(user.getDiscriminatedName(), user.getAvatar()).setColor(user.getRoleColor(user.getApi().getServerById(AN).orElse(null)).orElse(Color.BLACK)).setTimestampToNow();
     }
 
     private void userChangedName(UserChangeNameEvent event) {
@@ -391,35 +392,55 @@ public class GuildUtilities {
         if (event.getUser().isEmpty() || event.getUser().get().isBot()) return;
         User user = event.getUser().get();
 
-        event.getApi().getServerTextChannelById(623940807619248148L).ifPresent(textchannel -> {
-    		event.getNewActivity().ifPresent(activity -> {
-    			event.getOldActivity().ifPresent(oldactivity -> {
-    				if (!oldactivity.getApplicationId().orElse(0L).equals(activity.getApplicationId().orElse(1L))
-                            && ((activity.getType().equals(ActivityType.PLAYING)
-                            && activity.getName().equals("Fortnite"))
-                            || (activity.getApplicationId().orElse(0L) == 432980957394370572L))) {
-    					EmbedBuilder embed = new EmbedBuilder()
-    							.setColor(Color.RED)
-    							.setTimestampToNow()
-    							.setFooter(user.getDiscriminatedName(), user.getAvatar());
-    					activity.getDetails().ifPresent(string -> {
-    						embed.addField("\u200B", "\nDetails: (" + string + ")");
-    					});
-    					textchannel.sendMessage(embed.setDescription(user.getNicknameMentionTag() + " spielt " + activity.getName() + "."));
-    					func.getApi().getRoleById(623193804551487488L).ifPresent(user::addRole);
-    				}
-    			});
+        event.getApi().getServerTextChannelById(623940807619248148L).ifPresent(textChannel -> {
+            Set<Activity> oldActivities = event.getOldActivities();
+    		event.getNewActivities().forEach(activity -> {
+    		    if (activity.getType().equals(ActivityType.PLAYING) && (
+    		            activity.getName().toLowerCase().contains("fortnite")
+                        || activity.getApplicationId().orElse(0L) == 432980957394370572L)
+                ) {
+    		        boolean startedPlaying = true;
+                    for (Activity a : oldActivities) {
+                        if (a.getType().equals(ActivityType.PLAYING) && (
+                                a.getName().toLowerCase().contains("fortnite")
+                                        || a.getApplicationId().orElse(0L) == 432980957394370572L)) {
+                            startedPlaying = false;
+                            break;
+                        }
+                    }
+
+                    if (startedPlaying) {
+                        EmbedBuilder embed = new EmbedBuilder()
+                                .setColor(Color.RED)
+                                .setTimestampToNow()
+                                .setFooter(user.getDiscriminatedName(), user.getAvatar());
+                        activity.getDetails().ifPresent(string -> {
+                            embed.addField("\u200B", "\nDetails: (" + string + ")");
+                        });
+                        textChannel.sendMessage(embed.setDescription(user.getNicknameMentionTag() + " spielt " + activity.getName() + "."));
+                        func.getApi().getRoleById(623193804551487488L).ifPresent(user::addRole);
+                    }
+                }
     		});
     	});
 
         EmbedBuilder embed = getUserUpdatedEmbedBuilder(user);
-        if (event.getNewActivity().isPresent()) {
-            String n = getActivity(event.getNewActivity().get());
-            String o = getActivity(event.getOldActivity().orElse(null));
+        if (event.getNewActivities().size() > 0) {
+            String n = getActivities(event.getNewActivities());
+            String o = getActivities(event.getOldActivities());
             if (!o.equals(n)) {
-                sendEmbedToId(embed.addField("Activity:", o + " -> " + n), ACTIVITY_LOGS, event.getApi());
+                sendEmbedToId(embed.setTitle("Activities:").setDescription(o + "\n->\n" + n), ACTIVITY_LOGS, event.getApi());
             }
         }
+    }
+
+    private static String getActivities(Set<Activity> activities) {
+        StringBuilder sb = new StringBuilder()
+                .append("```\n");
+
+        activities.forEach(activity -> sb.append("- ").append(getActivity(activity)).append("\n"));
+
+        return sb.append("\n```").toString();
     }
 
     private static String getActivity(Activity activity) {
@@ -429,20 +450,22 @@ public class GuildUtilities {
         switch (activity.getType()) {
             case CUSTOM:
                 if (activity.getState().isPresent() || activity.getEmoji().isPresent()) {
-                    return  (activity.getEmoji().isPresent() ? activity.getEmoji().get().getMentionTag() : "")
-                            + (activity.getEmoji().isPresent() && activity.getState().isPresent() ? " " : "")
-                            + (activity.getState().isPresent() ? "`" + activity.getState().get() + "`" : "");
+                    boolean hasEmoji = activity.getEmoji().isPresent();
+                    boolean hasState = activity.getState().isPresent();
+                    return  (hasEmoji ? activity.getEmoji().get().getMentionTag() : "")
+                            + (hasEmoji && hasState ? " " : "")
+                            + (hasState ? "" + activity.getState().get() + "" : "");
                 }
             case STREAMING:
-                return "`Streamt " + activity.getStreamingUrl().orElse(activity.getName()) + "`";
+                return "Streamt " + activity.getStreamingUrl().orElse(activity.getName());
             case WATCHING:
-                type = "`Schaut %s`";
+                type = "Schaut %s";
                 break;
             case LISTENING:
-                type = "`Hört %s zu`";
+                type = "Hört %s zu";
                 break;
             default:
-                type = "`Spielt %s`";
+                type = "Spielt %s";
         }
         return String.format(type, activity.getName());
     }

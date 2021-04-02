@@ -1,6 +1,5 @@
 package Jemand;
 
-import Jemand.Listener.GuildUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;

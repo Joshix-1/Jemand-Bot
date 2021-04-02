@@ -25,7 +25,13 @@ public class KaenguruComics {
     }
 
     public void start() {
-        api.getThreadPool().getScheduler().scheduleAtFixedRate(this::check, 2, 29, TimeUnit.MINUTES);
+        api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
+            try {
+                check();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 2, 29, TimeUnit.MINUTES);
     }
 
     private void check() {
@@ -34,7 +40,7 @@ public class KaenguruComics {
 
         if (test(calendar)) {
             sendComic(calendar);
-            func.writetexttofile(dateFormat.format(calendar), fileName);
+            func.writetexttofile(dateFormat.format(calendar.getTime()), fileName);
             System.out.println(Instant.now() + " - Comic gefunden " + readableDateFormat.format(calendar.getTime()));
         } else {
             System.out.println(Instant.now() + " - Keinen Comic gefunden " + readableDateFormat.format(calendar.getTime()));

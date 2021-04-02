@@ -19,7 +19,11 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.lavaplayerwrapper.LavaplayerAudioSource;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class MusicPlayer {

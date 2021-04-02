@@ -1,6 +1,5 @@
 package Jemand.Listener;
 
-import Jemand.func;
 /*
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

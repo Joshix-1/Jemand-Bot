@@ -5,15 +5,11 @@ import Jemand.func;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.message.embed.EmbedImage;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
 import org.javacord.api.event.message.reaction.SingleReactionEvent;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
-import org.json.simple.JSONObject;
-
-import java.net.URL;
 
 public class ZitatBewerter {
 

@@ -11,11 +11,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Zitat {
     static final String WRONGQUOTES_API = "https://zitate.prapsschnalinen.de/api/wrongquotes";

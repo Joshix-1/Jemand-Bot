@@ -1,6 +1,7 @@
 package Jemand;
 
 import org.javacord.api.event.message.MessageCreateEvent;
+
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class Brainfuck {
