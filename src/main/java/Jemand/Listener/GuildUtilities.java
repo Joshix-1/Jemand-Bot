@@ -435,6 +435,10 @@ public class GuildUtilities {
     }
 
     private static String getActivities(Set<Activity> activities) {
+        if (activities.size() == 0) {
+            return "`none`";
+        }
+
         StringBuilder sb = new StringBuilder()
                 .append("```\n");
 
