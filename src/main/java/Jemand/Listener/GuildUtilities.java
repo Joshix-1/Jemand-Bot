@@ -231,6 +231,7 @@ public class GuildUtilities {
     private static void updatePermissions(RoleChangePermissionsEvent event, int bitmask) {
         if (event.getNewPermissions().getAllowedBitmask() == bitmask) return;
 
+        System.out.println(event.getRole().getName() + "-Rolle: Berechtigung zu " + bitmask + "geändert.");
         event.getRole().updatePermissions(Permissions.fromBitmask(bitmask)).exceptionally(ExceptionLogger.get());
     }
 
@@ -252,7 +253,7 @@ public class GuildUtilities {
                     } else if (m.getContent().contains(mitglied.getMentionTag())) {
                         removeMitglied(u, m.getChannel(), "Hat alle Mitglieder markiert: " + m.getLink());
                     } else if (m.getContent().contains("<@" + VORLÄUFIG + ">")) {
-                        removeMitglied(u, m.getChannel(), "Hat alle Vorläufigen markiert: " + m.getLink());
+                        removeMitglied(u, m.getChannel(), "Hat alle Vorlaeufigen markiert: " + m.getLink());
                     }
                 }
             });
@@ -383,7 +384,7 @@ public class GuildUtilities {
         event.getServer().getAuditLog(1, AuditLogActionType.ROLE_DELETE).join().getInvolvedUsers().forEach(user1 -> {
             user1.removeRole(func.getApi().getRoleById(MITGLIED).orElseThrow(() -> new AssertionError("Mitgliedsrolle nicht da")), "Role got deleted").join();
 
-            removeMitglied(user1, null, event.getRole().getName() + "-Rolle gelöscht.");
+            removeMitglied(user1, null, event.getRole().getName() + "-Rolle geloescht.");
         });
     }
 
