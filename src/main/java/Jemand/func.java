@@ -392,19 +392,27 @@ public class func {
          return output;
     }
 
-    public static String readtextoffile(String filename){
+    public static String readtextoffile(String filename, boolean printError) {
         String content = "";
         try{
             content = FileUtils.readFileToString(new File(filepathof(filename)), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            func.handle(e);
+            if (printError)
+                func.handle(e);
         }
         return content;
+    }
+
+    public static String readtextoffile(String filename){
+        return readtextoffile(filename, true);
     }
 
     public static File  writetexttofile(String text, String filename) {
         File f = new File(filepathof(filename));
         try {
+            try {
+                FileUtils.forceMkdirParent(f);
+            } catch (Exception e) {func.handle(e);}
             FileUtils.writeStringToFile(f, text, "UTF-8");
         } catch (Exception e) {func.handle(e);}
         return f;

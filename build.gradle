@@ -40,20 +40,20 @@ dependencies {
     //implementation 'com.github.Joshix-1:Javacord:Tag'
     //implementation 'com.github.Joshix-1:Javacord:Jemand-SNAPSHOT'
    // implementation 'org.javacord:javacord:3.2.0'
-    implementation name:'javacord-3.2.1-SNAPSHOT-shaded'
+    implementation name:'javacord-3.3.1-SNAPSHOT-shaded'
 
     implementation 'com.github.JojiiOfficial:Matrix-ClientServer-API-java:master-SNAPSHOT'
     implementation 'org.jsoup:jsoup:1.13.1'
 
     implementation 'com.sedmelluq:lavaplayer:1.3.50'
-    implementation group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: '4e8112c'
+    //implementation group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: '4e8112c'
     //implementation 'org.twitter4j:twitter4j-core:4.0.7'
 
     implementation group: 'org.kohsuke', name: 'github-api', version: '1.108'
 
 
 
-    implementation 'co.elastic.apm:apm-agent-api:1.20.0'
+    //implementation 'co.elastic.apm:apm-agent-api:1.22.0'
 
     implementation group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2'
 

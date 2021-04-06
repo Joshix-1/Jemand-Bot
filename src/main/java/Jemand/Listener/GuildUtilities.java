@@ -18,7 +18,9 @@ import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -40,7 +42,7 @@ import org.javacord.api.util.logging.ExceptionLogger;
 import java.awt.Color;
 import java.time.Instant;
 import java.util.LinkedList;
-import java.util.Locale;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -77,6 +79,11 @@ public class GuildUtilities {
             server.addRoleChangePermissionsListener(this::roleChangedPermission);
             server.addUserChangeActivityListener(this::activityChanged);
 
+            server.addServerMemberLeaveListener(event -> {
+                System.out.println(event.getUser() + " left server. Role count: " + event.getUser().getRoles(event.getServer()).size());
+                saveRoles(event.getUser(), event.getServer());
+            });
+
             server.addUserChangeNameListener(this::userChangedName);
             server.addUserChangeDiscriminatorListener(this::userChangedDiscriminator);
             server.addUserChangeNicknameListener(this::userChangedNickname);
@@ -101,6 +108,8 @@ public class GuildUtilities {
     }
 
     private void updatedRolesUser(UserRoleEvent event, boolean added) {
+        saveRoles(event.getUser(), event.getServer());
+
         if (added && event.getRole().getId() == BOT_MITGLIED && !event.getUser().isBot()) {
             event.getUser().removeRole(event.getRole()).exceptionally(ExceptionLogger.get());
         } else {
@@ -141,12 +150,11 @@ public class GuildUtilities {
     }
 
     private void userJoined(ServerMemberJoinEvent event) {
-        sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
-                .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
-                .addField("Name:", event.getUser().getDiscriminatedName())
-                , event.getApi());
+        String userInfo = getRolesFileName(event.getUser(), event.getServer());
+        String[] roles = func.readtextoffile(userInfo, false).split("\n");
+        ServerUpdater updater = event.getServer().createUpdater();
 
-        if (event.getUser().getNickname(event.getServer()).isEmpty()) {
+        if (roles[0].isBlank()) {
             String[] titles = func.readtextoffile("titles.txt").split("\n");
             Random random = new Random(event.getUser().getId()); //294508268942917633
             if (titles.length > 1) {
@@ -154,9 +162,26 @@ public class GuildUtilities {
                 do {
                     title = titles[random.nextInt(titles.length)];
                 } while (event.getServer().getMembersByNicknameIgnoreCase(title).size() > 0);
-                event.getUser().updateNickname(event.getServer(), title).exceptionally(ExceptionLogger.get());
+                updater.setNickname(event.getUser(), title);
             }
+        } else {
+            updater.setNickname(event.getUser(), roles[0]);
         }
+        for (String id : roles) {
+            event.getServer().getRoleById(id).ifPresent(role -> {
+                if (role.getId() == MITGLIED) // don't add mitglied role, to prevent giving too much rights.
+                    api.getRoleById(VORLÄUFIG).ifPresent(vorl ->
+                            updater.addRoleToUser(event.getUser(), vorl)
+                    );
+                else updater.addRoleToUser(event.getUser(), role);
+            });
+        }
+        updater.update().exceptionally(ExceptionLogger.get());
+
+        sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
+                .addField("Erstellt am:", event.getUser().getCreationTimestamp().toString())
+                .addField("Name:", event.getUser().getDiscriminatedName())
+                , event.getApi());
     }
 
     private static Optional<CompletableFuture<Message>> sendWebhookMessageBuilderToId(WebhookMessageBuilder wmb, long id, DiscordApi api) {
@@ -190,6 +215,8 @@ public class GuildUtilities {
     }
 
     private void userChangedNickname(UserChangeNicknameEvent event) {
+        saveRoles(event.getUser(), event.getServer());
+
         sendEmbedToLogs(getUserUpdatedEmbedBuilder(event.getUser())
                         .addField("Nickname:", xToY(event.getOldNickname().orElse(event.getUser().getName()), event.getNewNickname().orElse(event.getUser().getName())))
                 , event.getUser().getApi());
@@ -534,5 +561,24 @@ public class GuildUtilities {
                 sendWebhookMessageBuilderToId(wmb, LOGS, api);
             });
         }
+    }
+
+    private void saveRoles(User user, Server server) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(user.getNickname(server).orElse("")).append("\n");
+
+        List<Role> roles = user.getRoles(server);
+        if (roles.size() > 1) {
+            roles.forEach(role -> {
+                if (!role.isEveryoneRole())
+                    sb.append(role.getIdAsString()).append("\n");
+            });
+            func.writetexttofile(sb.toString(), getRolesFileName(user, server));
+        }
+    }
+
+    private String getRolesFileName(User user, Server server) {
+        return String.format("user_roles/%s/%s", server.getIdAsString(), user.getIdAsString());
     }
 }

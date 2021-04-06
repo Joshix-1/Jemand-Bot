@@ -17,7 +17,6 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.logging.ExceptionLogger;
-import org.javacord.lavaplayerwrapper.LavaplayerAudioSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,7 +75,7 @@ public class MusicPlayer {
 
 
     private boolean play(String videoLink) {
-        currentSource = new LavaplayerAudioSource(api, player);
+        //currentSource = new LavaplayerAudioSource(api, player);
         audioConnection.setAudioSource(currentSource);
         playerManager.loadItem(videoLink, new AudioLoadResultHandler() {
             @Override

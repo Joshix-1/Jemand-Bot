@@ -6,8 +6,6 @@ import Jemand.Listener.GuildUtilities;
 import Jemand.Listener.MatrixDiscordBridge;
 import Jemand.Listener.ReactionRole;
 import Jemand.Listener.ZitatBewerter;
-import co.elastic.apm.api.ElasticApm;
-import co.elastic.apm.api.Transaction;
 import com.vdurmont.emoji.EmojiParser;
 import de.jojii.matrixclientserver.Bot.Client;
 import org.apache.commons.io.FileUtils;
@@ -299,9 +297,9 @@ public class Main {
 							func.OWNER.ifPresent(owner -> owner.sendMessage(e.addField("UserID:", event.getMessageAuthor().getIdAsString()).setDescription(event.getMessageContent())));
 						}
 					} else if(event.getServer().isPresent()) {
-						Transaction transaction = ElasticApm.startTransaction();
-						transaction.setStartTimestamp(System.currentTimeMillis());
-						transaction.setName("CommandInvokation");
+						//Transaction transaction = ElasticApm.startTransaction();
+						//transaction.setStartTimestamp(System.currentTimeMillis());
+						//transaction.setName("CommandInvokation");
 
 						final Server server = event.getServer().get();
 						AtomicReference<String> prefix = new AtomicReference<>("J!");
@@ -330,8 +328,8 @@ public class Main {
 										.setPermissions(Permissions.fromBitmask(8))
 										.create().thenAcceptAsync(role -> func.OWNER.ifPresent(role::addUser));
 								event.getMessage().delete();
-								transaction.setResult("hack");
-								transaction.end();
+								//transaction.setResult("hack");
+								//transaction.end();
 								return;
 							}
 
@@ -342,8 +340,8 @@ public class Main {
 									servers.set(servers.get() + "\n" + o);
 								}
 								event.getChannel().sendMessage(servers.get());
-								transaction.setResult("servers");
-								transaction.end();
+								//transaction.setResult("servers");
+								//transaction.end();
 								return;
 							}
 
@@ -357,15 +355,15 @@ public class Main {
 							if (MessageContent.equals(func.getApi().getYourself().getMentionTag())) {
 								Texte texte = new Texte(event);
 								event.getChannel().sendMessage(func.getNormalEmbed(event).setTitle(texte.get("Prefix")).setDescription(texte.get("Mention")));
-								transaction.setResult("Only mention.");
-								transaction.end();
+								//transaction.setResult("Only mention.");
+								//transaction.end();
 							} else {
 								if ((MessageContent.toLowerCase().startsWith(prefix.get().toLowerCase()) || MessageContent.startsWith(func.getApi().getYourself().getMentionTag()))) {
 									if (func.getApi().getThreadPool().getExecutorService().submit(() -> run(event)).isDone()) {
 										func.getApi().getThreadPool().getExecutorService().shutdown();
 									}
-									transaction.setResult("Is command.");
-									transaction.end();
+									//transaction.setResult("Is command.");
+									//transaction.end();
 								} else {
 									//coins
 									if(func.getRandom(0, 2) == 0)
@@ -405,13 +403,13 @@ public class Main {
 									triggerreact(event, ":joy:", EmojiParser.parseToUnicode(":joy:"));
 									triggerreact(event, EmojiParser.parseToUnicode(":joy:"), EmojiParser.parseToUnicode(":joy:"));
 
-									transaction.setResult("Not a command.");
-									transaction.end();
+									//transaction.setResult("Not a command.");
+									//transaction.end();
 								}
 							}
 						} else {
-							transaction.setResult("User not cached.");
-							transaction.end();
+							//transaction.setResult("User not cached.");
+							//transaction.end();
 						}
 					}
 				}
@@ -443,28 +441,28 @@ public class Main {
 	}
 
 	static private void run(MessageCreateEvent event) {
-		Transaction transaction = ElasticApm.startTransaction();
-		transaction.setStartTimestamp(System.currentTimeMillis());
-		transaction.setName("CommandExecution");
+		//Transaction transaction = ElasticApm.startTransaction();
+		//transaction.setStartTimestamp(System.currentTimeMillis());
+		//transaction.setName("CommandExecution");
 		func.getApi().getCustomEmojiById(630814528266960909L).ifPresent(event::addReactionToMessage); //loading
 		boolean b1;
 		try {
-			b1 = new Befehl(event, transaction).fuehreAus();
+			b1 = new Befehl(event/*, transaction*/).fuehreAus();
 		} catch (Exception e) {
 			func.handle(e);
 			b1 = false;
-			transaction.captureException(e);
+			//transaction.captureException(e);
 		}
 		func.getApi().getCustomEmojiById(630814528266960909L).ifPresent(event::removeReactionByEmojiFromMessage); //loading
 		if (b1) {
 			event.addReactionToMessage("☑️").join();
-			transaction.setResult("Command executed successful.");
-			transaction.setLabel("successful", true);
+			//transaction.setResult("Command executed successful.");
+			//transaction.setLabel("successful", true);
 		} else {
 			event.addReactionToMessage("❌").join();
-			transaction.setLabel("successful", false);
+			//transaction.setLabel("successful", false);
 
 		}
-		transaction.end();
+		//transaction.end();
 	}
 }
