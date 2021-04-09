@@ -5,11 +5,16 @@ import Jemand.func;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
 import org.javacord.api.event.message.reaction.SingleReactionEvent;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
+import org.javacord.api.util.logging.ExceptionLogger;
+import org.javacord.core.entity.user.UserImpl;
+
+import java.util.Objects;
 
 public class ZitatBewerter {
 
@@ -18,31 +23,38 @@ public class ZitatBewerter {
         public void onReactionAdd(ReactionAddEvent event) {
             if(event.getUser().isEmpty() || event.getUser().get().isBot()  || event.getReaction().isEmpty()) return;
             try {
-                Message message = event.requestMessage().exceptionally(t -> null).join();
-                String zid = getZid(event, message);
-                if (!zid.isEmpty()) {
-                    Reaction reaction = event.requestReaction().join().orElse(null);
-                    if (reaction != null) {
-                        try {
-                            EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
+                event.requestMessage().exceptionally(t -> null).thenAccept(message -> {
+                    String zid = getZid(event, message);
+                    if (!zid.isEmpty()) {
+                        Reaction reaction = event.requestReaction().join().orElse(null);
+                        if (reaction != null) {
+                            try {
+                                EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
 
-                            int rating = Zitat.getRating(zid);
-                            if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
-                                Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
-                            }
-                            if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
-                                Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
-                            }
+                                int rating = Zitat.getRating(zid);
+                                if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
+                                    Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
+                                }
+                                if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
+                                    Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
+                                }
 
-                            if(rating != Zitat.getRating(zid)) {
-                                message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
-                            }
+                                if (reaction.getEmoji().equalsEmoji(Zitat.REPORT_EMOJI)) {
+                                    func.OWNER.ifPresent(owner -> {
+                                        owner.sendMessage(event.getUser().map(User::toString).orElse("null") + " mag Zitat https://asozial.org/zitate/#/" + zid + " nicht.").exceptionally(ExceptionLogger.get());
+                                    });
+                                }
 
-                        } catch (NullPointerException e) {
-                            func.handle(e);
+                                if (rating != Zitat.getRating(zid)) {
+                                    message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
+                                }
+
+                            } catch (NullPointerException e) {
+                                func.handle(e);
+                            }
                         }
                     }
-                }
+                });
             } catch(Exception e) {func.handle(e);};
         }
     }
@@ -53,31 +65,32 @@ public class ZitatBewerter {
         public void onReactionRemove(ReactionRemoveEvent event) {
             if(event.getUser().isEmpty() || event.getUser().get().isBot() || event.getReaction().isEmpty()) return;
             try {
-                Message message = event.requestMessage().exceptionally(t -> null).join();
-                String zid = getZid(event, message);
-                if (!zid.isEmpty()) {
-                    try {
-                        Reaction reaction = event.requestReaction().join().orElse(null);
-                        if (reaction != null) {
-                            int rating = Zitat.getRating(zid);
+                event.requestMessage().exceptionally(t -> null).thenAccept(message -> {
+                    String zid = getZid(event, message);
+                    if (!zid.isEmpty()) {
+                        try {
+                            Reaction reaction = event.requestReaction().join().orElse(null);
+                            if (reaction != null) {
+                                int rating = Zitat.getRating(zid);
 
-                            if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
-                                Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
-                            }
-                            if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
-                                Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
-                            }
+                                if (reaction.getEmoji().asCustomEmoji().map(customEmoji -> customEmoji.getId() == Zitat.WITZIG_ID).orElse(false)) {
+                                    Zitat.rateQuote(zid, -1, event.getUser().orElse(event.getApi().getYourself()));
+                                }
+                                if (reaction.getEmoji().equalsEmoji(Zitat.DOWNVOTE_EMOJI)) {
+                                    Zitat.rateQuote(zid, 1, event.getUser().orElse(event.getApi().getYourself()));
+                                }
 
-                            if (rating != Zitat.getRating(zid)) {
-                                EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
-                                //message.getEmbeds().get(0).getImage().ifPresent(image -> embed.setImage(image.downloadAsBufferedImage(message.getApi()).join()));
-                                message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
+                                if (rating != Zitat.getRating(zid)) {
+                                    EmbedBuilder embed = message.getEmbeds().get(0).toBuilder().setImage("");
+                                    //message.getEmbeds().get(0).getImage().ifPresent(image -> embed.setImage(image.downloadAsBufferedImage(message.getApi()).join()));
+                                    message.edit(embed.removeAllFields().addField("\u200B", Zitat.upvote + ": " + Zitat.getRating(zid)));
+                                }
                             }
+                        } catch (NullPointerException e) {
+                            func.handle(e);
                         }
-                    } catch (NullPointerException e) {
-                        func.handle(e);
                     }
-                }
+                });
             } catch(Exception e) {func.handle(e);};
         }
     }

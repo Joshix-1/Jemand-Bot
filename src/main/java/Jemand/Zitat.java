@@ -1,7 +1,9 @@
 package Jemand;
 
+import com.goebl.david.Response;
 import com.goebl.david.Webb;
 import com.vdurmont.emoji.EmojiParser;
+import org.apache.http.ExceptionLogger;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -57,7 +59,11 @@ public class Zitat {
                 .getBody();
 
         jsonArray.forEach(o -> {
-            addAuthor((JSONObject) o);
+            try {
+                addAuthor((JSONObject) o);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         jsonArray = webb
@@ -66,39 +72,61 @@ public class Zitat {
                 .getBody();
 
         jsonArray.forEach(o -> {
-            addQuote((JSONObject) o);
+            try {
+                addQuote((JSONObject) o);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
     static void handleWrongQuote(JSONObject data) {
-        JSONObject quote = data.getJSONObject("quote");
-        addQuote(quote);
         JSONObject author = data.getJSONObject("author");
-        addAuthor(author);
+        JSONObject quote = data.getJSONObject("quote");
+
+        try {
+            addAuthor(author);
+            addQuote(quote);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         String id = quote.get("id") + "-" + author.get("id");
         rating.put(id, data.getInt("rating"));
         quoteIds.put(id, data.getInt("id"));
     }
 
-    static void addQuote(JSONObject data) {
+    static Quote addQuote(JSONObject data) {
         if (data.has("id")) {
             int id = data.getInt("id");
             for (Quote q : quotesList) {
-                if (q.id == id) return; //TODO: Binary Search?
+                if (q.id == id) { //TODO: Binary Search?
+                    q.update(data);
+                    return q;
+                }
             }
-            quotesList.add(new Quote(data));
+            Quote q = new Quote(data);
+            quotesList.add(q);
+            return q;
         }
+        return null;
     }
 
-    static void addAuthor(JSONObject data) {
+    static Author addAuthor(JSONObject data) {
         if (data != null && data.has("id")) {
             int id = data.getInt("id");
             for (Author a : authorList) {
-                if (a.id == id) return; //TODO: Binary Search?
+                if (a.id == id) { //TODO: Binary Search?
+                    a.update(data);
+                    return a;
+                }
             }
-            authorList.add(new Author(data));
+            Author a = new Author(data);
+            authorList.add(a);
+            return a;
         }
+
+        return null;
     }
 
     static int getQuoteIdForGoq(String qStr) {
@@ -127,9 +155,47 @@ public class Zitat {
         return result.getInt("id");
     }
 
+    static ZitatObject updateObject(ZitatObject obj, String newStr) {
+        String paramName;
+        String url;
+        if (obj instanceof Quote) {
+            url = QUOTES;
+            paramName = "quote";
+        } else if (obj instanceof Author) {
+            url = AUTHORS;
+            paramName = "author";
+        } else {
+            return null;
+        }
+
+        Webb webb = Webb.create();
+
+        Response<JSONObject> response = webb
+                .post(url)
+                .param(paramName, newStr)
+                .param("key", func.pws[10])
+                .param("id", obj.id)
+                .asJsonObject();
+
+        if (!response.isSuccess()) {
+            System.out.println("updating " + obj + " failed with: " + response.getStatusCode() + " " + response.getResponseMessage());
+            System.out.println(response.getErrorBody());
+            return null;
+        }
+
+        JSONObject result = response.getBody();
+
+        if (obj instanceof Quote) {
+            return addQuote(result);
+        } else {
+            return addAuthor(result);
+        }
+    }
+
     static int getAuthorIdForGoq(String aStr) {
+        String aStr2 = func.goq_replace(aStr);
         for (Author a : authorList) {
-            if (a.name.equals(aStr) || func.goq_replace(a.name).equals(func.goq_replace(aStr))) {
+            if (a.name.equals(aStr) || func.goq_replace(a.name).equals(aStr2)) {
                 return a.id;
             }
         }
@@ -201,17 +267,11 @@ public class Zitat {
         return rating.getOrDefault(id, 0);
     }
 
-    static class Quote {
+    static class ZitatObject {
         public final int id;
-        public final String text;
-        public final Author origAuthor;
 
-        private Quote(JSONObject data) {
-            id = data.getInt("id");
-            text = data.getString("quote");
-            JSONObject author = data.getJSONObject("author");
-            addAuthor(author);
-            origAuthor = new Author(author);
+        private ZitatObject(int id) {
+            this.id = id;
         }
 
         @Override
@@ -226,6 +286,23 @@ public class Zitat {
         public int hashCode() {
             return Objects.hash(id);
         }
+    }
+
+    static class Quote extends ZitatObject{
+        public String text;
+        public final Author origAuthor;
+
+        private Quote(JSONObject data) {
+            super(data.getInt("id"));
+            text = data.getString("quote");
+            JSONObject author = data.getJSONObject("author");
+            origAuthor = addAuthor(author);
+        }
+
+        private void update(JSONObject data) {
+            text = data.getString("quote");
+            origAuthor.update(data.getJSONObject("author"));
+        }
 
         @Override
         public String toString() {
@@ -237,26 +314,16 @@ public class Zitat {
         }
     }
 
-    static class Author {
-        public final int id;
-        public final String name;
+    static class Author extends ZitatObject {
+        public String name;
 
         private Author(JSONObject data) {
-            id = data.getInt("id");
+            super(data.getInt("id"));
             name = data.getString("author");
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Author a = (Author) o;
-            return id == a.id;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id);
+        private void update(JSONObject data) {
+            name = data.getString("author");
         }
 
         @Override
@@ -311,7 +378,7 @@ public class Zitat {
 
         final String zid = getZid();
 
-        embed.setUrl("https://asozialesnetzwerk.github.io/zitate/#/" + zid);
+        embed.setUrl("https://asozial.org/zitate/#/" + zid);
 
         embed.addField("\u200B", upvote + ": " + getRating(zid)).setTitle("Zitat-Id: "+ zid).setDescription(func.LinkedEmbed(quote.text) + "\n\n- " + func.LinkedEmbed(author.name));
 
@@ -347,7 +414,7 @@ public class Zitat {
 
         Message message = channel.sendMessage(embed).join();
 
-        message.addReactions(UPVOTE_EMOJI.getReactionTag(), DOWNVOTE_EMOJI).join();
+        message.addReactions(UPVOTE_EMOJI.getReactionTag(), DOWNVOTE_EMOJI, REPORT_EMOJI).join();
     }
 
 }
