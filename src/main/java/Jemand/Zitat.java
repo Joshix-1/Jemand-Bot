@@ -4,6 +4,7 @@ import com.goebl.david.Response;
 import com.goebl.david.Webb;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.http.ExceptionLogger;
+import org.apache.http.HttpException;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class Zitat {
     static final String WRONGQUOTES_API = "https://zitate.prapsschnalinen.de/api/wrongquotes";
@@ -100,7 +102,7 @@ public class Zitat {
         if (data.has("id")) {
             int id = data.getInt("id");
             for (Quote q : quotesList) {
-                if (q.id == id) { //TODO: Binary Search?
+                if (q.id == id) {
                     q.update(data);
                     return q;
                 }
@@ -116,7 +118,7 @@ public class Zitat {
         if (data != null && data.has("id")) {
             int id = data.getInt("id");
             for (Author a : authorList) {
-                if (a.id == id) { //TODO: Binary Search?
+                if (a.id == id) {
                     a.update(data);
                     return a;
                 }
@@ -209,6 +211,42 @@ public class Zitat {
             }
         }
         return Optional.empty();
+    }
+
+    static CompletableFuture<Quote> requestQuoteById(int id) {
+        return getQuoteById(id).map(CompletableFuture::completedFuture).orElseGet(()-> {
+            CompletableFuture<Quote> completableFuture = new CompletableFuture<>();
+            func.getApi().getThreadPool().getExecutorService().submit(() -> {
+                Webb webb = Webb.create();
+                Response<JSONObject> response = webb
+                        .get(QUOTES + "/" + id)
+                        .asJsonObject();
+                if (!response.isSuccess()) {
+                    completableFuture.completeExceptionally(new Exception(response.getErrorBody().toString()));
+                } else {
+                    completableFuture.complete(addQuote(response.getBody()));
+                }
+            });
+            return completableFuture;
+        });
+    }
+
+    static CompletableFuture<Author> requestAuthorById(int id) {
+        return getAuthorById(id).map(CompletableFuture::completedFuture).orElseGet(()-> {
+            CompletableFuture<Author> completableFuture = new CompletableFuture<>();
+            func.getApi().getThreadPool().getExecutorService().submit(() -> {
+                Webb webb = Webb.create();
+                Response<JSONObject> response = webb
+                        .get(AUTHORS + "/" + id)
+                        .asJsonObject();
+                if (!response.isSuccess()) {
+                    completableFuture.completeExceptionally(new Exception(response.getErrorBody().toString()));
+                } else {
+                    completableFuture.complete(addAuthor(response.getBody()));
+                }
+            });
+            return completableFuture;
+        });
     }
 
     static String getQuotesTextById(int id) {

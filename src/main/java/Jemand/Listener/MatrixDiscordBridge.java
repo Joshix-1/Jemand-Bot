@@ -53,7 +53,7 @@ public class MatrixDiscordBridge {
 
     private void onRoomEvent(List<RoomEvent> roomEvent) {
        roomEvent.forEach(event -> {
-           if (event.getType().equals("m.room.message") && !event.getSender().equals(client.getLoginData().getUser_id())) {
+           if (event.getRoom_id().equals(matrixRoom) && event.getType().equals("m.room.message") && !event.getSender().equals(client.getLoginData().getUser_id())) {
                api.getServerTextChannelById(discordChannels.get(0)).flatMap(MatrixDiscordBridge::getIncomingWebhook).ifPresent(webhook -> {
                    WebhookMessageBuilder mb = new WebhookMessageBuilder();
 

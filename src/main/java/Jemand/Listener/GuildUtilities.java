@@ -322,7 +322,8 @@ public class GuildUtilities {
                 if (description.contains("https://disboard.org/") && embed.getImage().isPresent()) {
                     event.getApi().getThreadPool().getScheduler().schedule(() -> {
                         event.getChannel().getCurrentCachedInstance().ifPresent(channel -> {
-                            channel.sendMessage("<@&763147436825772042>!").exceptionally(ExceptionLogger.get());
+
+                            //channel.sendMessage("<@&763147436825772042>!").exceptionally(ExceptionLogger.get());
                         });
                     }, 2, TimeUnit.HOURS);
                 }

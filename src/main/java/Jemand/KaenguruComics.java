@@ -2,9 +2,11 @@ package Jemand;
 
 import com.goebl.david.Response;
 import com.goebl.david.Webb;
+import de.jojii.matrixclientserver.Bot.Client;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.util.logging.ExceptionLogger;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,9 +21,11 @@ public class KaenguruComics {
     static final private String fileName = "last_date.txt";
 
     private final DiscordApi api;
+    private final Client client;
 
-    public KaenguruComics(DiscordApi api) {
+    public KaenguruComics(DiscordApi api, Client matrixClient) {
         this.api = api;
+        this.client = matrixClient;
     }
 
     public void start() {
@@ -38,34 +42,47 @@ public class KaenguruComics {
         Calendar calendar = lastDeliveredDate();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
 
-        if (test(calendar)) {
-            sendComic(calendar);
-            func.writetexttofile(dateFormat.format(calendar.getTime()), fileName);
-            System.out.println(Instant.now() + " - Comic gefunden " + readableDateFormat.format(calendar.getTime()));
-        } else {
-            System.out.println(Instant.now() + " - Keinen Comic gefunden " + readableDateFormat.format(calendar.getTime()));
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Calendar in2days = Calendar.getInstance();
+        in2days.add(Calendar.DAY_OF_MONTH, 2);
 
-            if (test(calendar)) {
-                System.out.println(Instant.now() + " - Comic gefunden " + readableDateFormat.format(calendar.getTime()));
-                sendComic(calendar);
-                func.writetexttofile(dateFormat.format(calendar.getTime()), fileName);
+        while (calendar.before(in2days)) {
+            if (check(calendar)) {
+                // successfully sent
+                break;
             } else {
-                System.out.println(Instant.now() + " - Keinen Comic gefunden " + readableDateFormat.format(calendar.getTime()));
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
             }
         }
     }
 
+    private boolean check(Calendar c) {
+        if (test(c)) {
+            sendComic(c);
+            func.writetexttofile(dateFormat.format(c.getTime()), fileName);
+            System.out.println(Instant.now() + " - Comic gefunden " + readableDateFormat.format(c.getTime()));
+            return true;
+        } else {
+            System.out.println(Instant.now() + " - Keinen Comic gefunden " + readableDateFormat.format(c.getTime()));
+            return false;
+        }
+    }
+
     private void sendComic(Calendar date) {
+        String comicUrl = getComicUrl(date);
         api.getServerTextChannelById(784760963575447563L).ifPresent(channel -> {
-            channel.sendMessage(readableDateFormat.format(date.getTime()) + ", <@&796416266696785920>:\n" +
-                    getComicUrl(date)).thenAccept(message -> {
+            channel.sendMessage(readableDateFormat.format(date.getTime()) + ", <@&796416266696785920>:\n" + comicUrl).thenAccept(message -> {
                         api.getThreadPool().getScheduler()
                                 .schedule(() -> message.crossPost().exceptionally(ExceptionLogger.get()), 5, TimeUnit.SECONDS);
                         message.addReactions("wit:577887998310613032", "zig:577888095735906305")
                                 .exceptionally(ExceptionLogger.get());
             });
         });
+
+        try {
+            client.sendText("!AeeHcUEvoJlvgLCtnB:asozialer.club", comicUrl, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getComicUrl(Calendar date) {

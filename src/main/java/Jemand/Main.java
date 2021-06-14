@@ -37,9 +37,6 @@ public class Main {
 	public static void main(String[] args) {
 		func.getApi().updateStatus(UserStatus.DO_NOT_DISTURB);
 
-
-		new KaenguruComics(func.getApi()).start();
-
 		//func.getApi().getCachedUserById(331793234252660738L).ifPresent(user -> {
 		//	user.updateNickname(user.getApi().getServerById(367648314184826880L).get(), "Herr Oberfaschist").join();
 		//});
@@ -247,6 +244,8 @@ public class Main {
 					System.err.println("error logging in");
 				}
 			});
+
+			new KaenguruComics(func.getApi(), client).start();
 
 			func.getApi().addMessageCreateListener(event -> {
 				if (event.getMessageContent().equalsIgnoreCase("J!restart") && func.userIsTrusted(event.getMessageAuthor())) {

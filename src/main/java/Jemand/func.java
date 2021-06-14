@@ -66,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.regex.Matcher;
@@ -1066,14 +1067,22 @@ public class func {
         }
     }
 
+    static ConcurrentHashMap<Long, IncomingWebhook> webhookHashMap = new ConcurrentHashMap<>();
     public static Optional<IncomingWebhook> getIncomingWebhook (ServerTextChannel channel) {
         if (channel == null) {
             return Optional.empty();
         }
+        if (webhookHashMap.containsKey(channel.getId())) {
+            return Optional.of(webhookHashMap.get(channel.getId()));
+        }
         List<IncomingWebhook> webhooks = channel.getIncomingWebhooks().join();
-        return webhooks.size() == 0 ? Optional.ofNullable(channel.createWebhookBuilder()
+        Optional<IncomingWebhook> webhook = webhooks.size() == 0 ? Optional.ofNullable(channel.createWebhookBuilder()
                 .setAvatar(channel.getApi().getYourself().getAvatar()).setName(channel.getApi().getYourself().getName()).create().exceptionally(ExceptionLogger.get()).join())
                 : Optional.of(webhooks.get(0));
+        webhook.ifPresent(w -> {
+            webhookHashMap.put(channel.getId(), w);
+        });
+        return webhook;
     }
 
     //robot
