@@ -583,3 +583,23 @@ public class GuildUtilities {
         return String.format("user_roles/%s/%s", server.getIdAsString(), user.getIdAsString());
     }
 }
+
+//Anfang neu
+ private void reactionAdded(ReactionAddEvent event) {
+        if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == NOTTODOLISTE_EMOJI
+                && event.getChannel().getId() != not-to-do-liste_KANAL) {
+            Message m = event.requestMessage().join();
+            m.getReactions().stream().filter(reaction -> reaction.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == NOTTODOLISTE_EMOJI).findFirst().ifPresent(reaction -> {
+                if (reaction.getCount() == 1) {
+                    sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), not-to-do-liste_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
+                        messageCompletableFuture.thenAccept(message -> {
+                            message.addReaction(reaction.getEmoji()).exceptionally(ExceptionLogger.get());
+
+                            message.crossPost().exceptionally(ExceptionLogger.get());
+
+                        });
+                    });
+                }
+            });
+        }
+     //Ende neu
