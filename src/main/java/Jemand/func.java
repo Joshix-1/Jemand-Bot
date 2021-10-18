@@ -40,11 +40,14 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -83,7 +86,9 @@ public class func {
 
 
     private static String token = pws[6];
-    static private DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGE_TYPING).login().join();
+    static private DiscordApi api = new DiscordApiBuilder()
+            .setToken(token)
+            .login().join();
     public static final int PERMISSIONS = 604892353;
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);
@@ -103,6 +108,7 @@ public class func {
     static private final String normalfilepathlinux = "/usr/home/admin/Jemand_Dateien";
     static public final String[] NORMALABC = "a\tb\tc\td\te\tf\tg\th\ti\tj\tk\tl\tm\tn\to\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\t10\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t#\t*\t+\t-\tä\tö\tü\tß\t?\t!\t&\t ".split("\t");
     static public final String[] EMOJIABC = "\uD83C\uDDE6 \uD83C\uDDE7 \uD83C\uDDE8 \uD83C\uDDE9 \uD83C\uDDEA \uD83C\uDDEB \uD83C\uDDEC \uD83C\uDDED \uD83C\uDDEE \uD83C\uDDEF \uD83C\uDDF0 \uD83C\uDDF1 \uD83C\uDDF2 \uD83C\uDDF3 \uD83C\uDDF4 \uD83C\uDDF5 \uD83C\uDDF6 \uD83C\uDDF7 \uD83C\uDDF8 \uD83C\uDDF9 \uD83C\uDDFA \uD83C\uDDFB \uD83C\uDDFC \uD83C\uDDFD \uD83C\uDDFE \uD83C\uDDFF :keycap_ten: :zero: :one: :two: :three: :four: :five: :six: :seven: :eight: :nine: :hash: :asterisk: ➕ ➖ <:ae:703320745782018179> <:oe:703320746188865637> <:ue:703320746134601758> <:ss:703174443148509264> ❓ ❗ <:und:invalid:> <:leerzeichen:703321360180445224>".split(" ");
+
 
     static public void shutdown() {
         //redis.shutdown();
@@ -979,7 +985,8 @@ public class func {
                 || user.getId() == 396294727814610944L
                 || user.getId() == 564843886434975745L
                 || user.getId() == 230800661837512705L
-                || user.getId() == 702477000941502494L;
+                || user.getId() == 702477000941502494L
+                || user.getId() == 875136543608668251L;
     }
 
     //zitat // goq

@@ -106,7 +106,7 @@ public class ReactionRole {
                 embed.addField(abc[count++] + ":", role.get().getMentionTag());
         }
         if(count==0) embed.setDescription(new Texte(event).get("ReactionRoleNo"));
-        CompletableFuture<Message> m = event.getChannel().sendMessage(getMessageContentOfChannel(event.getChannel()), embed);
+        CompletableFuture<Message> m = event.getChannel().sendMessage(getMessageContentOfChannel(event.getChannel()), new EmbedBuilder[]{embed});
         final int finalCount = count;
         m.thenAcceptAsync(message -> {
             for (int i = 0; i < finalCount; i++)

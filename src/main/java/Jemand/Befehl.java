@@ -304,7 +304,7 @@ public class Befehl {
             if(!func.userIsTrusted(user)) return false;
             server.getMemberById(func.LongFromString(subtext1.get(), 0L)).ifPresent(u -> {
                 int i = Captcha.calculate(u, server);
-                event.getChannel().sendMessage(NumberToText.intToText(i) + " → " + i + "!");
+                event.getChannel().sendMessage(NumberToText.intToText(i) + " → " + i + "!").join();
             });
             return true;
         }
@@ -2461,7 +2461,7 @@ public class Befehl {
                 helpembed.setTitle("Help").setDescription(nhelp).setThumbnail("https://cdn2.iconfinder.com/data/icons/flat-style-svg-icons-part-1/512/confirmation_verification-512.png").setAuthor(event.getApi().getYourself().getDiscriminatedName(), func.createBotInvite(), event.getApi().getYourself().getAvatar());
 
 
-                event.getChannel().sendMessage("", helpembed).thenAccept(helpmessage -> {
+                event.getChannel().sendMessage("", new EmbedBuilder[]{helpembed}).thenAccept(helpmessage -> {
                     helpmessage.addReaction(EmojiParser.parseToUnicode(":arrow_backward:"));
                     func.react(helpmessage, helpabc, 12);
 

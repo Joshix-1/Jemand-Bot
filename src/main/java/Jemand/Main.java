@@ -37,6 +37,7 @@ public class Main {
 	public static void main(String[] args) {
 		func.getApi().updateStatus(UserStatus.DO_NOT_DISTURB);
 
+
 		//func.getApi().getCachedUserById(331793234252660738L).ifPresent(user -> {
 		//	user.updateNickname(user.getApi().getServerById(367648314184826880L).get(), "Herr Oberfaschist").join();
 		//});
@@ -198,9 +199,9 @@ public class Main {
 
 			if (func.getFileSeparator().equals("/")) { //only Linux
 
-				String logs = FileUtils.readFileToString(new File("/usr/home/admin/Jemand.log"));
-				if (logs.length() > 1000001)
-					FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 999999), "UTF-8");
+				//String logs = FileUtils.readFileToString(new File("/usr/home/admin/Jemand.log"));
+				//if (logs.length() > 1000001)
+				//	FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 999999), "UTF-8");
 //
 				func.getApi().addServerJoinListener(event -> {
 					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getApi().getUserById(event.getServer().getOwnerId()).join().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));

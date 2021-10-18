@@ -17,6 +17,7 @@ import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -248,14 +249,14 @@ public class GuildUtilities {
             updatePermissions(event, 804773313); //https://discordapi.com/permissions.html#804773313
         } else if (role != MITGLIED && role != ROLLENMEISTER) {
             if (event.getRole().getName().toLowerCase().contains("mitglied")) { //vorläufiges Mitglied, rest braucht die Rechte nicht
-                updatePermissions(event, 267771329); //https://discordapi.com/permissions.html#267771329
+                updatePermissions(event, 522106822593l); //https://discordapi.com/permissions.html#522106822593
             } else {
                 updatePermissions(event, 0);
             }
         }
     }
 
-    private static void updatePermissions(RoleChangePermissionsEvent event, int bitmask) {
+    private static void updatePermissions(RoleChangePermissionsEvent event, long bitmask) {
         if (event.getNewPermissions().getAllowedBitmask() == bitmask) return;
 
         System.out.println(event.getRole().getName() + "-Rolle: Berechtigung zu " + bitmask + "geändert.");
