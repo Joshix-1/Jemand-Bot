@@ -17,8 +17,7 @@ public class userleave {
     private static final Pattern MEMBERS = Pattern.compile("(?i)<member_count>");
     private static final Pattern USES = Pattern.compile("(?i)<uses>");
     private static final Pattern SERVER = Pattern.compile("(?i)<guild>");
-    private func f = new func();
-    private String filename = "listeners" + func.getFileSeparator() + "userleave.json";
+    private String filename = "listeners/userleave.json";
     private Server server;
     private User user;
     private Boolean activated = false;
@@ -100,12 +99,12 @@ public class userleave {
 
     public void updateJs() {
         js.put(server.getIdAsString(), parse());
-        f.JsonToFile(js, filename);
+        func.JsonToFile(js, filename);
     }
 
     public void updateJs(Boolean activated, String message, long uses) {
         js.put(server.getIdAsString(), parse(activated, message, uses));
-        f.JsonToFile(js, filename);
+        func.JsonToFile(js, filename);
     }
 
     public void addUse() {

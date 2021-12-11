@@ -199,15 +199,11 @@ public class Main {
 
 			if (func.getFileSeparator().equals("/")) { //only Linux
 
-				//String logs = FileUtils.readFileToString(new File("/usr/home/admin/Jemand.log"));
-				//if (logs.length() > 1000001)
-				//	FileUtils.writeStringToFile(new File("/usr/home/admin/Jemand.log"), logs.substring(logs.length() - 999999), "UTF-8");
-//
 				func.getApi().addServerJoinListener(event -> {
 					func.OWNER.ifPresent(u -> u.sendMessage("Neuer Server von " + event.getApi().getUserById(event.getServer().getOwnerId()).join().getDiscriminatedName() + " mit dem Namen: " + event.getServer().getName() + " und der Id: " + event.getServer().getIdAsString()));
 					func.getApi().getYourself().updateNickname(event.getServer(), "Jemand [J!]");
 					try {
-						func.sendOwner("https://joshix-1.github.io/invite?id=" + event.getServer().getIdAsString() + "\n", null);
+						func.sendOwner("https://asozial.org/api/discord/" + event.getServer().getIdAsString() + "/\n", null);
 						func.sendOwner(event.getServer().getChannels().get(0).createInviteBuilder().setMaxUses(1).setNeverExpire().create().join().getUrl().toString(), null);
 					} catch (Exception e) {
 						func.handle(e);
@@ -237,22 +233,22 @@ public class Main {
 			new GuildUtilities(func.getApi());
 
 			//MatrixBridge
-			Client client = new Client("http://matrix.org");
-			client.login("jemand-bot", func.pws[8], loginData -> {
-				if (loginData.isSuccess()) {
-					new MatrixDiscordBridge(func.getApi(), client, MatrixDiscordBridge.MATRIX_ROOM, Channelportal.channels[0]);
-				} else {
-					System.err.println("error logging in");
-				}
-			});
+			//Client client = new Client("http://matrix.org");
+			//client.login("jemand-bot", func.pws[8], loginData -> {
+			//	if (loginData.isSuccess()) {
+			//		new MatrixDiscordBridge(func.getApi(), client, MatrixDiscordBridge.MATRIX_ROOM, Channelportal.channels[0]);
+			//	} else {
+			//		System.err.println("error logging in");
+			//	}
+			//});
 
-			new KaenguruComics(func.getApi(), client).start();
+			new KaenguruComics(func.getApi()).start();
 
 			func.getApi().addMessageCreateListener(event -> {
 				if (event.getMessageContent().equalsIgnoreCase("J!restart") && func.userIsTrusted(event.getMessageAuthor())) {
 					if (func.getFileSeparator().equals("/")) {
 						try {
-							if (Runtime.getRuntime().exec("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
+							if (Runtime.getRuntime().exec("chmod +x /home/jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
 								func.shutdown();
 								System.exit(69);
 							} else {

@@ -2,7 +2,6 @@ package Jemand;
 
 import com.goebl.david.Response;
 import com.goebl.david.Webb;
-import de.jojii.matrixclientserver.Bot.Client;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.util.logging.ExceptionLogger;
 
@@ -21,11 +20,9 @@ public class KaenguruComics {
     static final private String fileName = "last_date.txt";
 
     private final DiscordApi api;
-    private final Client client;
 
-    public KaenguruComics(DiscordApi api, Client matrixClient) {
+    public KaenguruComics(DiscordApi api) {
         this.api = api;
-        this.client = matrixClient;
     }
 
     public void start() {
@@ -77,12 +74,6 @@ public class KaenguruComics {
                                 .exceptionally(ExceptionLogger.get());
             });
         });
-
-        try {
-            client.sendText("!AeeHcUEvoJlvgLCtnB:asozialer.club", comicUrl, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private String getComicUrl(Calendar date) {

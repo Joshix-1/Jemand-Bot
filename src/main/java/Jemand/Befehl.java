@@ -47,6 +47,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -269,11 +270,11 @@ public class Befehl {
 
         if(befehl.get().equalsIgnoreCase("getlog")  && func.getFileSeparator().equals("/")) {
             if (!func.userIsTrusted(user)) return false;
-            File f = new File("/usr/home/admin/Jemand.log");
+            File f = new File("/home/jemand/logs/jemand.log");
             String log = FileUtils.readFileToString(f);
             int leng = log.length();
-            if(leng > 1016)
-                log = log.substring(leng - 1015);
+            if(leng > 1716)
+                log = log.substring(leng - 1715);
             log = "```\n" + log + "```";
             user.sendMessage(getGruenEmbed().setTitle("Last Log:").setDescription(log), f);
             return true;
@@ -282,7 +283,7 @@ public class Befehl {
         //restart
         if(befehl.get().equalsIgnoreCase("restart") && func.getFileSeparator().equals("/")) {
             if(!func.userIsTrusted(user)) return false;
-            if(func.getFileSeparator().equals("/")) if(Runtime.getRuntime().exec("chmod +x /usr/home/admin/Jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
+            if(func.getFileSeparator().equals("/")) if(Runtime.getRuntime().exec("chmod +x /home/jemand/Jemand-1.0-SNAPSHOT/bin/Jemand").waitFor() == 0) {
                 func.shutdown();
                 System.exit(69);
                 return true;
@@ -1976,7 +1977,8 @@ public class Befehl {
             if (befehl.get().equalsIgnoreCase("top") || befehl.get().equalsIgnoreCase("rank")) {
                 HashMap<String, Long> top_unsorted = func.JsonFromFile("xp/user_xp_" + server.getIdAsString() + ".json");
                 Map<String, Long> top = func.sortByValue(top_unsorted, false);
-                String[] keys1 = top.keySet().toArray(new String[top.size()]);
+                String[] keys1 = top.keySet().toArray(new String[0]);
+
                 int newlength = keys1.length;
                 for (String s : keys1) {
                     if (server.getMemberById(s).isEmpty()) {
@@ -1994,6 +1996,9 @@ public class Befehl {
                         i2++;
                     }
                 }
+                System.out.println("Command:      "  + befehl.get());
+                System.out.println("Len of keys1: " + keys1.length);
+                System.out.println("Len of keys:  " + keys.length);
 
                 if (befehl.get().equalsIgnoreCase("rank")) {
                     String id2 = user.getIdAsString();
@@ -2016,7 +2021,7 @@ public class Befehl {
                     }
                     Integer i1 = -1;
                     for (int i = 0; i < keys.length; i++) {
-                        if (keys[i].equals(id2)) {
+                        if (keys[i] != null && keys[i].equals(id2)) {
                             i1 = i;
                             break;
                         }
