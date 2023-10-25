@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -94,7 +95,7 @@ public class func {
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);
     public static final String KEY = createCryptKey2(hashString( pws[1], false, 256));
-    public static final Optional<User> OWNER = Optional.ofNullable(api.getOwner().exceptionally((e) -> null).join());
+    public static final Optional<User> OWNER = api.getOwner().map(CompletableFuture::join);
 
     private static GitHub github;
 
@@ -981,7 +982,7 @@ public class func {
     }
 
     static public boolean userIsTrusted(DiscordEntity user) {
-        return user.getId() == api.getOwnerId()
+        return api.getOwnerId().map((id) -> id == user.getId()).orElse(false)
                 || user.getId() == 396294727814610944L
                 || user.getId() == 564843886434975745L
                 || user.getId() == 230800661837512705L

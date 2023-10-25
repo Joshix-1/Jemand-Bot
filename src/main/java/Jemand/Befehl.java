@@ -733,7 +733,7 @@ public class Befehl {
                 }
                 for (int i = 0; i < size; i++) {
                     try {
-                        embed.addField(a.get(i).getFileName(), owo.upload(a.get(i).downloadAsByteArray().join(), a.get(i).getFileName()).executeSync().getFullUrl());
+                        embed.addField(a.get(i).getFileName(), owo.upload(a.get(i).asByteArray().join(), a.get(i).getFileName()).executeSync().getFullUrl());
                     } catch (Throwable e) {
                         func.handle(e);
                         //transaction.captureException(e);
@@ -1523,7 +1523,7 @@ public class Befehl {
                         attach = "\u200B\u200B";
                         for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                             try {
-                                attach += owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
+                                attach += owo.upload(event.getMessageAttachments().get(i).asByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
                             } catch (Throwable e) {
                                 attach += event.getMessageAttachments().get(i).getUrl() + "\u200B";
                             }
@@ -1551,7 +1551,7 @@ public class Befehl {
                         attach = "\u200B\u200B";
                         for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                             try {
-                                attach += owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
+                                attach += owo.upload(event.getMessageAttachments().get(i).asByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
                             } catch (Throwable e) {
                                 attach += event.getMessageAttachments().get(i).getUrl() + "\u200B";
                             }
@@ -1578,7 +1578,7 @@ public class Befehl {
                         attach = "";
                         for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                             try {
-                                attach += owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
+                                attach += owo.upload(event.getMessageAttachments().get(i).asByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl() + "\u200B";
                             } catch (Throwable e) {
                                 attach += event.getMessageAttachments().get(i).getUrl() + "\u200B";
                             }
@@ -1615,7 +1615,7 @@ public class Befehl {
                     attach = new StringBuilder();
                     for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                         try {
-                            attach.append(owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
+                            attach.append(owo.upload(event.getMessageAttachments().get(i).asByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
                         } catch (Throwable e) {
                             attach.append(event.getMessageAttachments().get(i).getUrl()).append("\u200B");
                         }
@@ -1891,7 +1891,7 @@ public class Befehl {
                             attach = new StringBuilder("\u200B\u200B");
                             for (int i = 0; i < event.getMessageAttachments().size(); i++) {
                                 try {
-                                    attach.append(owo.upload(event.getMessageAttachments().get(i).downloadAsByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
+                                    attach.append(owo.upload(event.getMessageAttachments().get(i).asByteArray().join(), event.getMessageAttachments().get(i).getFileName()).executeSync().getFullUrl()).append("\u200B");
                                 } catch (Throwable e) {
                                     attach.append(event.getMessageAttachments().get(i).getUrl()).append("\u200B");
                                 }

@@ -14,6 +14,7 @@ import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.javacord.core.entity.user.UserImpl;
 
+import java.net.URL;
 import java.util.Objects;
 
 public class ZitatBewerter {
@@ -96,7 +97,18 @@ public class ZitatBewerter {
     }
 
     private static String getZid(SingleReactionEvent e, Message message) {
-        if(message == null || !message.getAuthor().isYourself()) return "";
+        if(message == null) return "";
+        if (
+                message.getChannel().getId() == 681956716077777070L
+                && message.getAuthor().isBotUser()
+                && message.getAuthor().getId() == 845655788240240640L
+                && message.getEmbeds().size() == 1
+                && message.getEmbeds().get(0).getUrl().isPresent()
+        ) {
+            URL url = message.getEmbeds().get(0).getUrl().get();
+            String path = url.getPath();
+        }
+        if (!message.getAuthor().isYourself()) return "";
         String zid = "";
 
         if(e.getUser().isPresent() && !e.getUser().get().isBot() && message.getEmbeds().size() > 0) {

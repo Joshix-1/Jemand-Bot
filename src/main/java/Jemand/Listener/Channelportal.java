@@ -53,7 +53,7 @@ public class Channelportal implements MessageCreateListener, MessageEditListener
 
     @Override
     public void onMessageEdit(MessageEditEvent event) {
-        if(event.getServer().isEmpty() || CLONED_MESSAGE.matcher(event.getNewContent()).matches()) return;
+        if(event.getServer().isEmpty() || CLONED_MESSAGE.matcher(event.getMessageContent()).matches()) return;
 
         for (String[] channel : channels) {
             for (int i = 0; i < channel.length; i++) {
@@ -68,9 +68,9 @@ public class Channelportal implements MessageCreateListener, MessageEditListener
                                         webhookCompletableFuture.thenAccept(webhook -> {
                                             webhook.asIncomingWebhook().ifPresent(iw -> {
 
-                                                String newContent = addIdToContent(event.getMessageId(), event.getNewContent());
+                                                String newContent = addIdToContent(event.getMessageId(), event.getMessageContent());
 
-                                                EmbedBuilder embed = event.getNewEmbeds().size() > 0 ? event.getNewEmbeds().get(0).toBuilder() : null;
+                                                EmbedBuilder embed = !event.getMessage().getEmbeds().isEmpty() ? event.getMessage().getEmbeds().get(0).toBuilder() : null;
 
                                                 event.getApi().getUncachedMessageUtil()
                                                         .edit(webhook.getId(), iw.getToken(), message.getId(), newContent, true, embed, true)

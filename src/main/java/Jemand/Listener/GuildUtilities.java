@@ -376,7 +376,7 @@ public class GuildUtilities {
                     || stc.isNsfw() != channel.isNsfw()) {
                 stc.createUpdater()
                         .setSlowmodeDelayInSeconds(channel.getSlowmodeDelayInSeconds())
-                        .setNsfwFlag(channel.isNsfw())
+                        .setNsfw(channel.isNsfw())
                         .setTopic(newTopic)
                         .update().exceptionally(ExceptionLogger.get());
             }

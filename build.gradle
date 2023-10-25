@@ -39,9 +39,9 @@ dependencies {
     //implementation "org.telegram:telegrambots:4.9.1"
 
     //implementation 'com.github.Joshix-1:Javacord:Tag'
-    //implementation 'com.github.Joshix-1:Javacord:Jemand-SNAPSHOT'
+     implementation 'com.github.Joshix-1:Javacord:Jemand-SNAPSHOT'
    // implementation 'org.javacord:javacord:3.2.0'
-    implementation name:'javacord-3.4.0-SNAPSHOT-shaded'
+    //implementation name:'javacord-3.4.0-SNAPSHOT-shaded'
 
     implementation 'com.github.JojiiOfficial:Matrix-ClientServer-API-java:master-SNAPSHOT'
     implementation 'org.jsoup:jsoup:1.13.1'

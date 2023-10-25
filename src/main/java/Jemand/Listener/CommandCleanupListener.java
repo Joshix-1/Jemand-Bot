@@ -43,7 +43,7 @@ public class CommandCleanupListener implements MessageDeleteListener {
     @Override
     public void onMessageDelete(MessageDeleteEvent event) {
         final Predicate<Message> isAfterAnHour = isMessageAfter(DiscordEntity.getCreationTimestamp(event.getMessageId())
-                .plus(1L, ChronoUnit.HOURS));
+                .plus(42L, ChronoUnit.SECONDS));
         final Predicate<Message> isOurResponseToDeletedMessage = isOurResponseTo(event.getMessageId());
         event.getChannel().getMessagesAfterUntil(isAfterAnHour.or(isOurResponseToDeletedMessage), event.getMessageId())
                 .thenAccept(messages -> messages.getNewestMessage()
