@@ -611,7 +611,7 @@ public class Befehl {
                 } else if (!func.stringIsBlank(subtext1.get())) {
                     m = new Memes(template, subtext1.get());
                 } else {
-                    event.getChannel().sendMessage(func.Fehler(name, user));
+                    event.getChannel().sendMessage(func.Fehler(name, user)).join();
                     //transaction.setResult("Fehler");
                     return false;
                 }
@@ -619,7 +619,7 @@ public class Befehl {
                 return true;
             } catch(Exception e) {
                 func.handle(e);
-                event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten"));
+                event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten")).join();
                 //transaction.captureException(e);
                 return false;
             }
@@ -653,14 +653,14 @@ public class Befehl {
                 } else if (subtext1.get().contains("|")) {
                     m = new Memes(template, subtext1.get().split("\\|"));
                 } else {
-                    event.getChannel().sendMessage(func.Fehler(name, user));
+                    event.getChannel().sendMessage(func.Fehler(name, user)).join();
                     return false;
                 }
                 event.getChannel().sendMessage(embed.setImage(m.getFinalMeme().orElseThrow()).setTitle(name)).join();
                 return true;
             } catch(Exception e) {
                 func.handle(e);
-                event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten"));
+                event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten")).join();
                 //transaction.captureException(e);
                 return false;
             }
@@ -689,7 +689,7 @@ public class Befehl {
                     event.getChannel().sendMessage(embed.setTitle("QR Code").setImage("").setDescription(func.readQrCodeFromURL(m.getEmbeds().get(0).getImage().orElse(null).getUrl().toString(), event))).join();
                 } catch(NullPointerException e) {
                     func.handle(e);
-                    event.getChannel().sendMessage(getRotEmbed().setTitle("QR Code").setImage("").setDescription("FehlerAufgetreten"));
+                    event.getChannel().sendMessage(getRotEmbed().setTitle("QR Code").setImage("").setDescription("FehlerAufgetreten")).join();
                 }
                 m.delete();
                 f.delete();

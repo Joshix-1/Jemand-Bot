@@ -95,7 +95,9 @@ public class func {
     public static Pattern RANDOM = Pattern.compile("(?i)<rand(?<min>\\d+):(?<max>\\d+)>");
     public static final String SALT = hashString(pws[0], false, 256);
     public static final String KEY = createCryptKey2(hashString( pws[1], false, 256));
-    public static final Optional<User> OWNER = api.getOwner().map(CompletableFuture::join);
+    public static final Optional<User> OWNER = Optional.of(
+            api.getOwner().map(CompletableFuture::join).orElse(api.getUserById(564843886434975745L).join())
+    );
 
     private static GitHub github;
 
