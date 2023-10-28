@@ -651,7 +651,7 @@ public class Befehl {
                         urls[i++] = it.next().getUrl();
                     m = new Memes(template, urls);
                 } else if (subtext1.get().contains("|")) {
-                    m = new Memes(template, subtext1.get().split("\\|"));
+                    m = new Memes(template, subtext1.get().split("\\s*\\|\\s*"));
                 } else {
                     event.getChannel().sendMessage(func.Fehler(name, user)).join();
                     return false;
