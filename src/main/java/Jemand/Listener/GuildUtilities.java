@@ -63,7 +63,10 @@ public class GuildUtilities {
 
     static private final long WITZIG_KANAL = 740498116171792395L;
     static private final long WITZIG_EMOJI = 609012744578007071L;
-
+    //neu
+    static private final long not-to-do-liste_KANAL = 740498116171792395L;//bitte Zahl richtig eingeben; ich weiß leider nicht, was das für eine ist
+    static private final long NOTTODOLISTE_EMOJI = 609012744578007071L;//bitte Zahl richtig eingeben; ich weiß leider nicht, was das für eine ist
+    //Ende neu
     static private final long BOT_MITGLIED = 559440621815857174L;
     static private final long LAWLIET_ID = 368521195940741122L;
 
@@ -584,3 +587,23 @@ public class GuildUtilities {
         return String.format("user_roles/%s/%s", server.getIdAsString(), user.getIdAsString());
     }
 }
+
+//Anfang neu
+ private void reactionAdded(ReactionAddEvent event) {
+        if (event.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == NOTTODOLISTE_EMOJI
+                && event.getChannel().getId() != not-to-do-liste_KANAL) {
+            Message m = event.requestMessage().join();
+            m.getReactions().stream().filter(reaction -> reaction.getEmoji().asCustomEmoji().map(DiscordEntity::getId).orElse(0L) == NOTTODOLISTE_EMOJI).findFirst().ifPresent(reaction -> {
+                if (reaction.getCount() == 1) {
+                    sendWebhookMessageBuilderToId(m.toWebhookMessageBuilder().setAllowedMentions(new AllowedMentionsBuilder().build()), not-to-do-liste_KANAL, event.getApi()).ifPresent(messageCompletableFuture -> {
+                        messageCompletableFuture.thenAccept(message -> {
+                            message.addReaction(reaction.getEmoji()).exceptionally(ExceptionLogger.get());
+
+                            message.crossPost().exceptionally(ExceptionLogger.get());
+
+                        });
+                    });
+                }
+            });
+        }
+     //Ende neu
