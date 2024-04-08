@@ -109,7 +109,7 @@ public class func {
         }
     }
 
-    static private final String normalfilepathlinux = "/home/jemand/files";
+    static private final String normalfilepathlinux = "/home/jemand/files";  // /home/josh/code/Jemand-Bot/Jemand_Dateien
     static public final String[] NORMALABC = "a\tb\tc\td\te\tf\tg\th\ti\tj\tk\tl\tm\tn\to\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\t10\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t#\t*\t+\t-\tä\tö\tü\tß\t?\t!\t&\t ".split("\t");
     static public final String[] EMOJIABC = "\uD83C\uDDE6 \uD83C\uDDE7 \uD83C\uDDE8 \uD83C\uDDE9 \uD83C\uDDEA \uD83C\uDDEB \uD83C\uDDEC \uD83C\uDDED \uD83C\uDDEE \uD83C\uDDEF \uD83C\uDDF0 \uD83C\uDDF1 \uD83C\uDDF2 \uD83C\uDDF3 \uD83C\uDDF4 \uD83C\uDDF5 \uD83C\uDDF6 \uD83C\uDDF7 \uD83C\uDDF8 \uD83C\uDDF9 \uD83C\uDDFA \uD83C\uDDFB \uD83C\uDDFC \uD83C\uDDFD \uD83C\uDDFE \uD83C\uDDFF :keycap_ten: :zero: :one: :two: :three: :four: :five: :six: :seven: :eight: :nine: :hash: :asterisk: ➕ ➖ <:ae:703320745782018179> <:oe:703320746188865637> <:ue:703320746134601758> <:ss:703174443148509264> ❓ ❗ <:und:invalid:> <:leerzeichen:703321360180445224>".split(" ");
 

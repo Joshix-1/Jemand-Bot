@@ -55,6 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -632,7 +633,6 @@ public class Befehl {
 
             List<MessageAttachment> lma = event.getMessageAttachments().stream().filter(MessageAttachment::isImage).collect(Collectors.toList());
 
-
             if(befehl.get().equalsIgnoreCase("drake")) {
                 template = Memes.DRAKE1;
                 name = "Drake";
@@ -641,6 +641,7 @@ public class Befehl {
                 else template = Memes.WINNIE_2;
                 name = "Winnie";
             }
+            System.out.println("template " + template + " name " + name);
             Memes m;
             try {
                 if (lma.size() > 1) {
@@ -651,14 +652,19 @@ public class Befehl {
                         urls[i++] = it.next().getUrl();
                     m = new Memes(template, urls);
                 } else if (subtext1.get().contains("|")) {
+                    System.out.println("contains pipe ");
+                    System.out.println(Arrays.toString( subtext1.get().split("\\s*\\|\\s*")));
                     m = new Memes(template, subtext1.get().split("\\s*\\|\\s*"));
                 } else {
                     event.getChannel().sendMessage(func.Fehler(name, user)).join();
                     return false;
                 }
+                System.out.println("Memes " + m);
                 event.getChannel().sendMessage(embed.setImage(m.getFinalMeme().orElseThrow()).setTitle(name)).join();
                 return true;
             } catch(Exception e) {
+                e.printStackTrace();
+                System.out.println("Exception " + e);
                 func.handle(e);
                 event.getChannel().sendMessage(getRotEmbed().setTitle(name).setDescription("FehlerAufgetreten")).join();
                 //transaction.captureException(e);

@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,12 +48,18 @@ public class Memes {
     }
 
     Memes(String template, BufferedImage... images) throws IOException {
+        System.out.println("Memes constructor" + template);
+        System.out.println(Arrays.toString(images));
+        System.out.println(template + " " + func.filepathof("templates/" + template + ".png"));
+        System.out.println("canRead" + func.fileOfName("templates/" + template + ".png").canRead());
         this.images = images;
         coordinates = getCoordinates(template);
         this.template = ImageIO.read(func.fileOfName("templates/" + template + ".png")); //gets the files in the templates folder the function basically replaces "/" with "\\" when on windows
+        System.out.println("images " + Arrays.toString(images) + " coordinates " + Arrays.deepToString(coordinates) + " template " + template +  " "+ func.fileOfName("templates/" + template + ".png"));
     }
 
     static int[][] getCoordinates(String template) {
+        System.out.println("get coordinates");
         int[][] coordinates = null;
         switch (template) {
             //coordinates = new int[][]{{0, 100, 0, 100, Bg-Color-RGB, Text-COlor.RGB, FontIndex}, {0, 100, 100, 200, Bg-Color-RGB, Text-COlor.RGB}};
@@ -111,6 +118,8 @@ public class Memes {
                 };
                 break;
         }
+        System.out.println("got coordinates");
+        System.out.println(Arrays.toString(coordinates));
         return coordinates;
     }
 
@@ -150,7 +159,11 @@ public class Memes {
     }
 
     static BufferedImage[] convertStrings(String[] text, int[][] coordinates) {
-        int pixels_between_lines = 4;
+        System.out.println("convertStrings");
+        System.out.println(Arrays.toString(text));
+        System.out.println(Arrays.toString(coordinates));
+
+        final int pixels_between_lines = 4;
 
         BufferedImage[] images = new BufferedImage[coordinates.length];
 
@@ -232,6 +245,8 @@ public class Memes {
                 g.dispose();
             }
         }
+        System.out.println("convertStrings end");
+        System.out.println(Arrays.toString(images));
         return images;
     }
 
