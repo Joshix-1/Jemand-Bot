@@ -2163,7 +2163,7 @@ public class Befehl {
                     event.getChannel().sendMessage(func.Fehler("React", user));
                     return (false);
                 } else {
-                    if (func.StringBlank(subtext2.get()) || !(subbefehl1.get().matches("^[0-9]*$") || subbefehl1.get().startsWith(" https://discordapp.com/channels/"))) {
+                    if (func.StringBlank(subtext2.get()) || !(subbefehl1.get().matches("^[0-9]*$") || subbefehl1.get().startsWith("https://discordapp.com/channels/"))) {
                         rps.set(true);
                         func.reactText(event, subtext1.get(), event.getMessage().getIdAsString());
                     } else {
