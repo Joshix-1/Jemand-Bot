@@ -985,11 +985,9 @@ public class func {
 
     static public boolean userIsTrusted(DiscordEntity user) {
         return api.getOwnerId().map((id) -> id == user.getId()).orElse(false)
-                || user.getId() == 396294727814610944L
+                // || user.getId() == 396294727814610944L
                 || user.getId() == 564843886434975745L
-                || user.getId() == 230800661837512705L
-                || user.getId() == 702477000941502494L
-                || user.getId() == 875136543608668251L;
+                || user.getId() == 230800661837512705L;
     }
 
     //zitat // goq
