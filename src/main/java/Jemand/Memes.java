@@ -60,6 +60,7 @@ public class Memes {
 
     static int[][] getCoordinates(String template) {
         System.out.println("get coordinates");
+        System.out.flush();
         int[][] coordinates = null;
         switch (template) {
             //coordinates = new int[][]{{0, 100, 0, 100, Bg-Color-RGB, Text-COlor.RGB, FontIndex}, {0, 100, 100, 200, Bg-Color-RGB, Text-COlor.RGB}};
@@ -119,6 +120,7 @@ public class Memes {
                 break;
         }
         System.out.println("got coordinates");
+        System.out.flush();
         System.out.println(Arrays.toString(coordinates));
         return coordinates;
     }
@@ -162,6 +164,7 @@ public class Memes {
         System.out.println("convertStrings");
         System.out.println(Arrays.toString(text));
         System.out.println(Arrays.toString(coordinates));
+        System.out.flush();
 
         final int pixels_between_lines = 4;
 
@@ -247,6 +250,7 @@ public class Memes {
         }
         System.out.println("convertStrings end");
         System.out.println(Arrays.toString(images));
+        System.out.flush();
         return images;
     }
 
