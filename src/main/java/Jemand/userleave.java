@@ -83,7 +83,7 @@ public class userleave {
             addUse();
             String s = SERVER.matcher(USES.matcher(MEMBERS.matcher(message).replaceAll(Integer.toString(server.getMemberCount()))).replaceAll(js.get(server.getIdAsString()).toString().split("\u200B")[2])).replaceAll(server.getName());
             if(join) s = USER.matcher(s).replaceAll(user.getMentionTag());
-            else s=USER.matcher(s).replaceAll(Matcher.quoteReplacement(user.getDiscriminatedName()));
+            else s=USER.matcher(s).replaceAll(Matcher.quoteReplacement(escapeUsernameMD(user.getName())));
             AtomicReference<Integer> online = new AtomicReference<>(server.getMemberCount());
             AtomicReference<Integer> bots = new AtomicReference<>(0);
 
@@ -136,6 +136,13 @@ public class userleave {
     public String getMessage() {
         return message;
     }
+
+    private String escapeUsernameMD(String input) {
+        return input
+            .replace("*", "\\*")
+            .replace("_", "\\_")
+            .replace("~~", "\\~~");
+}
 
     public Boolean getActivated() {
         activated = js.get(server.getIdAsString()).toString().startsWith("t");

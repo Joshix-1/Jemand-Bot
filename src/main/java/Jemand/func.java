@@ -987,7 +987,8 @@ public class func {
         return api.getOwnerId().map((id) -> id == user.getId()).orElse(false)
                 // || user.getId() == 396294727814610944L
                 || user.getId() == 564843886434975745L
-                || user.getId() == 230800661837512705L;
+                || user.getId() == 230800661837512705L
+                || user.getId() == 406551815346454528L;
     }
 
     //zitat // goq
